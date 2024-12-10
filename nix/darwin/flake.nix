@@ -97,7 +97,8 @@
     darwinConfigurations."mac" = nix-darwin.lib.darwinSystem {
       modules = [
         configuration
-	home-manager.darwinModules.home-manager 
+	home-manager.darwinModules.home-manager{
+	} 
       ];
     };
 
