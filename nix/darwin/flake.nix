@@ -11,11 +11,12 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
   };
 
   outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew, home-manager }:
   let
-    configuration = { pkgs, lib, config, ... }: {
+    configuration = { pkgs, config, ... }: {
 
       nixpkgs.config.allowUnfree = true;
 
@@ -23,9 +24,10 @@
       # $ nix-env -qaP | grep wget
       environment.systemPackages =
         [
-	  pkgs.kitty
-	  pkgs.alacritty
+          pkgs.kitty
+          pkgs.alacritty
           pkgs.neovim
+          pkgs.obsidian
           pkgs.tmux
         ];
 
@@ -37,12 +39,13 @@
         casks = [
           "arc"
           "firefox"
-	  "raycast"
-	  "obsidian"
-	  "discord"
+          "raycast"
+          "obsidian"
+          "discord"
+          "claude"
         ];
         masApps = {
-	  "ZSA Keymapp" = 6472865291;
+          "ZSA Keymapp" = 6472865291;
         };
         onActivation.cleanup = "zap";
       };
@@ -69,16 +72,16 @@
 
       system.defaults = {
         dock.autohide  = true;
-	dock.autohide-time-modifier = 0.4;
-	finder.FXPreferredViewStyle = "clmv";
-	loginwindow.GuestEnabled  = false;
-	NSGlobalDomain.AppleICUForce24HourTime = true;
-	NSGlobalDomain.KeyRepeat = 1;
-	NSGlobalDomain.AppleShowAllExtensions = true;
-	finder.AppleShowAllFiles = true;
-	dock.mru-spaces = false;
-	screencapture.location = "~/Pictures/screenshots";
-	screensaver.askForPasswordDelay = 10;
+        dock.autohide-time-modifier = 0.4;
+        dock.mru-spaces = false;
+        finder.FXPreferredViewStyle = "clmv";
+        finder.AppleShowAllFiles = true;
+        loginwindow.GuestEnabled  = false;
+        NSGlobalDomain.AppleICUForce24HourTime = true;
+        NSGlobalDomain.KeyRepeat = 1;
+        NSGlobalDomain.AppleShowAllExtensions = true;
+        screencapture.location = "~/Pictures/screenshots";
+        screensaver.askForPasswordDelay = 10;
       };
 
       services.nix-daemon.enable = true;
@@ -97,8 +100,14 @@
     darwinConfigurations."mac" = nix-darwin.lib.darwinSystem {
       modules = [
         configuration
-	home-manager.darwinModules.home-manager{
-	} 
+      ];
+    };
+
+    # Home Manager configuration
+    homeConfigurations."raf" = home-manager.lib.homeManagerConfiguration {
+      pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+      modules = [ 
+        ./home.nix 
       ];
     };
 
