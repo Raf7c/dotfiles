@@ -16,39 +16,28 @@
 
   outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew, home-manager }:
   let
-    configuration = { pkgs, config, ... }: {
+    configuration = { pkgs, config, lib, ... }: {
 
       nixpkgs.config.allowUnfree = true;
 
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
-      environment.systemPackages =
-        [
-          pkgs.kitty
-          pkgs.alacritty
-          pkgs.neovim
-          pkgs.obsidian
-          pkgs.tmux
-        ];
-
+      environment.systemPackages = [
+        pkgs.kitty
+        pkgs.alacritty
+        pkgs.neovim
+        pkgs.obsidian
+        pkgs.tmux
+        pkgs.tree
+      ];
       homebrew = {
         enable = true;
-        brews = [
-          "mas"
-        ];
-        casks = [
-          "arc"
-          "firefox"
-          "raycast"
-          "obsidian"
-          "discord"
-          "claude"
-        ];
-        masApps = {
-          "ZSA Keymapp" = 6472865291;
-        };
+        brews = ["mas"];
+        casks = ["arc" "firefox" "raycast"];
+        masApps = { "ZSA Keymapp" = 6472865291; };
         onActivation.cleanup = "zap";
       };
+
 
       system.activationScripts.applications.text = let
         env = pkgs.buildEnv {
@@ -107,7 +96,7 @@
     homeConfigurations."raf" = home-manager.lib.homeManagerConfiguration {
       pkgs = nixpkgs.legacyPackages.aarch64-darwin;
       modules = [ 
-        ./home.nix 
+        ./home.nix
       ];
     };
 
