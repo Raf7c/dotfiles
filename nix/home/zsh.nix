@@ -41,6 +41,7 @@
     zinit load zsh-users/zsh-autosuggestions
     zinit load zsh-users/zsh-syntax-highlighting
     zinit load zsh-users/zsh-completions
+    zinit light Aloxaf/fzf-tab
 
     ### ---- HISTORY additional ---- ###
     setopt hist_find_no_dups
@@ -48,6 +49,6 @@
     setopt appendhistory
 
     ### ---- SHELL integrations ---- ###
-    eval "$(starship init zsh)"
+
   '';
 }
