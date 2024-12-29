@@ -12,6 +12,8 @@
     bat
     eza
     starship
+    fzf
+    kitty-themes
   ];
   homebrew = {
     enable = true;
@@ -28,6 +30,8 @@
   system.stateVersion = 5;
   nixpkgs.hostPlatform = "aarch64-darwin";
   security.pam.enableSudoTouchIdAuth = true;
+
+  fonts.packages = builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
   
   system.defaults = {
     dock = {

@@ -7,6 +7,10 @@
   programs.home-manager.enable = true;
   xdg.enable = true;
 
+  home.file = {
+    ".config/kitty".source = "${config.home.homeDirectory}/dotfiles/kitty";
+  };
+
   programs = {
     zsh = import ../home/zsh.nix {inherit config pkgs lib; };
     git = import ../home/git.nix {inherit config pkgs; };
