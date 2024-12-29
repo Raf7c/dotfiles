@@ -10,6 +10,6 @@
   programs = {
     zsh = import ../home/zsh.nix {inherit config pkgs lib; };
     git = import ../home/git.nix {inherit config pkgs; };
-    starship = import ./starship.nix { inherit pkgs; };
+    starship = import ../home/starship.nix { inherit pkgs; };
   };
 }
