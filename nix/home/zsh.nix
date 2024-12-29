@@ -1,10 +1,53 @@
 { config, pkgs, lib, ...}:
 {
   enable = true;
-  history.size = 10000;
-  history.path = "${config.xdg.dataHome}/zsh/history";
+  history = {
+    size = 10000;
+    path = "${config.xdg.dataHome}/zsh/history";
+    ignoreDups = true;
+    ignoreSpace = true;
+    expireDuplicatesFirst = true;
+    share = true;
+    save = 10000;
+  };
+
   shellAliases = {
     vim = "nvim";
     ls = "ls --color";
+    cat = "bat";
   };
+
+  initExtra = ''
+    ### ----  EXPORT  ---- ###
+    export TERM="xterm-256color" 
+    export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+    export PATH=/opt/homebrew/bin:$PATH
+    export HOMEBREW_CASK_OPTS="--no-quarantine"
+    export TERMINAL="kitty"
+    export BROWSER="arc"
+    export EDITOR=nvim
+    export NULLCMD=bat
+
+    ### ----  Installer zinit  ---- ###
+    ZINIT_HOME="''${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
+    if [[ ! -d $ZINIT_HOME ]]; then
+      mkdir -p "$(dirname $ZINIT_HOME)"
+      git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+    fi
+
+    source "''${ZINIT_HOME}/zinit.zsh"
+
+    ### ----  PLUGINS  ---- ###
+    zinit load zsh-users/zsh-autosuggestions
+    zinit load zsh-users/zsh-syntax-highlighting
+    zinit load zsh-users/zsh-completions
+
+    ### ---- HISTORY additional ---- ###
+    setopt hist_find_no_dups
+    setopt hist_save_no_dups
+    setopt appendhistory
+
+    ### ---- SHELL integrations ---- ###
+    eval "$(starship init zsh)"
+  '';
 }

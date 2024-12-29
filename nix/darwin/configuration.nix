@@ -2,7 +2,6 @@
 {
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
-    vim
     alacritty
     neovim
     vscode
@@ -10,6 +9,9 @@
     curl
     tree
     tmux
+    bat
+    eza
+    starship
   ];
   homebrew = {
     enable = true;
