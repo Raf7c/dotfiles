@@ -8,6 +8,7 @@
   xdg.enable = true;
 
   programs = {
-    zsh = import ../home/zsh.nix {inherit config pkgs lib; }; 
+    zsh = import ../home/zsh.nix {inherit config pkgs lib; };
+    git = import ../home/git.nix {inherit config pkgs; }; 
   };
 }
