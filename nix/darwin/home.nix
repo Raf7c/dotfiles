@@ -17,5 +17,6 @@
     starship = import ../home/starship.nix { inherit pkgs; };
     fzf = import "${config.home.homeDirectory}/dotfiles/nix/home/fzf.nix" { inherit pkgs; };
     bat = import "${config.home.homeDirectory}/dotfiles/nix/home/bat.nix" { inherit config lib pkgs; };
+    mise = import "${config.home.homeDirectory}/dotfiles/nix/home/mise.nix" { inherit config lib pkgs; };
   };
 }
