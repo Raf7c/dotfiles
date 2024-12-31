@@ -13,8 +13,15 @@
 
   shellAliases = {
     vim = "nvim";
-    ls = "ls --color";
     cat = "bat";
+    cl = "clear";
+    ls = "eza -lhF --icons --git";
+    ll = "eza -lahF --icons --git";
+    lt = "eza -hF --tree --level=2 --long --icons --git";
+    ltree = "eza -lahF --tree --level=2 --long --icons --git";
+    fvim = "nvim $(fzf --preview=\"bat --color=always {}\")";
+    rebuild-flake = "darwin-rebuild switch --flake .#Mac --impure";
+    sczshrc = "source ~/.zshrc";
   };
 
   initExtra = ''
@@ -41,7 +48,15 @@
     zinit load zsh-users/zsh-autosuggestions
     zinit load zsh-users/zsh-syntax-highlighting
     zinit load zsh-users/zsh-completions
+    zinit ice wait lucid
     zinit light Aloxaf/fzf-tab
+
+
+    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -lah --color=always --icons --git $realpath'
+
+
+
+
 
     ### ---- HISTORY additional ---- ###
     setopt hist_find_no_dups

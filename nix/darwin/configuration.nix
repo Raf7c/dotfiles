@@ -6,14 +6,13 @@
     neovim
     vscode
     git
+    gh
     curl
     tree
     tmux
-    bat
     eza
-    starship
-    fzf
-    kitty-themes
+    fd
+    ripgrep
   ];
   homebrew = {
     enable = true;
