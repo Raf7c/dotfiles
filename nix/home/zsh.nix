@@ -20,7 +20,7 @@
     lt = "eza -hF --tree --level=2 --long --icons --git";
     ltree = "eza -lahF --tree --level=2 --long --icons --git";
     fvim = "nvim $(fzf --preview=\"bat --color=always {}\")";
-    rebuild-flake = "darwin-rebuild switch --flake .#Mac --impure";
+    rebuild-flake = "darwin-rebuild switch --flake ~/.dotfiles/nix#Mac --impure";
     sczshrc = "source ~/.zshrc";
   };
 

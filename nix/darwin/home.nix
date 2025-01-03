@@ -11,12 +11,12 @@ in
   xdg.enable = true;
 
   home.file = {
-    ".tool-versions".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/.tool-versions";
+    ".tool-versions".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/.tool-versions";
   };
 
   xdg.configFile = {
-    "kitty".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/.config/kitty";
-    "nvim".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/.config/nvim";
+    "kitty".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/.config/kitty";
+    "nvim".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/.config/nvim";
   };
    
 
