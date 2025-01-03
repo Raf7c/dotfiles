@@ -15,6 +15,7 @@
     fd
     ripgrep
     asdf-vm
+    xz
   ];
   homebrew = {
     enable = true;

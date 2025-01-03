@@ -1,4 +1,7 @@
 { config, lib, pkgs, configDir, ... }:
+let
+  inherit (config.lib.file) mkOutOfStoreSymlink;
+in 
 
 {
   home.username = "raf";
@@ -8,8 +11,17 @@
   xdg.enable = true;
 
   home.file = {
-    ".config/kitty".source = "${config.home.homeDirectory}/dotfiles/kitty";
+    ".tool-versions".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/.tool-versions";
   };
+
+  xdg.configFile = {
+    "kitty".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/.config/kitty";
+    "nvim".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/.config/nvim";
+  };
+   
+
+
+
 
   programs = {
     zsh = import ../home/zsh.nix {inherit config pkgs lib; };
@@ -18,11 +30,6 @@
     fzf = import ../home/fzf.nix { inherit pkgs; };
     bat = import ../home/bat.nix { inherit config lib pkgs; };
   };
-    # ASDF 
-  home.file.".tool-versions".text = ''
-    nodejs latest
-    python latest
-  '';
-
   
+
 }

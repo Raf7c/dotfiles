@@ -44,6 +44,7 @@
 
     source "''${ZINIT_HOME}/zinit.zsh"
 
+
     ### ----  PLUGINS  ---- ###
     zinit load zsh-users/zsh-autosuggestions
     zinit load zsh-users/zsh-syntax-highlighting
@@ -51,12 +52,7 @@
     zinit ice wait lucid
     zinit light Aloxaf/fzf-tab
 
-
     zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -lah --color=always --icons --git $realpath'
-     . ${pkgs.asdf-vm}/share/asdf-vm/asdf.sh
-
-
-
 
 
     ### ---- HISTORY additional ---- ###
@@ -65,6 +61,7 @@
     setopt appendhistory
 
     ### ---- SHELL integrations ---- ###
+    . ${pkgs.asdf-vm}/share/asdf-vm/asdf.sh
 
   '';
 }

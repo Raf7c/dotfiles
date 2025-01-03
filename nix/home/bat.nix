@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 {
-
+  
     enable = true;
     config = {
       theme = "Dracula";
