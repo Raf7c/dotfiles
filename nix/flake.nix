@@ -12,12 +12,16 @@
     };
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew, home-manager }:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, home-manager }@inputs:
+  let
+    # Définition du chemin global vers votre dossier de configuration
+    configDir = "${self}/nix";
+  in
   {
     # Build darwin flake using:
     # $ darwin-rebuild build --flake .#Mac
     darwinConfigurations."Mac" = nix-darwin.lib.darwinSystem {
-      specialArgs = { inherit self; };
+      specialArgs = { inherit self inputs configDir; };
       modules = [ 
         ./darwin/configuration.nix
         home-manager.darwinModules.home-manager
@@ -25,10 +29,13 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.users.raf = import ./darwin/home.nix;
+          home-manager.extraSpecialArgs = { inherit inputs configDir; };
         }
       ];
     };
     # Expose the package set, including overlays, for convenience.
     darwinPackages = self.darwinConfigurations."Mac".pkgs;
+    inherit configDir;
+
   };
 }

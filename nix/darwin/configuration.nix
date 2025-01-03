@@ -8,11 +8,13 @@
     git
     gh
     curl
+    gnupg
     tree
     tmux
     eza
     fd
     ripgrep
+    asdf-vm
   ];
   homebrew = {
     enable = true;
@@ -22,7 +24,10 @@
     onActivation.cleanup = "zap";
   };
 
-  users.users.raf.home = "/Users/raf";
+  users.users.raf = {
+    name = "raf";
+    home = "/Users/raf";
+  };
   nix.settings.experimental-features = "nix-command flakes";
   programs.zsh.enable = true;
   system.configurationRevision = self.rev or self.dirtyRev or null;
