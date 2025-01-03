@@ -53,6 +53,7 @@
 
 
     zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -lah --color=always --icons --git $realpath'
+     . ${pkgs.asdf-vm}/share/asdf-vm/asdf.sh
 
 
 
