@@ -5,11 +5,6 @@
   system.defaults.dock.autohide = true;
   system.defaults.finder.AppleShowAllExtensions = true;
 
-  # Logiciels installés au niveau du système
-  environment.systemPackages = with pkgs; [
-    curl
-    wget
-  ];
 
   # Activation de certains services
   services.nix-daemon.enable = true;
@@ -24,8 +19,6 @@
   # Assurez-vous que le système est à jour
   system.stateVersion = 4;
 
-  # Configuration du shell
-  programs.zsh.enable = true;
-  environment.shells = with pkgs; [ zsh ];
+
 
 }

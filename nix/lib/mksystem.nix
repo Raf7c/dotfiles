@@ -1,12 +1,13 @@
-{ inputs, nixpkgs, darwin }:
+{ inputs, nixpkgs, darwin, configDir }:
 
 { hostname, system, user }:
 
 darwin.lib.darwinSystem {
   inherit system;
-  specialArgs = { inherit inputs user hostname; };
+  specialArgs = { inherit inputs user hostname configDir; };
   modules = [
-    ../modules/darwin
-    # Nous ajouterons d'autres modules ici plus tard
+    (configDir + "/hosts/${hostname}.nix")
+    (configDir + "/hosts/common/core")
+    (configDir + "/modules/darwin")
   ];
 }
