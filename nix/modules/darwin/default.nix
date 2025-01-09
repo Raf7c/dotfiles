@@ -19,6 +19,18 @@
   # Assurez-vous que le système est à jour
   system.stateVersion = 4;
 
+homebrew = {
+    enable = true;
+    onActivation = {
+      autoUpdate = true;
+      cleanup = "zap";
+    };
+    global = {
+      brewfile = true;
+      lockfiles = false;
+    };
+  };
+
 
 
 }

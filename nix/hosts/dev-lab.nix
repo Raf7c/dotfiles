@@ -1,8 +1,14 @@
 { config, pkgs, ... }:
 
 {
-  networking.hostName = "dev-lab";
-  networking.computerName = "Dev Lab MacStudio";
+  networking.hostName = "raf-devlab";
+  networking.computerName = "Raf Dev Lab MacStudio";
+
+  users.users.raf = {
+    name = "raf";
+    home = "/Users/raf";
+  };
+  
 
 
 }
