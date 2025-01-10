@@ -1,23 +1,15 @@
 { config, pkgs, ... }:
 
 {
-  # Configuration de base de Darwin
-  system.defaults.dock.autohide = true;
-  system.defaults.finder.AppleShowAllExtensions = true;
-
-
-  # Activation de certains services
   services.nix-daemon.enable = true;
+  nix.package = pkgs.nix;
+  system.stateVersion = 4;
+  security.pam.enableSudoTouchIdAuth = true;
 
-  # Configuration de Nix
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     substituters = [ "https://cache.nixos.org/" ];
   };
-  nix.package = pkgs.nix;
-
-  # Assurez-vous que le système est à jour
-  system.stateVersion = 4;
 
 homebrew = {
     enable = true;
@@ -31,6 +23,31 @@ homebrew = {
     };
   };
 
-
-
+  system.defaults = {
+    dock = {
+      autohide = true;
+      autohide-time-modifier = 0.1;
+      autohide-delay = 0.0;
+      mru-spaces = false;
+      show-recents = false;
+    };
+    finder = {
+      FXPreferredViewStyle = "clmv";
+      AppleShowAllFiles = true;
+      AppleShowAllExtensions = true;
+    };
+    NSGlobalDomain = {
+      AppleICUForce24HourTime = true;
+      AppleShowAllExtensions = true;
+      NSAutomaticSpellingCorrectionEnabled = false;
+    };
+    screencapture = {
+      location = "~/Pictures/screenshots";
+      type = "png";
+    };
+    screensaver = {
+      askForPassword = true;
+      askForPasswordDelay = 10;
+    };
+  };
 }
