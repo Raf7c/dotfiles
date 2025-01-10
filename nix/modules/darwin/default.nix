@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, self, ... }:
 
 {
   services.nix-daemon.enable = true;
@@ -10,8 +10,9 @@
     experimental-features = [ "nix-command" "flakes" ];
     substituters = [ "https://cache.nixos.org/" ];
   };
+  system.configurationRevision = self.rev or self.dirtyRev or null;
 
-homebrew = {
+  homebrew = {
     enable = true;
     onActivation = {
       autoUpdate = true;

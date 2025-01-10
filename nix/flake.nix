@@ -16,7 +16,7 @@
   outputs = { self, nixpkgs, darwin, home-manager }@inputs: 
   let 
     configDir = "/Users/raf/.dotfiles/nix";
-    mkSystem = import ./lib/mksystem.nix { inherit inputs nixpkgs darwin home-manager configDir; };
+    mkSystem = import ./lib/mksystem.nix { inherit inputs nixpkgs darwin home-manager configDir self; };
   in
   {
     darwinConfigurations = {
