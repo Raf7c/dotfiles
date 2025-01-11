@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports = [
@@ -8,6 +8,7 @@
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
     curl
+    kitty
     wget
     gnupg
     git
@@ -15,16 +16,20 @@
     tree
     tmux
     vscode
+    eza
+    fd
+    ripgrep
+    xz
   ];
-
-
-  programs.zsh.enable = true;
-    # Configuration du shell
-  environment.shells = with pkgs; [ zsh ];
 
   homebrew = {
     taps = [ ];
     brews = ["mas"];
     casks = ["arc" "raycast" "cleanmymac" "discord" "obsidian"];
+    masApps = { "ZSA Keymapp" = 6472865291; };
   };
+
+  fonts.packages = builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
+  programs.zsh.enable = true;
+  environment.shells = with pkgs; [ zsh ];
 }
