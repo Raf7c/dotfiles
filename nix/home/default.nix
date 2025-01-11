@@ -9,6 +9,9 @@ in
   home.homeDirectory = "/Users/raf";
   home.username = "raf";
 
+  home.file = {
+    ".tool-versions".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/.tool-versions";
+  };
 
 
   programs = {

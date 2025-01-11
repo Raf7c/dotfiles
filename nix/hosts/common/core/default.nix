@@ -20,6 +20,7 @@
     fd
     ripgrep
     xz
+    asdf-vm
   ];
 
   homebrew = {
