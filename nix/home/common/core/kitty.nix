@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
- themePath = ../../../theme/catppuccin_mocha.conf;
+ themePath = ../../../theme/catppuccin_latte.conf;
 in
 {
     enable = true;
