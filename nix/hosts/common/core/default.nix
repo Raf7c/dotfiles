@@ -19,14 +19,15 @@
     eza
     fd
     ripgrep
-    xz
     asdf-vm
+    lazygit
+    lazydocker
   ];
 
   homebrew = {
     taps = [ ];
-    brews = ["mas"];
-    casks = ["arc" "raycast" "cleanmymac" "discord" "obsidian"];
+    brews = ["mas" "xz" "zlib" "openssl" "readline"];
+    casks = ["arc" "raycast" "cleanmymac" "discord" "obsidian" "notion" "slack" "figma"];
     masApps = { "ZSA Keymapp" = 6472865291; };
   };
 

@@ -33,7 +33,8 @@
     export BROWSER="arc"
     export EDITOR=nvim
     export NULLCMD=bat
-
+    export ASDF_CRATE_DEFAULT_PACKAGES_FILE="$ASDF_DEFAULTS_ROOT/.default-cargo-crates"
+ 
     ### ----  Installer zinit  ---- ###
     ZINIT_HOME="''${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
     if [[ ! -d $ZINIT_HOME ]]; then
@@ -61,6 +62,8 @@
 
     ### ---- SHELL integrations ---- ###
     . ${pkgs.asdf-vm}/share/asdf-vm/asdf.sh
-
+    
   '';
+
+
 }
