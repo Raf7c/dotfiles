@@ -12,7 +12,7 @@
     save = 10000;
   };
   shellAliases = {
-    #vim = "nvim";
+    vim = "nvim";
     cat = "bat";
     cl = "clear";
     ls = "eza -lhF --icons --git";
@@ -34,7 +34,9 @@
     export EDITOR=nvim
     export NULLCMD=bat
     export ASDF_CRATE_DEFAULT_PACKAGES_FILE="$ASDF_DEFAULTS_ROOT/.default-cargo-crates"
- 
+    export EDITOR=nvim
+    export NVIM_CONFIG="$HOME/.config/nvim/init.lua"
+     
     ### ----  Installer zinit  ---- ###
     ZINIT_HOME="''${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
     if [[ ! -d $ZINIT_HOME ]]; then

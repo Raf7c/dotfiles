@@ -1,0 +1,3 @@
+[submodule "nix/config/nvim"]
+	path = nix/config/nvim
+	url = git@github.com:Raf7c/neovim-config.git
