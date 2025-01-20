@@ -7,7 +7,7 @@ darwin.lib.darwinSystem {
   inherit system;
   specialArgs = { inherit inputs user hostname configDir self ; };
   modules = [
-    (configDir + "/hosts/dev-lab.nix")
+    (configDir + "/hosts/${hostname}.nix")
     (configDir + "/hosts/common/core")
     (configDir + "/modules/darwin")
     home-manager.darwinModules.home-manager {

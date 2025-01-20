@@ -21,7 +21,12 @@
   {
     darwinConfigurations = {
       "raf-devlab" = mkSystem {
-        hostname = "raf-devlab";
+        hostname = "dev-lab";
+        system = "aarch64-darwin";
+        user = "raf";
+      };
+      "raf-devlab-bis" = mkSystem {
+        hostname = "dev-lab-bis";
         system = "aarch64-darwin";
         user = "raf";
       };
