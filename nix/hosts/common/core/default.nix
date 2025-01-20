@@ -5,6 +5,7 @@
     ./sops.nix
   ];
 
+  # Allow non-free packages
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
     curl
@@ -31,6 +32,7 @@
     masApps = { "ZSA Keymapp" = 6472865291; };
   };
 
+  # All nerd-fonts
   fonts.packages = builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
   programs.zsh.enable = true;
   environment.shells = with pkgs; [ zsh ];

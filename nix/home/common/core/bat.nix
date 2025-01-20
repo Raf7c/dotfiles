@@ -1,5 +1,4 @@
 { config, lib, pkgs, ... }:
-
 {
   enable = true;
   config = {
@@ -7,6 +6,7 @@
     italic-text = "always";
     style = "numbers,changes,header";
   };
+
   themes = {
     "Catppuccin-latte" = {
       src = pkgs.fetchFromGitHub {

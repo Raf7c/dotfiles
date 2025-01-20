@@ -13,11 +13,10 @@ in
     ".tool-versions".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/.tool-versions";
   };
 
-  #Import nvim directly
+  # Import nvim directly
   imports = [
     ./common/core/nvim.nix
   ];
-
 
   programs = {
     zsh = import ../home/common/core/zsh.nix { inherit config pkgs lib; };

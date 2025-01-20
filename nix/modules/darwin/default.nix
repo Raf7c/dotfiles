@@ -1,17 +1,20 @@
 { config, pkgs, self, ... }:
 
 {
+  # service nix-daemon
   services.nix-daemon.enable = true;
   nix.package = pkgs.nix;
   system.stateVersion = 4;
-  security.pam.enableSudoTouchIdAuth = true;
-
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     substituters = [ "https://cache.nixos.org/" ];
   };
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
+  # TouchID
+  security.pam.enableSudoTouchIdAuth = true;
+
+  # Setup Homebrew
   homebrew = {
     enable = true;
     onActivation = {
@@ -24,6 +27,7 @@
     };
   };
 
+  # macOS system preferences
   system.defaults = {
     dock = {
       autohide = true;
@@ -37,6 +41,7 @@
       AppleShowAllFiles = true;
       AppleShowAllExtensions = true;
     };
+    # Overall system configuration
     NSGlobalDomain = {
       AppleICUForce24HourTime = true;
       AppleShowAllExtensions = true;

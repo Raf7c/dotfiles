@@ -29,7 +29,7 @@ in
       active_tab_title_template = "{fmt.fg._e5c07b}{fmt.bg.default}{fmt.fg._282c34}{fmt.bg._e5c07b} {title.split()[0]} {fmt.fg._e5c07b}{fmt.bg.default} ";
     };
 
-    # Pour les options qui ne sont pas directement supportées dans les settings
+    # Option not supported
     extraConfig = ''
       include ${themePath}
       background_opacity 0.95

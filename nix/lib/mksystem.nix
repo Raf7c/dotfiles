@@ -1,10 +1,11 @@
+# Darwin system construction function
 { inputs, nixpkgs, darwin, home-manager, configDir, self }:
 
 { hostname, system, user, extraModules ? [] }:
 
 darwin.lib.darwinSystem {
   inherit system;
-  specialArgs = { inherit inputs user hostname configDir self; };
+  specialArgs = { inherit inputs user hostname configDir self ; };
   modules = [
     (configDir + "/hosts/dev-lab.nix")
     (configDir + "/hosts/common/core")
