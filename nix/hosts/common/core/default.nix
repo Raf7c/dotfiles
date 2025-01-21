@@ -27,7 +27,7 @@
   homebrew = {
     taps = [ ];
     brews = ["mas" "xz" "zlib" "openssl" "readline"];
-    casks = ["arc" "raycast" "cleanmymac" "discord" "obsidian" "notion" "slack" "figma"];
+    casks = ["arc" "raycast" "cleanmymac" "discord" "obsidian" "notion" "notion-calendar" "slack" "figma" "docker" "istat-menus" "ledger-live"];
     masApps = { "ZSA Keymapp" = 6472865291; };
   };
 

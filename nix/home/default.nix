@@ -10,12 +10,13 @@ in
   home.username = "raf";
 
   home.file = {
-    ".tool-versions".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/.tool-versions";
+    # asdf
+    ".tool-versions".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/nix//home/common/core/.tool-versions";
   };
 
-  # Import nvim directly
   imports = [
     ./common/core/nvim.nix
+    # Import nvim directly
   ];
 
   programs = {
