@@ -1,4 +1,6 @@
 # dotfiles
+[ 🇺🇸 ](./README.md)  [ 🇫🇷 ](docs/fr/README_fr.md)
+
 > [!NOTE] This is written more as a reminder for myself than for you.
 
 ## Table of Contents
@@ -15,9 +17,9 @@
 - Multi-host and multi-user configurations based on Flake, Darwin, and Home-Manager.
   - The base configurations for hosts and users dynamically manage host specifications based on Darwin.
   - Optional configurations for specific user and host needs.
+  - submodule conf-nvim.
 
-
-The roadmap for additional features is spread across short-term goals, detailed in the [TODO Roadmap](docs/).
+The roadmap for additional features is spread across short-term goals, detailed in the [TODO Roadmap](docs/TODO.md).
 
 Completed features will be added here as each step is finalized.
 
@@ -51,16 +53,12 @@ For more details on design concepts:
 
 ## How to Get Started
 
-Run:
-
-Download configuration
-
+Download configuration :
 ```shell
 $ nix-shell -p git --run 'git clone https://github.com/Raf7c/dotfiles.git .dotfiles'
 ```
 
-Install
-
+Install:
 ```shell
 $ nix run nix-darwin --extra-experimental-features "nix-command flakes" -- switch --flake .#raf-devlab --impure
 ```
