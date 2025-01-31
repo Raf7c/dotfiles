@@ -2,7 +2,7 @@
 {
   enable = true;
   config = {
-    theme = "Catppuccin-latte";
+    theme = "Catppuccin-mocha";
     italic-text = "always";
     style = "numbers,changes,header";
   };
