@@ -7,19 +7,25 @@
   # Allow non-free packages
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
-    curl
+    # App
     kitty
+    vscode
+    obsidian
+    slack
+    raycast
+    arc-browser
+    discord
+    # CLI tool
+    curl
     wget
     gnupg
     git
     gh
     tree
     tmux
-    vscode
     eza
     fd
     ripgrep
-    asdf-vm
     lazygit
     lazydocker
   ];
@@ -27,7 +33,7 @@
   homebrew = {
     taps = [ ];
     brews = ["mas" "xz" "zlib" "openssl" "readline"];
-    casks = ["arc" "raycast" "cleanmymac" "discord" "obsidian" "notion" "notion-calendar" "slack" "figma" "docker" "istat-menus" "ledger-live"];
+    casks = [ "cleanmymac" "notion" "notion-calendar" "figma" "docker" "istat-menus" "ledger-live"];
     masApps = { "ZSA Keymapp" = 6472865291; };
   };
 

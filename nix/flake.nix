@@ -31,7 +31,5 @@
         user = "raf";
       };
     };
-
-    packages.aarch64-darwin.default = self.darwinConfigurations."raf-devlab".system;
   };
 }
