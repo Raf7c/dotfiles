@@ -15,6 +15,7 @@ in
   };
 
   imports = [
+    ./common/core/asdf.nix
     ./common/core/nvim.nix
     # Import nvim directly
   ];
