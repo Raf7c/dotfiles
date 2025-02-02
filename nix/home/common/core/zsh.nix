@@ -21,6 +21,11 @@
     ltree = "eza -lahF --tree --level=2 --long --icons --git";
     #fvim = "nvim $(fzf --preview=\"bat --color=always {}\")";
     sczshrc = "source ~/.zshrc";
+    # git
+    gs = "git status";
+    gc = "git commit";
+    gck = "git checkout";
+    gb = "git branch";
   };
 
   initExtra = ''

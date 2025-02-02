@@ -15,6 +15,7 @@
     raycast
     arc-browser
     discord
+    gitkraken
     # CLI tool
     curl
     wget
