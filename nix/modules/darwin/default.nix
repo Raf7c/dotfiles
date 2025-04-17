@@ -1,8 +1,8 @@
 { config, pkgs, self, ... }:
 
 {
-  # service nix-daemon
-  services.nix-daemon.enable = true;
+  # service nix-daemon (maj d'api)
+  nix.enable = true;
   nix.package = pkgs.nix;
   system.stateVersion = 4;
   nix.settings = {
@@ -11,8 +11,11 @@
   };
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
-  # TouchID
-  security.pam.enableSudoTouchIdAuth = true;
+  # Résoudre le problème de GID pour les utilisateurs nixbld
+  ids.gids.nixbld = 350;
+
+  # TouchID (maj d'api)
+  security.pam.services.sudo_local.touchIdAuth = true;
 
   # Setup Homebrew
   homebrew = {
@@ -23,7 +26,6 @@
     };
     global = {
       brewfile = true;
-      lockfiles = false;
     };
   };
 
