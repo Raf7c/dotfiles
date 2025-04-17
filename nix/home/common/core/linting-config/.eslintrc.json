@@ -1,0 +1,37 @@
+{
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2021": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {
+    // Règles minimales - Prettier s'occupe du formatage
+    "no-unused-vars": "warn",
+    "no-console": "warn",
+    "no-undef": "error",
+    "prefer-const": "warn"
+  },
+  "globals": {
+    // Ajouter ici des variables globales si nécessaire
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "parser": "@typescript-eslint/parser",
+      "plugins": ["@typescript-eslint"],
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "prettier"
+      ]
+    }
+  ]
+} 

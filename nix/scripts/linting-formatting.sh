@@ -18,6 +18,10 @@ npm install -g @fsouza/prettierd
 echo "🔄 Installing eslint-config-prettier..."
 npm install -g eslint-config-prettier
 
+# Install Prettier plugins
+echo "🔄 Installing Prettier plugins..."
+npm install -g prettier-plugin-tailwindcss @trivago/prettier-plugin-sort-imports
+
 echo ""
 echo "✅ Installation verification:"
 echo ""
@@ -38,4 +42,7 @@ fi
 
 echo ""
 echo "Installation complete. If any tools are missing, use Mason in Neovim (:Mason)."
-echo "For documentation: eslint.org | prettier.io | github.com/fsouza/prettierd" 
+echo "For documentation: eslint.org | prettier.io | github.com/fsouza/prettierd"
+echo "Global configuration files are now linked to your home directory:"
+echo "~/.prettierrc.json -> ~/.dotfiles/nix/home/common/core/formatting-config/.prettierrc.json"
+echo "~/.eslintrc.json -> ~/.dotfiles/nix/home/common/core/linting-config/.eslintrc.json" 

@@ -12,6 +12,10 @@ in
   home.file = {
     # asdf
     ".tool-versions".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/nix//home/common/core/.tool-versions";
+    # prettier
+    ".prettierrc.json".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/nix/home/common/core/formatting-config/.prettierrc.json";
+    # eslint
+    ".eslintrc.json".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/nix/home/common/core/linting-config/.eslintrc.json";
   };
 
   imports = [
