@@ -1,6 +1,7 @@
 #!/bin/bash
 
-echo "=== Installing linting and formatting tools for Neovim ==="
+echo "=== Installing minimal formatting tools for Neovim ==="
+echo "Note: These tools will also be installed by Mason in Neovim."
 
 # Check for npm
 if ! command -v npm &> /dev/null; then
@@ -9,40 +10,26 @@ if ! command -v npm &> /dev/null; then
 fi
 
 echo "🔄 Installing main tools..."
-npm install -g eslint eslint_d prettier
-
-echo "🔄 Installing prettierd..."
-npm install -g @fsouza/prettierd
-
-# Install eslint-config-prettier for ESLint/Prettier integration
-echo "🔄 Installing eslint-config-prettier..."
-npm install -g eslint-config-prettier
+npm install -g prettier
 
 # Install Prettier plugins
-echo "🔄 Installing Prettier plugins..."
-npm install -g prettier-plugin-tailwindcss @trivago/prettier-plugin-sort-imports
+echo "🔄 Installing selected Prettier plugins..."
+npm install -g prettier-plugin-tailwindcss
 
 echo ""
 echo "✅ Installation verification:"
 echo ""
-for tool in eslint eslint_d prettier; do
+for tool in prettier ; do
     if command -v $tool &> /dev/null; then
-        echo "✓ $tool"
+        echo "✓ $tool (global installation)"
     else
-        echo "❌ $tool not found"
+        echo "❌ $tool not found globally (but may be installed via Mason in Neovim)"
     fi
 done
 
-# Special check for prettierd
-if command -v prettierd &> /dev/null; then
-    echo "✓ prettierd"
-else
-    echo "❌ prettierd not found (install via Mason if needed)"
-fi
-
 echo ""
-echo "Installation complete. If any tools are missing, use Mason in Neovim (:Mason)."
-echo "For documentation: eslint.org | prettier.io | github.com/fsouza/prettierd"
-echo "Global configuration files are now linked to your home directory:"
+echo "Installation complete. For additional tools, use Mason in Neovim (:Mason)."
+echo "Configuration globale :"
 echo "~/.prettierrc.json -> ~/.dotfiles/nix/home/common/core/formatting-config/.prettierrc.json"
-echo "~/.eslintrc.json -> ~/.dotfiles/nix/home/common/core/linting-config/.eslintrc.json" 
+echo ""
+echo "Note: These tools will also be installed and managed by Mason in Neovim." 
