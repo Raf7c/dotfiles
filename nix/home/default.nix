@@ -15,7 +15,9 @@ in
     # prettier
     ".prettierrc.json".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/nix/home/common/core/formatting-config/.prettierrc.json";
     # eslint
-    ".eslintrc.json".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/nix/home/common/core/linting-config/.eslintrc.json";
+    # vscode
+    ".vscode/settings.json".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/nix/home/common/core/vscode/settings.json";
+    ".vscode/keybindings.json".source = mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/nix/home/common/core/vscode/keybindings.json";
   };
 
   imports = [

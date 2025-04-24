@@ -1,0 +1,66 @@
+{
+  // Fenêtre et Interface
+  "window.zoomLevel": 2,
+  "window.commandCenter": false,
+  "window.menuBarVisibility": "compact",
+  "window.restoreWindows": "none",
+  "window.density.editorTabHeight": "compact",
+  "workbench.editor.showTabs": "multiple",
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.colorTheme": "Catppuccin Mocha",
+  "workbench.tree.indent": 20,
+  "workbench.tree.renderIndentGuides": "always",
+  "workbench.editor.enablePreview": false,
+  "material-icon-theme.hidesExplorerArrows": true,
+
+  // Éditeur - Apparence
+  "editor.fontFamily": "JetBrainsMono Nerd Font",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 15,
+  "editor.lineHeight": 20,
+  "editor.minimap.enabled": false,
+  "editor.lineNumbers": "relative",
+  "editor.renderWhitespace": "trailing",
+
+  // Éditeur - Comportement
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.wordWrap": "off",
+  "editor.suggest.insertMode": "replace",
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "editor.formatOnSave": false,
+  "editor.formatOnPaste": false,
+  "editor.linkedEditing": true,
+
+  // Explorateur
+  "explorer.autoReveal": true,
+  "explorer.confirmDragAndDrop": false,
+  "explorer.confirmDelete": false,
+
+  // Fichiers
+  "files.autoSave": "afterDelay",
+  "files.defaultLanguage": "markdown",
+
+  // Git
+  "git.confirmSync": false,
+
+  // Extensions - GitLens
+  "gitlens.hovers.currentLine.over": "line",
+
+  // Extensions - Indentation visuelle
+  "indentRainbow.colors": [
+    "rgba(255,255,64,0.02)",
+    "rgba(127,255,127,0.02)",
+    "rgba(255,127,255,0.02)",
+    "rgba(79,236,236,0.02)"
+  ],
+  "RainbowBrackets.depreciation-notice": false,
+
+  // Extensions - VSCodeVim
+  "vim.useSystemClipboard": true,
+  "vim.timeoutlen": 300,
+  "vim.hlsearch": true,
+
+  // Extensions - Emmet
+  "emmet.triggerExpansionOnTab": true
+}

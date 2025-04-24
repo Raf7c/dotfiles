@@ -10,6 +10,7 @@
     # App
     kitty
     vscode
+    code-cursor
     obsidian
     slack
     raycast
