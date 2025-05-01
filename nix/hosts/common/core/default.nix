@@ -28,6 +28,8 @@
     eza
     fd
     ripgrep
+    fd
+    jq
     lazygit
     lazydocker
   ];
