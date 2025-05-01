@@ -1,5 +1,5 @@
 {
-  // Fenêtre et Interface
+  // Window and Interface
   "window.zoomLevel": 2,
   "window.commandCenter": false,
   "window.menuBarVisibility": "compact",
@@ -13,7 +13,7 @@
   "workbench.editor.enablePreview": false,
   "material-icon-theme.hidesExplorerArrows": true,
 
-  // Éditeur - Apparence
+  // Editor - Appearance
   "editor.fontFamily": "JetBrainsMono Nerd Font",
   "editor.fontLigatures": true,
   "editor.fontSize": 15,
@@ -22,23 +22,23 @@
   "editor.lineNumbers": "relative",
   "editor.renderWhitespace": "trailing",
 
-  // Éditeur - Comportement
+  // Editor - Behavior
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "editor.wordWrap": "off",
   "editor.suggest.insertMode": "replace",
   "editor.acceptSuggestionOnCommitCharacter": false,
-  "editor.formatOnSave": false,
+  "editor.formatOnSave": true,
   "editor.formatOnPaste": false,
   "editor.linkedEditing": true,
 
-  // Explorateur
+  // Explorer
   "explorer.autoReveal": true,
   "explorer.confirmDragAndDrop": false,
   "explorer.confirmDelete": false,
 
-  // Fichiers
-  "files.autoSave": "afterDelay",
+  // Files
+  "files.autoSave": "off",
   "files.defaultLanguage": "markdown",
 
   // Git
@@ -47,7 +47,7 @@
   // Extensions - GitLens
   "gitlens.hovers.currentLine.over": "line",
 
-  // Extensions - Indentation visuelle
+  // Extensions - Visual Indentation
   "indentRainbow.colors": [
     "rgba(255,255,64,0.02)",
     "rgba(127,255,127,0.02)",
@@ -56,11 +56,143 @@
   ],
   "RainbowBrackets.depreciation-notice": false,
 
-  // Extensions - VSCodeVim
+  // Extensions - Emmet
+  "emmet.triggerExpansionOnTab": true,
+
+  // VSCodeVim - setting
   "vim.useSystemClipboard": true,
   "vim.timeoutlen": 300,
   "vim.hlsearch": true,
 
-  // Extensions - Emmet
-  "emmet.triggerExpansionOnTab": true
+  // Which Key
+  "whichkey.useFullWidthCharacters": true,
+  "vim.normalModeKeyBindingsNonRecursive": [
+    {
+      "before": ["<space>"],
+      "commands": ["whichkey.show"]
+    }
+  ],
+  "vim.visualModeKeyBindingsNonRecursive": [
+    {
+      "before": ["<space>"],
+      "commands": ["whichkey.show"]
+    }
+  ],
+  "whichkey.bindings": [
+    {
+      "key": "/",
+      "name": "[/] Fuzzy search in current editor",
+      "type": "command",
+      "command": "fuzzySearch.activeTextEditor"
+    },
+    {
+      "key": "a",
+      "name": "[A]dd editor to harpoon",
+      "type": "command",
+      "command": "vscode-harpoon.addEditor"
+    },
+    {
+      "key": "e",
+      "name": "[E]dit harpoon editors",
+      "type": "command",
+      "command": "vscode-harpoon.editEditors"
+    },
+    {
+      "key": "q",
+      "name": "[Q]uit",
+      "type": "bindings",
+      "bindings": [
+        {
+          "key": "w",
+          "name": "[Q]uit and [W]rite (Save & Close Window)",
+          "type": "commands",
+          "commands": ["workbench.action.files.save", "workbench.action.closeActiveEditor"]
+        },
+        {
+          "key": "q",
+          "name": "[Q]uit without saving (Close Window)",
+          "type": "command",
+          "command": "workbench.action.closeActiveEditor"
+        }
+      ]
+    },
+    {
+      "key": "w",
+      "name": "[W]rite ",
+      "type": "command",
+      "command": "workbench.action.files.save"
+    },
+    {
+      "key": "s",
+      "name": "[S]earch",
+      "type": "bindings",
+      "bindings": [
+        {
+          "key": "p",
+          "name": "[S]earch Command [P]alette",
+          "type": "command",
+          "command": "workbench.action.showCommands"
+        },
+        {
+          "key": "e",
+          "name": "[S]earch [E]xtensions",
+          "type": "command",
+          "command": "workbench.view.extensions"
+        }
+      ]
+    },
+    {
+      "key": "f",
+      "name": "[F]ile",
+      "type": "bindings",
+      "bindings": [
+        {
+          "key": "f",
+          "name": "[S]earch [F]iles",
+          "type": "command",
+          "command": "workbench.action.quickOpen"
+        },
+        {
+          "key": ".",
+          "name": "[S]earch Recent Files",
+          "type": "command",
+          "command": "workbench.action.openRecent"
+        },
+        {
+          "key": "t",
+          "name": "Open File [T]ree",
+          "type": "command",
+          "command": "workbench.view.explorer"
+        }
+      ]
+    },
+    {
+      "key": "c",
+      "name": "[C]ode",
+      "type": "bindings",
+      "bindings": [
+        {
+          "key": "f",
+          "name": "[F]format Document",
+          "type": "command",
+          "command": "editor.action.formatDocument"
+        }
+      ]
+    }
+  ],
+
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+
+  // Prettier Configuration
+  "prettier.requireConfig": true,
+  "prettier.configPath": "~/.dotfiles/nix/home/common/core/formatting-config/.prettierrc.json",
+
+  // ESLint Configuration
+  "eslint.enable": true,
+  "eslint.options": {
+    "configFile": "~/.dotfiles/nix/home/common/core/linting-config/.eslintrc.json"
+  }
 }
