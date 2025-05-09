@@ -1,0 +1,37 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-prettier",
+    "stylelint-config-tailwindcss"
+  ],
+  "plugins": ["stylelint-scss", "stylelint-order"],
+  "rules": {
+    "at-rule-no-unknown": null,
+    "scss/at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": ["tailwind", "apply", "variants", "responsive", "screen", "layer"]
+      }
+    ],
+    "order/properties-alphabetical-order": true,
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        "ignorePseudoClasses": ["global"]
+      }
+    ],
+    "selector-class-pattern": null,
+    "declaration-block-trailing-semicolon": null,
+    "no-descending-specificity": null
+  },
+  "overrides": [
+    {
+      "files": ["*.scss", "**/*.scss"],
+      "customSyntax": "postcss-scss"
+    },
+    {
+      "files": ["*.less", "**/*.less"],
+      "customSyntax": "postcss-less"
+    }
+  ]
+}

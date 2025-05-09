@@ -13,12 +13,12 @@ fi
 echo "✓ PNPM est bien installé, installation des outils..."
 
 # Installer les outils principaux de formatage et linting
-echo "🔄 Installation de prettier et eslint..."
-pnpm add -g prettier eslint
+echo "🔄 Installation de prettier, eslint et stylelint..."
+pnpm add -g prettier eslint stylelint
 
 # Installer les plugins pour l'intégration entre ESLint et Prettier
 echo "🔄 Installation des plugins d'intégration..."
-pnpm add -g eslint-config-prettier
+pnpm add -g eslint-config-prettier stylelint-config-prettier
 
 # Installer les plugins Prettier officiels et activement maintenus
 echo "🔄 Installation des plugins Prettier..."
@@ -33,11 +33,21 @@ pnpm add -g eslint-plugin-html
 pnpm add -g eslint-plugin-markdown
 pnpm add -g eslint-plugin-yml
 
+# Installer les plugins Stylelint officiels et activement maintenus
+echo "🔄 Installation des plugins Stylelint..."
+pnpm add -g stylelint-config-standard
+pnpm add -g stylelint-config-recommended
+pnpm add -g stylelint-config-tailwindcss
+pnpm add -g stylelint-scss
+pnpm add -g stylelint-order
+pnpm add -g postcss-scss
+pnpm add -g postcss-less
+
 # Vérification de l'installation
 echo ""
 echo "✅ Vérification de l'installation :"
 echo ""
-for tool in prettier eslint; do
+for tool in prettier eslint stylelint; do
     if command -v $tool &> /dev/null; then
         echo "✓ $tool (installation globale)"
     else

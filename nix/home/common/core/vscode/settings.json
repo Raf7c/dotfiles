@@ -183,7 +183,8 @@
 
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
   },
 
   // Prettier Configuration
@@ -194,5 +195,11 @@
   "eslint.enable": true,
   "eslint.options": {
     "configFile": "~/.dotfiles/nix/home/common/core/linting-config/.eslintrc.json"
-  }
+  },
+  "eslint.validate": ["javascript", "typescript", "html", "vue", "json", "markdown", "yaml"],
+
+  // Stylelint Configuration
+  "stylelint.enable": true,
+  "stylelint.configFile": "~/.dotfiles/nix/home/common/core/stylelint-config/.stylelintrc.json",
+  "stylelint.validate": ["css", "scss", "less", "postcss"]
 }

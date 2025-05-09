@@ -4,10 +4,7 @@
     "node": true,
     "es2021": true
   },
-  "extends": [
-    "eslint:recommended",
-    "prettier"
-  ],
+  "extends": ["eslint:recommended", "prettier"],
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module"
@@ -24,26 +21,16 @@
       "files": ["*.ts", "*.tsx"],
       "parser": "@typescript-eslint/parser",
       "plugins": ["@typescript-eslint"],
-      "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "prettier"
-      ]
+      "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"]
     },
     {
       "files": ["*.json", "*.json5"],
       "plugins": ["json-schema-validator"],
-      "extends": [
-        "plugin:json-schema-validator/recommended",
-        "prettier"
-      ]
+      "extends": ["plugin:json-schema-validator/recommended", "prettier"]
     },
     {
       "files": ["*.vue"],
-      "extends": [
-        "plugin:vue/vue3-recommended",
-        "prettier"
-      ],
+      "extends": ["plugin:vue/vue3-recommended", "prettier"],
       "plugins": ["vue"]
     },
     {
@@ -59,6 +46,10 @@
     {
       "files": ["*.html"],
       "plugins": ["html"],
+      "extends": ["prettier"]
+    },
+    {
+      "files": ["*.css", "*.scss", "*.less"],
       "extends": ["prettier"]
     }
   ]

@@ -10,7 +10,6 @@
     # App
     kitty
     vscode
-    code-cursor
     obsidian
     slack
     raycast
@@ -37,7 +36,7 @@
   homebrew = {
     taps = [ ];
     brews = ["mas" "xz" "zlib" "openssl" "readline"];
-    casks = [ "cleanmymac" "notion" "notion-calendar" "figma" "docker" "istat-menus" "ledger-live"];
+    casks = [ "cleanmymac" "notion" "notion-calendar" "figma" "docker" "istat-menus" "ledger-live" "cursor"];
     masApps = { "ZSA Keymapp" = 6472865291; };
   };
 

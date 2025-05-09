@@ -28,6 +28,9 @@ extensions=(
   "eamodio.gitlens"                     # Améliore les fonctionnalités Git
   "tal7aouy.rainbow-bracket"           # Colore les parenthèses et accolades
   "oderwat.indent-rainbow"             # Colore les niveaux d'indentation
+  "formulahendry.auto-rename-tag"      # Renomme automatiquement les balises HTML/XML jumelées
+  "dbaeumer.vscode-eslint"             # Intègre ESLint pour la validation du code JavaScript/TypeScript
+  "stylelint.vscode-stylelint"         # Intègre Stylelint pour la validation des fichiers CSS/SCSS/Less
 )
 
 # Installation des extensions
