@@ -1,16 +1,16 @@
-{ config, pkgs, ... }:
+{ config, pkgs, isLaptop ? false, fontSize ? 16, fontFamily ? "JetBrains Mono", theme ? "catppuccin_mocha", ... }:
 let
- themePath = ../../../theme/catppuccin_mocha.conf;
+  themePath = ../../../theme/${theme}.conf;
 in
 {
     enable = true;
     settings = {
       # Fonts
-      font_family = "DaddyTimeMono Nerd Font Mono";
+      font_family = "${fontFamily} Nerd Font Mono";
       bold_font = "auto";
       italic_font = "auto";
       bold_italic_font = "auto";
-      font_size = 20;
+      font_size = fontSize;
 
       # Customization
       hide_window_decorations = "titlebar-only";
@@ -32,6 +32,6 @@ in
     # Option not supported
     extraConfig = ''
       include ${themePath}
-      background_opacity 0.95
+      background_opacity ${if isLaptop then "1.0" else "0.95"}
     '';
 }

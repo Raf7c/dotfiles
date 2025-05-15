@@ -2,10 +2,10 @@
 {
   imports = [
     ./sops.nix
+    ./nix.nix
   ];
 
-  # Allow non-free packages
-  nixpkgs.config.allowUnfree = true;
+  # Packages système de base
   environment.systemPackages = with pkgs; [
     # App
     kitty
@@ -16,6 +16,7 @@
     arc-browser
     discord
     gitkraken
+    
     # CLI tool
     curl
     wget
@@ -23,23 +24,27 @@
     git
     gh
     tree
-    tmux
     eza
     fd
     ripgrep
-    fd
     jq
     lazygit
     lazydocker
   ];
 
   homebrew = {
+    enable = true;
+    onActivation = {
+      autoUpdate = true;
+      cleanup = "zap"; # Nettoie les packages non déclarés
+      upgrade = true;
+    };
     taps = [ ];
     brews = ["mas" "xz" "zlib" "openssl" "readline"];
     casks = [ "cleanmymac" "notion" "notion-calendar" "figma" "docker" "istat-menus" "ledger-live" "cursor"];
     masApps = { "ZSA Keymapp" = 6472865291; };
   };
-
+  
   # All nerd-fonts
   fonts.packages = builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
   programs.zsh.enable = true;

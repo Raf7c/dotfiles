@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, isLaptop, ... }:
 {
   networking = {
     hostName = "raf-devlab-bis";
@@ -8,6 +8,18 @@
   users.users.raf = {
     name = "raf";
     home = "/Users/raf";
+  };
+  
+  # Configuration spécifique au MacBookPro
+  system.defaults = {
+    dock = {
+      tilesize = 42;
+    };
+    
+    # Trackpad
+    trackpad = {
+      Clicking = true;
+    };
   };
 
   homebrew = {

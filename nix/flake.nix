@@ -15,7 +15,7 @@
 
   outputs = { self, nixpkgs, darwin, home-manager }@inputs: 
   let 
-    configDir = "/Users/raf/.dotfiles/nix";
+    configDir = "${self}/nix";
     mkSystem = import ./lib/mksystem.nix { inherit inputs nixpkgs darwin home-manager configDir self; };
   in
   {
@@ -24,11 +24,13 @@
         hostname = "dev-lab";
         system = "aarch64-darwin";
         user = "raf";
+        isLaptop = false;
       };
       "raf-devlab-bis" = mkSystem {
         hostname = "dev-lab-bis";
         system = "aarch64-darwin";
         user = "raf";
+        isLaptop = true;
       };
     };
   };
