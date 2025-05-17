@@ -4,7 +4,7 @@
 { hostname, system, user, isLaptop ? false }:
 
 let
-  # Importer les variables d'environnement partagées
+  # Import shared environment variables
   sharedEnv = import ./shared-env.nix;
 in
 
@@ -15,9 +15,9 @@ darwin.lib.darwinSystem {
   };
   modules = [
     # Base modules
-    ../hosts/${hostname}.nix
-    ../hosts/common/core
-    ../modules/darwin
+    ../darwin/hosts/${hostname}.nix
+    ../darwin/modules
+    ../darwin
     
     # Home Manager
     home-manager.darwinModules.home-manager {

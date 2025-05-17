@@ -1,10 +1,10 @@
 {
-  # Applications par défaut
+  # Default applications
   terminal = "kitty";
   browser = "arc";
   editor = "nvim";
   
-  # Thèmes et apparence
+  # Themes and appearance
   theme = "catppuccin_mocha";
   fontFamily = "JetBrains Mono";
   fontSize = {
