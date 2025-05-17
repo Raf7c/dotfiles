@@ -8,71 +8,156 @@
 - [Feature Highlights](#feature-highlights)
 - [TODO Roadmap](docs/TODO.md)
 - [Requirements](#requirements)
-- [Structure](#structure-quick-reference)
+- [Structure](#structure)
 - [Secrets Management](#secrets-management)
-- [Tools and Applications I Use](#acknowledgments)
+- [Tools and Applications](#tools-and-applications)
+- [Getting Started](#getting-started)
+- [Maintenance](#maintenance)
 
 ## Feature Highlights
 
-- Multi-host and multi-user configurations based on Flake, Darwin, and Home-Manager.
-  - The base configurations for hosts and users dynamically manage host specifications based on Darwin.
-  - Optional configurations for specific user and host needs.
-  - submodule conf-nvim.
+- **Multi-host Configuration**
+  - MacStudio (dev-lab) and MacBookPro (dev-lab-bis) support
+  - Dynamic host-specific configurations
+  - Shared common configurations
 
-The roadmap for additional features is spread across short-term goals, detailed in the [TODO Roadmap](docs/TODO.md).
+- **Development Environment**
+  - Neovim with custom configuration
+  - VSCode integration
+  - Git configuration
+  - ASDF version manager
+  - Custom shell setup with Starship
 
-Completed features will be added here as each step is finalized.
+- **System Management**
+  - Nix Flakes for reproducible builds
+  - Home Manager for user configurations
+  - Homebrew integration for macOS packages
+  - Automatic garbage collection and optimization
+
+- **UI/UX**
+  - Kitty terminal with custom theme
+  - Catppuccin Mocha theme
+  - JetBrains Mono font
+  - Adaptive font sizes for different devices
 
 ## Requirements
 
-- *MacOS =>* `15.2`
-- *Nix =>* `2.25.4`
-- *`Homebrew`*
+- **System Requirements**
+  - macOS >= 15.2
+  - Nix >= 2.25.4
+  - Homebrew
 
-This is a custom configuration that requires several technical prerequisites to be successfully built. This Nix setup will serve best as a reference, a learning resource, and a model for creating your own configuration.
+- **Hardware Support**
+  - Apple Silicon (M1/M2) support
+  - Multi-monitor setup support
+  - Laptop/Desktop adaptive configurations
 
 ## Structure
 
-For more details on design concepts:
-
-- `flake.nix` - Entry point for host and user configurations.
-- `hosts` - NixOS configurations accessible via `darwin-rebuild switch --flake .#<host>`.
-  - `common` - Shared configurations used by specific machines.
-    - `core` - Configurations present on all hosts. This is a strict rule! If something is not essential, it is optional.
-    - `optional` - Optional configurations present on multiple hosts.
-- `dev-lab` - MacStudio
-- `dev-lab-bis` - MacBookPro
-- `home/<user>` - Home-manager configurations, automatically built during host rebuilds.
-  - `common` - Shared home-manager configurations consumed by the user's specific machine.
-    - `core` - Home-manager configurations present for the user on all machines. This is a strict rule! If something is not essential, it is optional.
-    - `optional` - Optional home-manager configurations that can be added for specific machines.
-- `lib` - Custom library used in nix-config to make import paths more readable. Accessible via `lib.custom`.
-- `modules` - Custom modules to enable special features and options.
-  - `darwin` - Custom modules specific to Darwin-based hosts.
-- `scripts` - Custom scripts for automation.
-
-## How to Get Started
-
-Download configuration :
-```shell
-$ nix-shell -p git --run 'git clone https://github.com/Raf7c/dotfiles.git .dotfiles'
+```
+.
+├── flake.nix                 # Main entry point
+├── nix/
+│   ├── darwin/              # macOS specific configurations
+│   │   ├── hosts/          # Host-specific configurations
+│   │   └── modules/        # Darwin modules
+│   ├── home/               # Home Manager configurations
+│   │   ├── programs/       # Program configurations
+│   │   └── profiles/       # User profiles
+│   ├── common/             # Shared configurations
+│   │   ├── packages/       # Common packages
+│   │   └── fonts/         # Font configurations
+│   └── lib/                # Custom library functions
+└── docs/                   # Documentation
 ```
 
-Install:
+## Tools and Applications
+
+### Development Tools
+- **Editors**
+  - Neovim
+  - VSCode
+  - Cursor
+
+- **Version Control**
+  - Git
+  - GitHub CLI
+  - LazyGit
+
+- **Terminal**
+  - Kitty
+  - Tmux
+  - Starship prompt
+
+### System Tools
+- **Package Management**
+  - Nix
+  - Homebrew
+  - ASDF
+
+- **System Monitoring**
+  - iStat Menus
+  - CleanMyMac
+
+### Productivity
+- **Note Taking**
+  - Obsidian
+  - Notion
+
+- **Communication**
+  - Slack
+  - Discord
+
+- **Design**
+  - Figma
+
+## Getting Started
+
+1. **Clone the Repository**
 ```shell
-$ nix run nix-darwin --extra-experimental-features "nix-command flakes" -- switch --flake .#raf-devlab --impure
+nix-shell -p git --run 'git clone https://github.com/Raf7c/dotfiles.git .dotfiles'
 ```
 
-`.#raf-devlab` or `.#raf-devlab-bis`
-
-`darwin-rebuild --flake .#<host>` To build system configurations.</br>
-`home-manager --flake .#<host>` To create user configurations.</br>
-`nix build` (or shell or run) To build and use packages.</br>
-</br>
-
-Avoid errors related to missing dependencies:
+2. **Initialize Submodules**
 ```shell
 git submodule update --init --recursive
 ```
 
-## Tools and Applications I Use
+3. **Install Configuration**
+```shell
+# For MacStudio
+nix run nix-darwin --extra-experimental-features "nix-command flakes" -- switch --flake .#raf-devlab 
+
+# For MacBookPro
+nix run nix-darwin --extra-experimental-features "nix-command flakes" -- switch --flake .#raf-devlab-bis 
+```
+
+## Maintenance
+
+### Common Commands
+```shell
+# Rebuild system configuration
+darwin-rebuild --flake .#<host>
+
+# Update user configuration
+home-manager --flake .#<host>
+
+# Build packages
+nix build
+
+# Clean up old generations
+nix-collect-garbage -d
+```
+
+### Updating
+- Regular `nix flake update` to update dependencies
+- `home-manager switch` for user configuration updates
+- `brew update` for Homebrew packages
+
+## Contributing
+
+Feel free to use this configuration as a reference or starting point for your own setup. If you find any issues or have suggestions, please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
