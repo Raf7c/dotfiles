@@ -4,9 +4,9 @@ let
   nvimConfigPath = ../../../config/nvim;
 in
 {
-  xdg.configFile = {
-    "nvim" = {
-      source = config.lib.file.mkOutOfStoreSymlink nvimConfigPath;
+  home.file = {
+    ".config/nvim" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/nix/config/nvim";
       recursive = true;
     };
   };
