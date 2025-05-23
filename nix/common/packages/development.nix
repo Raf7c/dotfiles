@@ -8,5 +8,6 @@
     lazydocker
     glab
     gitkraken
+
   ];
 } 

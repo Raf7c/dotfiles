@@ -8,7 +8,7 @@
   theme = "catppuccin_mocha";
   fontFamily = "JetBrains Mono";
   fontSize = {
-    desktop = 16;
-    laptop = 14;
+    desktop = 20;
+    laptop = 18;
   };
 } 

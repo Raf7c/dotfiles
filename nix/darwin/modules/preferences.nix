@@ -14,6 +14,9 @@
   # macOS system preferences
   system.defaults = {
     dock = {
+      magnification = true;
+      largesize = 69;
+      
       autohide = true;
       autohide-time-modifier = 0.1;
       autohide-delay = 0.0;

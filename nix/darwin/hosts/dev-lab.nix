@@ -13,7 +13,7 @@
   # Configuration spécifique au MacStudio
   system.defaults = {
     dock = {
-      tilesize = 48;
+      tilesize = 60;
     };
   };
   
