@@ -10,12 +10,16 @@ in
 
 darwin.lib.darwinSystem {
   inherit system;
+  
   specialArgs = { 
     inherit inputs user hostname configDir self isLaptop sharedEnv; 
   };
+  
   modules = [
-    # Base modules
+    # Base modules 
     ../darwin/hosts/${hostname}.nix
+    
+    # Modules Darwin communs
     ../darwin/modules
     ../darwin
     

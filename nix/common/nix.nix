@@ -5,13 +5,14 @@
   nix = {
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
+
     };
     
     # Automatic garbage collection
     gc = {
       automatic = true;
       interval = { Day = 2; Hour = 20; Minute = 30; };
-      options = "--delete-older-than 5d";
+      options = "--delete-older-than 7d";
     };
     
     # Store optimization

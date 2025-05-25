@@ -8,7 +8,6 @@
 
   # macOS specific packages
   environment.systemPackages = with pkgs; [
-    # App
     kitty
     obsidian
     slack
@@ -17,18 +16,44 @@
 
   homebrew = {
     enable = true;
+    
     onActivation = {
       autoUpdate = true;
-      cleanup = "zap"; # Clean up undeclared packages
+      cleanup = "zap"; 
       upgrade = true;
     };
+    
     taps = [ ];
-    brews = ["mas" "xz" "zlib" "openssl" "readline"];
-    casks = [ "cleanmymac" "notion" "notion-calendar" "figma" "docker" "istat-menus" "ledger-live" "cursor"];
-    masApps = { "ZSA Keymapp" = 6472865291; };
+    
+    brews = [
+      "mas"        
+      "xz"         
+      "zlib"       
+      "openssl"    
+      "readline"   
+    ];
+    
+    casks = [
+      "cleanmymac"
+      "notion"
+      "notion-calendar"
+      
+      "figma"
+      "docker"
+      "cursor"
+      
+      "istat-menus"
+      
+      # Finance
+      "ledger-live"
+    ];
+    
+    masApps = { 
+      "ZSA Keymapp" = 6472865291; 
+    };
   };
   
-  # Shell configuration
+  # Shell Configuration
   programs.zsh.enable = true;
   environment.shells = with pkgs; [ zsh ];
 }
