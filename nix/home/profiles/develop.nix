@@ -23,6 +23,7 @@ in
     ../programs/tools/fzf.nix
     ../programs/tools/bat.nix
     ../programs/tools/tmux.nix
+    ../programs/tools/monitoring.nix
     ../programs/shell/starship.nix
   ];
 
@@ -40,6 +41,5 @@ in
     inherit config pkgs isLaptop;
     fontSize = fontSize;
     fontFamily = sharedEnv.fontFamily;
-    theme = sharedEnv.theme;
   };
 } 
