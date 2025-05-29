@@ -18,6 +18,30 @@ let
     is_dark_mode() { [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" == "Dark" ]]; }
     log() { echo "$(date '+%H:%M:%S') $*"; }
     
+    # Fonction pour mettre à jour la configuration bat
+    update_bat_config() {
+      local theme="$1"
+      local bat_theme
+      
+      case "$theme" in
+        "light") bat_theme="gruvbox-light" ;;
+        "dark") bat_theme="Catppuccin-mocha" ;;
+        *) bat_theme="Catppuccin-mocha" ;;
+      esac
+      
+      mkdir -p "$HOME/.local/share"
+      cat > "$HOME/.local/share/bat-config-dynamic" << EOF
+# Configuration bat dynamique générée automatiquement
+# Dernière mise à jour: $(date)
+
+--theme="$bat_theme"
+--italic-text=always
+--style="numbers,changes,header"
+--pager="less -FR"
+EOF
+      log "🦇 Bat config updated to $bat_theme"
+    }
+    
     apply_theme() {
       local theme="$1" theme_name
       
@@ -41,6 +65,9 @@ let
       mkdir -p "$HOME/.config/nix-themes"
       ln -sf "${cfg.themeDir}/$theme_name.conf" "$HOME/.config/nix-themes/current.conf"
       
+      # Update bat configuration
+      update_bat_config "$theme"
+      
       # Reload Kitty if it exists
       if command -v kitty >/dev/null 2>&1; then
         pkill -USR1 kitty 2>/dev/null || true
@@ -63,7 +90,8 @@ let
         echo "🌓 System mode: $(is_dark_mode && echo "dark" || echo "light")"
         [[ -f "$HOME/.local/share/current-theme" ]] && echo "🎨 Theme: $(cat "$HOME/.local/share/current-theme")"
         [[ -f "$HOME/.local/share/current-theme-name" ]] && echo "📋 File: $(cat "$HOME/.local/share/current-theme-name").conf"
-        [[ -f "$HOME/.config/nix-themes/current.conf" ]] && echo "🔗 Link: $(readlink "$HOME/.config/nix-themes/current.conf")" ;;
+        [[ -f "$HOME/.config/nix-themes/current.conf" ]] && echo "🔗 Link: $(readlink "$HOME/.config/nix-themes/current.conf")"
+        [[ -f "$HOME/.local/share/bat-config-dynamic" ]] && echo "🦇 Bat theme: $(grep -- --theme "$HOME/.local/share/bat-config-dynamic" | cut -d'"' -f2)" ;;
       *) apply_theme "$1" ;;
     esac
   '';
