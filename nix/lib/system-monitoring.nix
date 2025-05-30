@@ -1,98 +1,147 @@
 { pkgs, lib, config, ... }:
 
 let
-  # Centralized configuration
-  cfg = {
-    themeDir = "$HOME/.dotfiles/nix/theme";
-    themes = {
-      light = "gruvbox_light";
-      dark = "catppuccin_mocha";
+  # Centralized theme configuration
+  themeConfig = {
+    # Theme directory
+    dir = "$HOME/.dotfiles/nix/theme";
+    
+    # Kitty themes
+    kitty = {
+      light = "catppuccin/kitty/catppuccin_latte";
+      dark = "catppuccin/kitty/catppuccin_mocha";
     };
+    
+    # Bat themes
+    bat = {
+      light = "Catppuccin-latte";
+      dark = "Catppuccin-mocha";
+    };
+    
+    # Detection speed (in seconds)
+    checkInterval = 0.5;
   };
-  
-  # Theme management script with Home Manager
+
+  # Simplified theme management script
   themeScript = pkgs.writeShellScriptBin "theme-switcher" ''
     #!/bin/bash
     set -euo pipefail
     
-    is_dark_mode() { [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" == "Dark" ]]; }
-    log() { echo "$(date '+%H:%M:%S') $*"; }
+    # === UTILITIES ===
+    is_dark_mode() { 
+      [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" == "Dark" ]]
+    }
     
-    # Fonction pour mettre à jour la configuration bat
-    update_bat_config() {
+    log() { 
+      echo "$(date '+%H:%M:%S') $*" 
+    }
+    
+    # === BAT CONFIGURATION ===
+    setup_bat() {
       local theme="$1"
       local bat_theme
       
       case "$theme" in
-        "light") bat_theme="gruvbox-light" ;;
-        "dark") bat_theme="Catppuccin-mocha" ;;
-        *) bat_theme="Catppuccin-mocha" ;;
+        light) bat_theme="${themeConfig.bat.light}" ;;
+        dark)  bat_theme="${themeConfig.bat.dark}" ;;
+        *)     bat_theme="${themeConfig.bat.dark}" ;;
       esac
       
       mkdir -p "$HOME/.local/share"
       cat > "$HOME/.local/share/bat-config-dynamic" << EOF
-# Configuration bat dynamique générée automatiquement
-# Dernière mise à jour: $(date)
-
+# Automatic bat configuration - $(date)
 --theme="$bat_theme"
 --italic-text=always
 --style="numbers,changes,header"
 --pager="less -FR"
 EOF
-      log "🦇 Bat config updated to $bat_theme"
+      log "🦇 Bat: $bat_theme"
     }
     
-    apply_theme() {
-      local theme="$1" theme_name
+    # === KITTY CONFIGURATION ===
+    setup_kitty() {
+      local theme="$1"
+      local kitty_theme
       
       case "$theme" in
-        light) theme_name="${cfg.themes.light}" ;;
-        dark) theme_name="${cfg.themes.dark}" ;;
-        auto) 
-          if is_dark_mode; then
-            theme="dark"; theme_name="${cfg.themes.dark}"
-          else  
-            theme="light"; theme_name="${cfg.themes.light}"
-          fi ;;
+        light) kitty_theme="${themeConfig.kitty.light}" ;;
+        dark)  kitty_theme="${themeConfig.kitty.dark}" ;;
+        *)     kitty_theme="${themeConfig.kitty.dark}" ;;
+      esac
+      
+      # Symbolic link for Kitty
+      mkdir -p "$HOME/.config/nix-themes"
+      ln -sf "${themeConfig.dir}/$kitty_theme.conf" "$HOME/.config/nix-themes/current.conf"
+      
+      # Reload Kitty if possible
+      pkill -USR1 kitty 2>/dev/null || true
+      
+      log "🐱 Kitty: $kitty_theme"
+    }
+    
+    # === THEME APPLICATION ===
+    apply_theme() {
+      local mode="$1"
+      
+      # Automatic detection if needed
+      if [[ "$mode" == "auto" ]]; then
+        mode=$(is_dark_mode && echo "dark" || echo "light")
+      fi
+      
+      # Mode validation
+      case "$mode" in
+        light|dark) ;;
         *) echo "Usage: theme-switcher {light|dark|auto|watch|status}"; exit 1 ;;
       esac
       
-      # Save current theme
-      echo "$theme" > "$HOME/.local/share/current-theme"
-      echo "$theme_name" > "$HOME/.local/share/current-theme-name"
+      # Save state
+      echo "$mode" > "$HOME/.local/share/current-theme"
       
-      # Create symbolic link to current theme for Home Manager
-      mkdir -p "$HOME/.config/nix-themes"
-      ln -sf "${cfg.themeDir}/$theme_name.conf" "$HOME/.config/nix-themes/current.conf"
+      # Apply themes
+      setup_kitty "$mode"
+      setup_bat "$mode"
       
-      # Update bat configuration
-      update_bat_config "$theme"
-      
-      # Reload Kitty if it exists
-      if command -v kitty >/dev/null 2>&1; then
-        pkill -USR1 kitty 2>/dev/null || true
-        kitty @ load-config 2>/dev/null || true
-      fi
-      
-      log "✅ Theme $theme applied ($theme_name)"
+      log "✅ $mode theme applied"
     }
     
+    # === AUTOMATIC MONITORING ===
+    watch_changes() {
+      log "🔄 Automatic monitoring enabled (checking every ${toString themeConfig.checkInterval}s)"
+      current=""
+      
+      while true; do
+        new=$(is_dark_mode && echo "dark" || echo "light")
+        if [[ "$new" != "$current" ]]; then
+          current="$new"
+          apply_theme "$new"
+          log "🌓 Change detected: $current"
+        fi
+        sleep ${toString themeConfig.checkInterval}
+      done
+    }
+    
+    # === STATUS ===
+    show_status() {
+      echo "🌓 System mode: $(is_dark_mode && echo "dark" || echo "light")"
+      
+      if [[ -f "$HOME/.local/share/current-theme" ]]; then
+        echo "🎨 Current theme: $(cat "$HOME/.local/share/current-theme")"
+      fi
+      
+      if [[ -f "$HOME/.config/nix-themes/current.conf" ]]; then
+        echo "🔗 Kitty: $(basename "$(readlink "$HOME/.config/nix-themes/current.conf")" .conf)"
+      fi
+      
+      if [[ -f "$HOME/.local/share/bat-config-dynamic" ]]; then
+        echo "🦇 Bat: $(grep -- --theme "$HOME/.local/share/bat-config-dynamic" | cut -d'"' -f2)"
+      fi
+    }
+    
+    # === COMMANDS ===
     case "''${1:-}" in
-      watch)
-        log "🔄 Automatic monitoring enabled"
-        current=""
-        while true; do
-          new=$(is_dark_mode && echo "dark" || echo "light")
-          [[ "$new" != "$current" ]] && { current="$new"; apply_theme "auto"; log "🌓 Change: $current"; }
-          sleep 5
-        done ;;
-      status)
-        echo "🌓 System mode: $(is_dark_mode && echo "dark" || echo "light")"
-        [[ -f "$HOME/.local/share/current-theme" ]] && echo "🎨 Theme: $(cat "$HOME/.local/share/current-theme")"
-        [[ -f "$HOME/.local/share/current-theme-name" ]] && echo "📋 File: $(cat "$HOME/.local/share/current-theme-name").conf"
-        [[ -f "$HOME/.config/nix-themes/current.conf" ]] && echo "🔗 Link: $(readlink "$HOME/.config/nix-themes/current.conf")"
-        [[ -f "$HOME/.local/share/bat-config-dynamic" ]] && echo "🦇 Bat theme: $(grep -- --theme "$HOME/.local/share/bat-config-dynamic" | cut -d'"' -f2)" ;;
-      *) apply_theme "$1" ;;
+      watch)  watch_changes ;;
+      status) show_status ;;
+      *)      apply_theme "$1" ;;
     esac
   '';
 

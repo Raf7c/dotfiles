@@ -1,10 +1,10 @@
 #!/bin/zsh
 
 ### ----  PATH & ENVIRONMENT  ---- ###
-# Définition initiale du PATH avec les priorités
+# Initial PATH definition with priorities
 export PATH="/nix/var/nix/profiles/default/bin:$HOME/.nix-profile/bin:$HOME/.asdf/shims:/opt/homebrew/bin:$PATH"
 
-# Variables d'environnement générales
+# General environment variables
 export TERM="xterm-256color"
 export EDITOR=nvim
 export HOMEBREW_BUNDLE_NO_LOCK=1
@@ -14,7 +14,7 @@ export BROWSER="arc"
 export NULLCMD=bat
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
-# Variables pour les outils de développement
+# Development tools variables
 export NVIM_CONFIG="$HOME/.config/nvim/init.lua"
 export ASDF_CRATE_DEFAULT_PACKAGES_FILE="$ASDF_DEFAULTS_ROOT/.default-cargo-crates"
 
@@ -31,13 +31,13 @@ setopt hist_save_no_dups
 setopt appendhistory
 
 ### ----  ALIASES  ---- ###
-# Commandes générales
+# General commands
 alias vim="nvim"
-alias cat="bat"
+alias cat="bat-auto"  # Uses automatic theme
 alias cl="clear"
 alias sczshrc="source ~/.zshrc"
 
-# Navigation et listing
+# Navigation and listing
 alias ls="eza -lhF --icons --git"
 alias ll="eza -lahF --icons --git"
 alias lt="eza -hF --tree --level=2 --long --icons --git"
@@ -50,19 +50,19 @@ alias gck="git checkout"
 alias gb="git branch"
 
 ### ----  TOOLS INTEGRATION  ---- ###
-# Intégration Nix
+# Nix integration
 if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
   . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
 fi
 
-# Intégration asdf
+# asdf integration
 if [ -f "$HOME/.nix-profile/share/asdf-vm/asdf.sh" ]; then
   . "$HOME/.nix-profile/share/asdf-vm/asdf.sh"
 elif [ -f "$HOME/.asdf/asdf.sh" ]; then
   . "$HOME/.asdf/asdf.sh"
 fi
 
-# Intégration pnpm
+# pnpm integration
 export PNPM_HOME="$HOME/.local/share/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
@@ -70,7 +70,7 @@ case ":$PATH:" in
 esac
 
 ### ----  PLUGINS & EXTENSIONS  ---- ###
-# Installation et chargement de zinit
+# Install and load zinit
 ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
 if [[ ! -d $ZINIT_HOME ]]; then
   mkdir -p "$(dirname $ZINIT_HOME)"
@@ -79,16 +79,16 @@ fi
 
 source "${ZINIT_HOME}/zinit.zsh"
 
-# Chargement des plugins zinit
+# Load zinit plugins
 zinit load zsh-users/zsh-autosuggestions
 zinit load zsh-users/zsh-syntax-highlighting
 zinit load zsh-users/zsh-completions
 zinit ice wait lucid
 zinit light Aloxaf/fzf-tab
 
-# Configuration des plugins
+# Plugin configuration
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -lah --color=always --icons --git $realpath'
 
 ### ----  PROMPT  ---- ###
-# Initialisation de Starship
+# Initialize Starship
 eval "$(starship init zsh)" 
