@@ -12,6 +12,7 @@
     obsidian
     slack
     raycast
+    tmux
   ];
 
   homebrew = {

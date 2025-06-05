@@ -33,7 +33,7 @@ setopt appendhistory
 ### ----  ALIASES  ---- ###
 # General commands
 alias vim="nvim"
-alias cat="bat-auto"  # Uses automatic theme
+alias cat="bat"
 alias cl="clear"
 alias sczshrc="source ~/.zshrc"
 

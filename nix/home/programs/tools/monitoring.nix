@@ -4,16 +4,11 @@ let
   monitoring = import ../../../lib/system-monitoring.nix { inherit pkgs lib config; };
 in
 {
-  # Packages and configuration
+  # Base packages and configuration
   home.packages = monitoring.systemMonitoring.packages;
   home.shellAliases = monitoring.systemMonitoring.aliases;
   
-  programs.btop = {
-    enable = true;
-    settings = monitoring.systemMonitoring.btopConfig;
-  };
-  
-  # Automatic theme monitoring service (macOS LaunchAgent)
+  # Automatic theme switching service
   launchd.agents.theme-auto-switcher = {
     enable = true;
     config = {
@@ -36,7 +31,6 @@ in
     mkdir -p "$HOME/.local/share"
     
     if command -v theme-switcher >/dev/null 2>&1; then
-      echo "🎨 Applying initial automatic theme..."
       theme-switcher auto || true
     fi
   '';
