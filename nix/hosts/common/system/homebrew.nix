@@ -1,39 +1,24 @@
 { config, pkgs, lib, ... }:
 {
-  imports = [
-    ./sops.nix
-    ./preferences.nix
-    ../../common
-  ];
-
-  # macOS specific packages
-  environment.systemPackages = with pkgs; [
-    kitty
-    obsidian
-    slack
-    raycast
-    tmux
-  ];
-
   homebrew = {
     enable = true;
-    
+
     onActivation = {
       autoUpdate = true;
       cleanup = "zap"; 
       upgrade = true;
     };
-    
+
     taps = [ ];
-    
+
     brews = [
-      "mas"        
-      "xz"         
-      "zlib"       
-      "openssl"    
-      "readline"   
+      "mas"
+      "xz"
+      "zlib"
+      "openssl"
+      "readline"
     ];
-    
+
     casks = [
       "cleanmymac"
       "notion"
@@ -53,8 +38,4 @@
       "ZSA Keymapp" = 6472865291; 
     };
   };
-  
-  # Shell Configuration
-  programs.zsh.enable = true;
-  environment.shells = with pkgs; [ zsh ];
-}
+} 

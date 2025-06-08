@@ -30,4 +30,8 @@
     echo "Cleaning up unused packages..."
     /run/current-system/sw/bin/nix-collect-garbage --delete-old > /dev/null 2>&1 || true
   '';
+
+  # Shell Configuration
+  programs.zsh.enable = true;
+  environment.shells = with pkgs; [ zsh ];
 } 

@@ -8,12 +8,12 @@
     # Required for Nix to install the themes
     themes = {
       "Catppuccin-mocha" = {
-        src = ../../../theme/catppuccin/bat;
+        src = ../../../../theme/catppuccin/bat;
         file = "catppuccin_mocha.tmTheme";
       };
       
       "Catppuccin-latte" = {
-        src = ../../../theme/catppuccin/bat;
+        src = ../../../../theme/catppuccin/bat;
         file = "catppuccin_latte.tmTheme";
       };
     };

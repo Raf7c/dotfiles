@@ -8,6 +8,20 @@
     lazydocker
     glab
     gitkraken
+    tmux
+    kitty
+
+
+    curl
+    wget
+    gnupg
+    git
+    gh
+    tree
+    eza
+    fd
+    ripgrep
+    jq
 
   ];
 } 

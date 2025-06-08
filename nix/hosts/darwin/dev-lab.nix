@@ -1,5 +1,7 @@
 { config, pkgs, isLaptop, ... }:
 {
+  imports = [ ../common/core ];
+
   networking = {
     hostName = "raf-devlab";
     computerName = "Raf Dev Lab MacStudio"; 
@@ -16,5 +18,4 @@
       tilesize = 60;
     };
   };
-  
 }

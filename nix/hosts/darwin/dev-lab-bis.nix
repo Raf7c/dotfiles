@@ -1,5 +1,7 @@
 { config, pkgs, isLaptop, ... }:
 {
+  imports = [ ../common/core ];
+
   networking = {
     hostName = "raf-devlab-bis";
     computerName = "Raf Dev Lab MacBook Pro"; 
@@ -23,6 +25,7 @@
   };
 
   homebrew = {
+    brews = [];
     casks = ["aldente"];
   };
 }

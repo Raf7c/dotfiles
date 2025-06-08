@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 
 let
-  monitoring = import ../../../lib/system-monitoring.nix { inherit pkgs lib config; };
+  monitoring = import ../../../../lib/system-monitoring.nix { inherit pkgs lib config; };
 in
 {
   # Base packages and configuration

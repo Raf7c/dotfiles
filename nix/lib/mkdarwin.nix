@@ -17,11 +17,7 @@ darwin.lib.darwinSystem {
   
   modules = [
     # Base modules 
-    ../darwin/hosts/${hostname}.nix
-    
-    # Modules Darwin communs
-    ../darwin/modules
-    ../darwin
+    ../hosts/darwin/${hostname}.nix
     
     # Home Manager
     home-manager.darwinModules.home-manager {
