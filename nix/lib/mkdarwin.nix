@@ -26,7 +26,11 @@ darwin.lib.darwinSystem {
       home-manager.extraSpecialArgs = { 
         inherit hostname isLaptop sharedEnv;
       };
-      home-manager.users.${user} = import ../home;
+      home-manager.users.${user} = import ../home/${
+        if hostname == "dev-lab" then "dev-lab.nix"
+        else if hostname == "dev-lab-bis" then "dev-lab-bis.nix"
+        else throw "Unknown hostname ${hostname}"
+      };
     }
   ];
 }

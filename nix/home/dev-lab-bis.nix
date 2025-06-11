@@ -7,8 +7,7 @@
   home.username = "raf";
 
   imports = [
-    # Import profiles (which themselves import specific configurations)
-    ./profiles
+    ./profiles/develop.nix
   ];
 
-}
+} 

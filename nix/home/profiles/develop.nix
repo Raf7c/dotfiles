@@ -24,6 +24,7 @@ in
     ../common/core/tools/bat.nix
     ../common/core/tools/monitoring.nix
     ../common/core/shell/starship.nix
+    ../common/core/tools/tmux.nix
   ];
 
   # Configuration files for development
