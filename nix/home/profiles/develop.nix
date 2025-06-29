@@ -3,11 +3,6 @@ let
   # Use relative paths instead of absolute paths
   dotfilesDir = builtins.toString ../../../.;
   
-  # Function to create symbolic links for core configuration files
-  mkCoreConfigFile = file: source: program: {
-    "${file}".source = "${dotfilesDir}/nix/home/common/core/${program}/${source}";
-  };
-  
   # Font size based on machine type
   fontSize = if isLaptop 
     then sharedEnv.fontSize.laptop 
@@ -24,17 +19,26 @@ in
     ../common/core/tools/bat.nix
     ../common/core/tools/monitoring.nix
     ../common/core/shell/starship.nix
-    ../common/core/tools/tmux/tmux.nix
+    ../common/core/tools/tmux.nix
   ];
 
   # Configuration files for development
-  home.file = lib.mkMerge [
-    (mkCoreConfigFile ".zshrc" ".zshrc" "shell")
-    (mkCoreConfigFile ".tool-versions" ".tool-versions" "development")
-    (mkCoreConfigFile ".prettierrc.json" "config/formatting-config/.prettierrc.json" "tools")
-    (mkCoreConfigFile ".eslintrc.json" "config/linting-config/.eslintrc.json" "tools")
-    (mkCoreConfigFile ".stylelintrc.json" "config/stylelint-config/.stylelintrc.json" "tools")
-  ];
+  xdg.configFile = {
+    "prettier/.prettierrc.json".source = "${dotfilesDir}/nix/home/common/core/tools/config/formatting-config/.prettierrc.json";
+    "eslint/.eslintrc.json".source = "${dotfilesDir}/nix/home/common/core/tools/config/linting-config/.eslintrc.json";
+    "stylelint/.stylelintrc.json".source = "${dotfilesDir}/nix/home/common/core/tools/config/stylelint-config/.stylelintrc.json";
+  };
+
+  home.file = {
+    ".zshrc" = {
+      source = "${dotfilesDir}/nix/home/common/core/shell/.zshrc";
+      target = "${config.home.homeDirectory}/.zshrc";
+    };
+    ".tool-versions" = {
+      source = "${dotfilesDir}/nix/home/common/core/development/.tool-versions";
+      target = "${config.home.homeDirectory}/.tool-versions";
+    };
+  };
   
   # Development terminal configuration
   programs.kitty = import ../common/core/terminal/kitty.nix {

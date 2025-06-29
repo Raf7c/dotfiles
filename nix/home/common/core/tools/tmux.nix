@@ -8,9 +8,7 @@
     mouse = true;
   };
   
-  # Création du lien symbolique pour tmux.conf
-  home.file.".config/tmux/tmux.conf".source = ./tmux.conf;
-  
+
   # Installation automatique de TPM
   home.activation.setupTmux = lib.hm.dag.entryAfter ["writeBoundary"] ''
     if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
