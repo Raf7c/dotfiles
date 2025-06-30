@@ -13,16 +13,23 @@ in
     enable = true;
     config = {
       Label = "theme-auto-switcher";
-      ProgramArguments = [ "/etc/profiles/per-user/${config.home.username}/bin/theme-switcher" "watch" ];
+      ProgramArguments = [ "${pkgs.bash}/bin/bash" "-c" ''
+        # Attendre que le système soit complètement démarré
+        sleep 5
+        
+        # Configurer l'environnement
+        export PATH="/etc/profiles/per-user/${config.home.username}/bin:$PATH"
+        export HOME="${config.home.homeDirectory}"
+        
+        # Démarrer le watcher
+        exec theme-switcher watch
+      '' ];
       KeepAlive = true;
       RunAtLoad = true;
       StandardOutPath = "${config.home.homeDirectory}/.local/share/theme-switcher.log";
       StandardErrorPath = "${config.home.homeDirectory}/.local/share/theme-switcher.error.log";
       ProcessType = "Background";
-      EnvironmentVariables = {
-        HOME = config.home.homeDirectory;
-        PATH = "/etc/profiles/per-user/${config.home.username}/bin:/usr/bin:/bin";
-      };
+      ThrottleInterval = 30;
     };
   };
   

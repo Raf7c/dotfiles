@@ -14,6 +14,11 @@ let
       light = "Catppuccin-latte";
       dark = "Catppuccin-mocha";
     };
+
+    tmux = {
+      light = "catppuccin/tmux/catppuccin-latte";
+      dark = "catppuccin/tmux/catppuccin-mocha";
+    };
     
     checkInterval = 0.5;
   };
@@ -56,6 +61,28 @@ let
       ln -sf "${themeConfig.dir}/$kitty_theme.conf" "$HOME/.config/nix-themes/current.conf"
       pkill -USR1 kitty 2>/dev/null || true
     }
+
+    # Tmux configuration
+    setup_tmux() {
+      local theme="$1"
+      local tmux_theme
+      
+      case "$theme" in
+        light) tmux_theme="catppuccin-latte" ;;
+        dark)  tmux_theme="catppuccin-mocha" ;;
+      esac
+      
+      if command -v tmux >/dev/null 2>&1 && tmux list-sessions >/dev/null 2>&1; then
+        echo "Changing tmux theme to: $tmux_theme"
+        echo "Source file: $HOME/.config/tmux/themes/$tmux_theme.conf"
+        if [ -f "$HOME/.config/tmux/themes/$tmux_theme.conf" ]; then
+          echo "Theme file exists"
+          tmux source-file "$HOME/.config/tmux/themes/$tmux_theme.conf" || echo "Error sourcing tmux config"
+        else
+          echo "Theme file not found"
+        fi
+      fi
+    }
     
     # Theme application
     apply_theme() {
@@ -73,6 +100,7 @@ let
       echo "$mode" > "$HOME/.local/share/current-theme"
       setup_kitty "$mode"
       setup_bat "$mode"
+      setup_tmux "$mode"
     }
     
     # Change monitoring
@@ -103,6 +131,10 @@ let
       
       if [[ -f "$HOME/.local/share/bat-config-dynamic" ]]; then
         echo "Bat: $(grep -- --theme "$HOME/.local/share/bat-config-dynamic" | cut -d'"' -f2)"
+      fi
+
+      if command -v tmux >/dev/null 2>&1 && tmux list-sessions >/dev/null 2>&1; then
+        echo "Tmux: Active and themed"
       fi
     }
     
