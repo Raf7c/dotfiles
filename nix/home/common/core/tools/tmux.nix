@@ -13,6 +13,13 @@
       # resurrect
     ];
 
+    shellAliases = {
+      tl = "tmux list-sessions";
+      tn = "tmux new-session -s";
+      ta = "tmux attach";
+      tks = "tmux kill-session";
+    };
+
     extraConfig = ''
       ##############################
       # ⚙️ Basic configuration
@@ -21,6 +28,26 @@
       set -g default-command "${pkgs.zsh}/bin/zsh -l"  # ou bash
       set -ag terminal-overrides ",xterm-256color:RGB"
       set -g focus-events on
+
+      # Configuration des touches en mode vi
+      set -g mode-keys vi
+      set -g status-keys vi
+
+
+      ###################################
+      # 🖱️ Enable copy with mouse + pbcopy
+      ###################################
+
+      set-option -g set-clipboard on
+      bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "pbcopy"
+
+
+      ##############################
+      # �� History management
+      ##############################
+
+      set -g history-limit 10000
+      set -g history-file ~/.tmux_history
 
 
       #################################
