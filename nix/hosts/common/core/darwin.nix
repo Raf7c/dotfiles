@@ -21,7 +21,8 @@
       interval = { Day = 2; Hour = 20; Minute = 30; };
     };
   };
-  
+  # Enable Touch ID for sudo authentication
+  security.pam.services.sudo_local.touchIdAuth = true;
   # Allow non-free packages
   nixpkgs.config.allowUnfree = true;
 
