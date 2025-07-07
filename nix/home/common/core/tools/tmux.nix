@@ -13,12 +13,6 @@
       # resurrect
     ];
 
-    shellAliases = {
-      tl = "tmux list-sessions";
-      tn = "tmux new-session -s";
-      ta = "tmux attach";
-      tks = "tmux kill-session";
-    };
 
     extraConfig = ''
       ##############################
@@ -150,4 +144,15 @@
       theme-switcher auto || true
     fi
   '';
+
+  ##############################
+  # 🐚 Shell aliases for tmux
+  ##############################
+
+  home.shellAliases = {
+    tl = "tmux list-sessions";
+    tn = "tmux new-session -s";
+    ta = "tmux attach";
+    tks = "tmux kill-session";
+  };
 }
