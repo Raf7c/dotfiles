@@ -43,11 +43,6 @@ alias ll="eza -lahF --icons --git"
 alias lt="eza -hF --tree --level=2 --long --icons --git"
 alias ltree="eza -lahF --tree --level=2 --long --icons --git"
 
-# Git
-alias gs="git status"
-alias gc="git commit"
-alias gck="git checkout"
-alias gb="git branch"
 
 ### ----  TOOLS INTEGRATION  ---- ###
 # Nix integration

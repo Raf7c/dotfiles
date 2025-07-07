@@ -14,7 +14,7 @@ in
     ../common/core/editors/nvim.nix
     ../common/core/editors/vscode.nix
     ../common/core/development/asdf.nix
-    ../common/core/tools/git.nix
+    ../common/core/tools/git/git.nix
     ../common/core/tools/fzf.nix
     ../common/core/tools/bat.nix
     ../common/core/tools/monitoring.nix
