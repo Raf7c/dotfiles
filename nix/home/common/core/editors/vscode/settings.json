@@ -38,7 +38,7 @@
   "explorer.confirmDelete": false,
 
   // Files
-  "files.autoSave": "off",
+  "files.autoSave": "afterDelay",
   "files.defaultLanguage": "markdown",
 
   // Git
@@ -86,6 +86,12 @@
       "command": "fuzzySearch.activeTextEditor"
     },
     {
+      "key":",",
+      "name":"[,] Fuzzy search in current editor",
+      "type":"command",
+      "command": "workbench.action.showAllEditors"
+    },
+    {
       "key": "a",
       "name": "[A]dd editor to harpoon",
       "type": "command",
@@ -99,7 +105,7 @@
     },
     {
       "key": "q",
-      "name": "[Q]uit",
+      "name": "[Q]uit/[S]ave",
       "type": "bindings",
       "bindings": [
         {
@@ -117,16 +123,16 @@
       ]
     },
     {
-      "key": "w",
-      "name": "[W]rite ",
-      "type": "command",
-      "command": "workbench.action.files.save"
-    },
-    {
       "key": "s",
       "name": "[S]earch",
       "type": "bindings",
       "bindings": [
+        {
+        "key": "h",
+        "name": "[S]earch [H]arpoon Editors",
+        "type": "command",
+        "command": "vscode-harpoon.editorQuickPick"
+        },
         {
           "key": "p",
           "name": "[S]earch Command [P]alette",

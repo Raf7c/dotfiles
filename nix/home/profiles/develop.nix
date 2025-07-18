@@ -34,10 +34,16 @@ in
       source = "${dotfilesDir}/nix/home/common/core/shell/.zshrc";
       target = "${config.home.homeDirectory}/.zshrc";
     };
-    ".tool-versions" = {
-      source = "${dotfilesDir}/nix/home/common/core/development/.tool-versions";
-      target = "${config.home.homeDirectory}/.tool-versions";
-    };
+  };
+
+  home.activation = {
+    linkToolVersions = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      # Link .tool-versions directly to dotfiles
+      if [ ! -L "$HOME/.tool-versions" ] || [ "$(readlink "$HOME/.tool-versions")" != "${config.home.homeDirectory}/.dotfiles/nix/home/common/core/development/.tool-versions" ]; then
+        $DRY_RUN_CMD rm -f "$HOME/.tool-versions"
+        $DRY_RUN_CMD ln -sf "${config.home.homeDirectory}/.dotfiles/nix/home/common/core/development/.tool-versions" "$HOME/.tool-versions"
+      fi
+    '';
   };
   
   # Development terminal configuration
