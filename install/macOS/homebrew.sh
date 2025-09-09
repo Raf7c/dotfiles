@@ -1,38 +1,31 @@
 #!/bin/sh
 # ==========================================
-# ~/hombrew.sh
+# ~/homebrew.sh
 # ==========================================
+
 set -eu
 
-echo "🔍 Vérification de Homebrew..."
+echo "🔍 Checking Homebrew..."
 
+# More robust and faster detection
 if command -v brew >/dev/null 2>&1; then
-    :
+    echo "✅ Homebrew already available"
 elif [ -x /opt/homebrew/bin/brew ]; then
-    # Homebrew est installé mais pas dans le PATH de cette session
     eval "$(/opt/homebrew/bin/brew shellenv)"
-    echo "ℹ️ Homebrew détecté et ajouté au PATH pour cette session."
+    echo "ℹ️ Homebrew detected and added to PATH"
 else
-    echo "⬇️ Installation de Homebrew..."
+    echo "⬇️ Installing Homebrew..."
     /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    # Charger Homebrew pour la session courante
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-# Affiche la version (utile pour vérifier rapidement)
-echo "✅ Homebrew prêt : $(brew --version | head -n1)"
+# More concise version display
+echo "✅ Homebrew ready: $(brew --version | head -n1)"
 
-# ----------------------------
-# Application du Brewfile
-# ----------------------------
+# Brewfile with simplified verification
 BREWFILE="${1:-$HOME/.dotfiles/Brewfile}"
+[ -f "$BREWFILE" ] || { echo "❌ Brewfile not found: $BREWFILE" >&2; exit 1; }
 
-if [ -f "$BREWFILE" ]; then
-    echo "📦 Installation depuis $BREWFILE..."
-    brew bundle --file="$BREWFILE"
-    echo "✅ Terminé!"
-else
-    echo "⚠️ Brewfile introuvable: $BREWFILE"
-    exit 1
-fi
-
+echo "📦 Installing from $BREWFILE..."
+brew bundle --file="$BREWFILE"
+echo "✅ Completed!"
