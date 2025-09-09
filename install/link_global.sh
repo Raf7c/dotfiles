@@ -11,6 +11,7 @@ set -eu
 # .config
 ln -sfn "$HOME/.dotfiles/.config/kitty" "$HOME/.config/kitty"
 ln -sfn "$HOME/.dotfiles/.config/git" 	"$HOME/.config/git"
+ln -sfn "$HOME/.dotfiles/.vimrc"	"$HOME/.vimrc"
 
 # Zsh à la racine (convention)
 ln -sfn "$HOME/.dotfiles/zsh/.zshenv"   "$HOME/.zshenv"
