@@ -1,7 +1,28 @@
 [user]
     name = Raphaël C
     email = 122828688+Raf7c@users.noreply.github.com
+[column]
+	ui = auto
+[branch]
+	sort = -committerdate
+[tag]
+	sort = version:refname
+[init]
+	defaultBranch = main
+
 [core]
     excludesFile = ~/.gitignore
-[init]
-    defaultBranch = main
+[diff]
+    algorithm = histogram
+    colorMoved = plain
+    mnemonicPrefix = true
+	renames = true
+[fetch]
+	prune = true
+	pruneTags = true
+	all = true
+
+[help]
+	autocorrect = prompt
+[commit]
+    verbose = true
