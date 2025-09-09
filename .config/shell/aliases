@@ -1,0 +1,17 @@
+alias cl="clear"
+alias ll="ls -l"
+
+alias gi='git init'
+alias gs='git status'
+alias ga='git add'
+
+alias gb='git branch'
+alias gba='gb --all'
+
+alias gc='git commit'
+
+alias gko='git checkout'
+
+alias gp='git push'
+alias gu='git pull'
+

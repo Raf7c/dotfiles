@@ -1,0 +1,7 @@
+[user]
+    name = Raphaël C
+    email = 122828688+Raf7c@users.noreply.github.com
+[core]
+    excludesFile = ~/.gitignore
+[init]
+    defaultBranch = main
