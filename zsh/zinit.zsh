@@ -12,6 +12,14 @@ compinit -C -d "$XDG_CACHE_HOME/zsh/.zcompdump"
 
 zinit load zsh-users/zsh-autosuggestions
 zinit load zsh-users/zsh-syntax-highlighting
+zinit light Aloxaf/fzf-tab
+
+# Completion styling
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' menu no
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
+zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit

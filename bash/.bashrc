@@ -2,6 +2,9 @@
 # ~/.bashrc
 # ==========================================
 
+# Load common environment variables
+[ -f "${DOTFILES:-$HOME/.dotfiles}/.config/shell/env" ] && . "${DOTFILES:-$HOME/.dotfiles}/.config/shell/env"
+
 # History
 HISTSIZE=10000
 HISTFILESIZE=$HISTSIZE

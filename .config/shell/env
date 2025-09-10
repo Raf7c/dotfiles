@@ -1,0 +1,9 @@
+# Common environment variables (useful for both shells)
+: "${XDG_CONFIG_HOME:=${HOME}/.config}"
+: "${XDG_CACHE_HOME:=${HOME}/.cache}"
+: "${XDG_DATA_HOME:=${HOME}/.local/share}"
+: "${DOTFILES:=${HOME}/.dotfiles}"
+
+# Personal bin at the beginning
+PATH="${HOME}/.local/bin:${PATH}"
+export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME DOTFILES PATH
