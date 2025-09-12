@@ -9,4 +9,3 @@ set noexpandtab      " utiliser des vraies tabs, pas des espaces
 
 set autoindent       " répète l'indentation de la ligne précédente
 set cindent          " indentation C stricte (mieux que smartindent)
-
