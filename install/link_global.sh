@@ -14,6 +14,7 @@ mkdir -p "$HOME/.config"
 ln -sfn "$HOME/.dotfiles/.config/kitty"		"$HOME/.config/kitty"
 ln -sfn "$HOME/.dotfiles/.config/git"		"$HOME/.config/git"
 ln -sfn "$HOME/.dotfiles/.config/starship"  "$HOME/.config/starship"
+ln -sfn "$HOME/.dotfiles/.config/ghostty"   "$HOME/.config/ghostty"
 
 # Shell links
 ln -sfn "$HOME/.dotfiles/zsh/.zshenv" "$HOME/.zshenv"
