@@ -15,7 +15,7 @@ elif [ -x /opt/homebrew/bin/brew ]; then
     echo "ℹ️ Homebrew detected and added to PATH"
 else
     echo "⬇️ Installing Homebrew..."
-    /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
