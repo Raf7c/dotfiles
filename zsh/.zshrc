@@ -30,3 +30,4 @@ source ~/.dotfiles/.config/shell/aliases
 
 # Shell integrations
 eval "$(fzf --zsh)"
+eval "$(starship init zsh)"

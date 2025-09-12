@@ -21,4 +21,4 @@ fi
 
 # Load common aliases
 . ~/.dotfiles/.config/shell/aliases
-
+eval "$(starship init bash)"

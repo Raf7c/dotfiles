@@ -11,8 +11,9 @@ echo "🔗 Creating symbolic links..."
 mkdir -p "$HOME/.config"
 
 # .config links
-ln -sfn "$HOME/.dotfiles/.config/kitty" "$HOME/.config/kitty"
-ln -sfn "$HOME/.dotfiles/.config/git" "$HOME/.config/git"
+ln -sfn "$HOME/.dotfiles/.config/kitty"		"$HOME/.config/kitty"
+ln -sfn "$HOME/.dotfiles/.config/git"		"$HOME/.config/git"
+ln -sfn "$HOME/.dotfiles/.config/starship"  "$HOME/.config/starship"
 
 # Shell links
 ln -sfn "$HOME/.dotfiles/zsh/.zshenv" "$HOME/.zshenv"
