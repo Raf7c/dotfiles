@@ -7,8 +7,11 @@ set -eu
 
 echo "🚀 macOS Environment Configuration"
 
-# macOS verification (more concise)
-[ "$(uname -s)" = "Darwin" ] || { echo "❌ This script must be run on macOS" >&2; exit 1; }
+# macOS verification(Darwin)
+if [ "$(uname -s)" != "Darwin" ]; then
+    printf '%s\n' "❌ This script must be run on macOS" >&2
+    exit 1
+fi
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
