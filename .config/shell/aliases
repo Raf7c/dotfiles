@@ -15,3 +15,5 @@ alias gko='git checkout'
 alias gp='git push'
 alias gu='git pull'
 
+command -v brew >/dev/null 2>&1 && { alias gcc="gcc-15"; alias g++="g++-15"; }
+

@@ -8,6 +8,7 @@
 
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
+command -v brew >/dev/null 2>&1 && export PATH="/opt/homebrew/opt/gcc/bin:$PATH"
 
 # Homebrew bundle file
 export HOMEBREW_BUNDLE_FILE="$DOTFILES/Brewfile"
