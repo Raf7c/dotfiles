@@ -1,5 +1,8 @@
+macos-option-as-alt = true
+window-decoration = true
 theme = catppuccin-mocha
-font-size = 19
+font-family = "Monaspace Xenon"
+font-size = 21
 background-blur-radius = 20
 background-opacity = 0.7
 mouse-hide-while-typing = true
