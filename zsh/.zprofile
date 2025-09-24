@@ -1,6 +1,6 @@
 # ==========================================
 # ~/.zprofile
-# Login shell configuration (global env)
+# Login shell configuration (zprofile)
 # ==========================================
 
 # Homebrew (macOS only)
@@ -8,8 +8,15 @@
 
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
-command -v brew >/dev/null 2>&1 && export PATH="/opt/homebrew/opt/gcc/bin:$PATH"
-command -v brew >/dev/null 2>&1 && export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
 
 # Homebrew bundle file
 export HOMEBREW_BUNDLE_FILE="$DOTFILES/Brewfile"
+
+
+if command -v brew >/dev/null 2>&1; then
+    PATH="/opt/homebrew/bin:$PATH"
+    export HOMEBREW_NO_AUTO_UPDATE=1
+    PATH="/opt/homebrew/opt/gcc/bin:$PATH"
+    PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+    export PATH
+fi

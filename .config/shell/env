@@ -1,3 +1,8 @@
+# ==========================================
+# ~/.config/shell/env
+# Login shell configuration (global env)
+# ==========================================
+
 # Common environment variables (useful for both shells)
 : "${XDG_CONFIG_HOME:=${HOME}/.config}"
 : "${XDG_CACHE_HOME:=${HOME}/.cache}"

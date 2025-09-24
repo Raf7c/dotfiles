@@ -16,11 +16,15 @@ elif [ -x /opt/homebrew/bin/brew ]; then
 else
     echo "⬇️ Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
+
+# Now source .zprofile after Homebrew is ready
+echo "🔧 Loading full shell environment..."
+[ -f "$HOME/.zprofile" ] && . "$HOME/.zprofile"
 
 # More concise version display
 echo "✅ Homebrew ready: $(brew --version | head -n1)"
+
 
 # Brewfile with simplified verification
 BREWFILE="${1:-$HOME/.dotfiles/Brewfile}"
