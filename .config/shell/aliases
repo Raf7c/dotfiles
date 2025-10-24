@@ -1,3 +1,8 @@
+# ==========================================
+# ~/.config/shell/aliases
+# Login shell configuration (global aliases)
+# ==========================================
+
 alias cl="clear"
 alias ll="ls -l"
 
@@ -15,5 +20,11 @@ alias gko='git checkout'
 alias gp='git push'
 alias gu='git pull'
 
-command -v brew >/dev/null 2>&1 && { alias gcc="gcc-15"; alias g++="g++-15"; }
+# macOS specific aliases
+if command -v brew >/dev/null 2>&1; then
+    BREW_PREFIX=$(brew --prefix)
+    alias gcc="$BREW_PREFIX/opt/gcc/bin/gcc-15"
+    alias g++="$BREW_PREFIX/opt/gcc/bin/g++-15"
+    alias brewup='brew update && brew upgrade && brew cleanup'
+fi
 
