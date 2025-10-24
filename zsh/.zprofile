@@ -25,7 +25,3 @@ if [ "$(uname -s)" = "Darwin" ]; then
         export PATH
     fi
 fi
-
-# Locale settings
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"

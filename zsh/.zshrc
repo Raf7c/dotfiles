@@ -19,15 +19,22 @@ _compdump="${XDG_CACHE_HOME}/zsh/.zcompdump"
 compinit -d "${_compdump}"
 
 # Homebrew completions (macOS only)
-[ "$(uname -s)" = "Darwin" ] && command -v brew >/dev/null 2>&1 && [ -r "$(brew --prefix)/share/zsh/site-functions/_brew" ] && FPATH="$(brew --prefix)/share/zsh/site-functions:$FPATH"
-
+if [ "$(uname -s)" = "Darwin" ]; then
+    command -v brew >/dev/null 2>&1 && \
+    [ -r "/opt/homebrew/share/zsh/site-functions/_brew" ] && \
+    FPATH="/opt/homebrew/share/zsh/site-functions:$FPATH"
+fi
 
 # Load common aliases
-source ~/.dotfiles/.config/shell/aliases
+[ -f "${DOTFILES:-$HOME/.dotfiles}/.config/shell/aliases" ] && . "${DOTFILES:-$HOME/.dotfiles}/.config/shell/aliases"
 
 # Load zinit if available
-[ -f "$DOTFILES/zsh/zinit.zsh" ] && . "$DOTFILES/zsh/zinit.zsh"
+[ -f "${DOTFILES:-$HOME/.dotfiles}/zsh/zinit.zsh" ] && . "${DOTFILES:-$HOME/.dotfiles}/zsh/zinit.zsh"
 
 # Shell integrations
-eval "$(fzf --zsh)"
-eval "$(starship init zsh)"
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init zsh)"
+fi
+if command -v fzf >/dev/null 2>&1; then
+    eval "$(fzf --zsh)"
+fi

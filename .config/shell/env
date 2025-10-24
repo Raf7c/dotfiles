@@ -12,3 +12,6 @@
 # Personal bin at the beginning
 PATH="${HOME}/.local/bin:${PATH}"
 export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME DOTFILES PATH
+
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
