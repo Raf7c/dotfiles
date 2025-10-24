@@ -23,7 +23,12 @@ echo "🍺 Configuring Homebrew..."
 sh "$SCRIPT_DIR/install/macOS/homebrew.sh"
 
 echo "📚 Configuring shell..."
-source ~/.zshenv
+# Source shell environment if available
+if [ -f ~/.zshenv ]; then
+    source ~/.zshenv
+else
+    echo "⚠️ ~/.zshenv not found, skipping shell environment loading"
+fi
 sh "$SCRIPT_DIR/install/shell.sh"
 
 echo "⚙️ Configuring macOS..."
