@@ -7,19 +7,16 @@ set -eu
 
 echo "🔍 Checking Homebrew..."
 
-# Initialize Homebrew if available
+# Initialize Homebrew (Apple Silicon only)
 if command -v brew >/dev/null 2>&1; then
     echo "✅ Homebrew already available"
 elif [ -x /opt/homebrew/bin/brew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
     echo "ℹ️ Homebrew detected and added to PATH"
-elif [ -x /usr/local/bin/brew ]; then
-    eval "$(/usr/local/bin/brew shellenv)"
-    echo "ℹ️ Homebrew detected and added to PATH"
 else
     echo "⬇️ Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    # Initialize after installation
+    # Initialize after installation (Apple Silicon only)
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
