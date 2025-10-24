@@ -3,7 +3,7 @@
 # ==========================================
 
 # Load common environment variables
-[ -f "${DOTFILES:-$HOME/.dotfiles}/.config/shell/env" ] && . "${DOTFILES:-$HOME/.dotfiles}/.config/shell/env"
+[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/env" ] && . "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/env"
 
 # History
 HISTSIZE=10000
@@ -20,7 +20,7 @@ if [ "$(uname -s)" = "Darwin" ]; then
 fi
 
 # Load common aliases
-[ -f "${DOTFILES:-$HOME/.dotfiles}/.config/shell/aliases" ] && . "${DOTFILES:-$HOME/.dotfiles}/.config/shell/aliases"
+[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases" ] && . "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases"
 
 # Shell integrations
 if command -v starship >/dev/null 2>&1; then

@@ -26,7 +26,7 @@ if [ "$(uname -s)" = "Darwin" ]; then
 fi
 
 # Load common aliases
-[ -f "${DOTFILES:-$HOME/.dotfiles}/.config/shell/aliases" ] && . "${DOTFILES:-$HOME/.dotfiles}/.config/shell/aliases"
+[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases" ] && . "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases"
 
 # Load zinit if available
 [ -f "${DOTFILES:-$HOME/.dotfiles}/zsh/zinit.zsh" ] && . "${DOTFILES:-$HOME/.dotfiles}/zsh/zinit.zsh"
