@@ -2,8 +2,9 @@
 # ~/.bashrc
 # ==========================================
 
-# Load common environment variables
+# Load common environment variables and aliases
 [ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/env" ] && . "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/env"
+[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases" ] && . "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases"
 
 # History
 HISTSIZE=10000
@@ -19,8 +20,13 @@ if [ "$(uname -s)" = "Darwin" ]; then
   fi
 fi
 
-# Load common aliases
-[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases" ] && . "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases"
+# asdf version manager and completions
+if [ -f /opt/homebrew/opt/asdf/libexec/asdf.sh ]; then
+    . /opt/homebrew/opt/asdf/libexec/asdf.sh
+fi
+if [ -f /opt/homebrew/opt/asdf/etc/bash_completion.d/asdf.bash ]; then
+    . /opt/homebrew/opt/asdf/etc/bash_completion.d/asdf.bash
+fi
 
 # Shell integrations
 if command -v starship >/dev/null 2>&1; then

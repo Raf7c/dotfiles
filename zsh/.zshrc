@@ -25,6 +25,14 @@ if [ "$(uname -s)" = "Darwin" ]; then
     FPATH="/opt/homebrew/share/zsh/site-functions:$FPATH"
 fi
 
+# asdf version manager and completions
+if [ -f /opt/homebrew/opt/asdf/libexec/asdf.sh ]; then
+    . /opt/homebrew/opt/asdf/libexec/asdf.sh
+fi
+if [ -f /opt/homebrew/opt/asdf/etc/bash_completion.d/asdf.bash ]; then
+    . /opt/homebrew/opt/asdf/etc/bash_completion.d/asdf.bash
+fi
+
 # Load common aliases
 [ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases" ] && . "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases"
 

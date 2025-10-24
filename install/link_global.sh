@@ -22,6 +22,7 @@ ln -sfn "$HOME/.dotfiles/zsh/.zshenv" "$HOME/.zshenv"
 ln -sfn "$HOME/.dotfiles/zsh/.zprofile" "$HOME/.zprofile"
 ln -sfn "$HOME/.dotfiles/zsh/.zshrc" "$HOME/.zshrc"
 ln -sfn "$HOME/.dotfiles/bash/.bashrc" "$HOME/.bashrc"
+ln -sfn "$HOME/.dotfiles/.tool-versions" "$HOME/.tool-versions"
 
 # Vim links
 ln -sfn "$HOME/.dotfiles/.vimrc" "$HOME/.vimrc"
