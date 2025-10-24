@@ -13,11 +13,6 @@ setopt hist_ignore_all_dups
 setopt hist_save_no_dups
 setopt hist_find_no_dups
 
-# Completions (XDG cache)
-autoload -Uz compinit
-_compdump="${XDG_CACHE_HOME}/zsh/.zcompdump"
-compinit -d "${_compdump}"
-
 # Homebrew completions (macOS only)
 if [ "$(uname -s)" = "Darwin" ]; then
     command -v brew >/dev/null 2>&1 && \

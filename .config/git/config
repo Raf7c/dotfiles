@@ -11,7 +11,7 @@
 	defaultBranch = main
 
 [core]
-    excludesFile = ~/.gitignore
+    excludesFile = ~/.config/git/ignore
 [diff]
     algorithm = histogram
     colorMoved = plain

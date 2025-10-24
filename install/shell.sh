@@ -9,9 +9,9 @@ echo "📚 Shell migration..."
 
 # Helper function for migration (POSIX-compliant)
 migrate_history() {
-    local shell_name="$1"
-    local old_file="$2"
-    local new_dir="$3"
+    shell_name="$1"
+    old_file="$2"
+    new_dir="$3"
     
     mkdir -p "$new_dir"
     
