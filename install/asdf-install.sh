@@ -1,7 +1,9 @@
 #!/bin/sh
-# asdf-install.sh - Install asdf plugins and versions from .tool-versions file
+# ==========================================
+# ~/asdf-install.sh
+# ==========================================
 
-set -e
+set -eu
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 TOOL_VERSIONS_FILE="$SCRIPT_DIR/../.tool-versions"
