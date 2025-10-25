@@ -28,7 +28,10 @@ migrate_history() {
     fi
     
     # Cleanup
-    [ -f "$old_file" ] && rm "$old_file" && echo "🧹 Old $old_file removed"
+    if [ -f "$old_file" ]; then
+        rm "$old_file"
+        echo "🧹 Old $old_file removed"
+    fi
 }
 
 # Zsh migration

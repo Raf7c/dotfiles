@@ -1,8 +1,14 @@
+# Theme automatique basé sur macOS
+theme = light:/Users/raf/.config/ghostty/themes/catppuccin/catppuccin-latte.conf,dark:/Users/raf/.config/ghostty/themes/catppuccin/catppuccin-mocha.conf
+
 macos-option-as-alt = true
 window-decoration = true
-theme = catppuccin-mocha
 font-family = "Monaspace Xenon"
 font-size = 21
 background-blur-radius = 20
 background-opacity = 0.7
 mouse-hide-while-typing = true
+
+window-padding-x = 10
+window-padding-y = 10
+copy-on-select = true
