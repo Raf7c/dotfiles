@@ -2,9 +2,8 @@
 # ~/.bashrc
 # ==========================================
 
-# Load common environment variables and aliases
+# Load common environment variables
 [ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/env" ] && . "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/env"
-[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases" ] && . "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases"
 
 # History
 HISTSIZE=10000
@@ -28,10 +27,13 @@ if [ -f /opt/homebrew/opt/asdf/etc/bash_completion.d/asdf.bash ]; then
     . /opt/homebrew/opt/asdf/etc/bash_completion.d/asdf.bash
 fi
 
+# Load common aliases
+[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases" ] && . "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/aliases"
+
 # Shell integrations
 if command -v starship >/dev/null 2>&1; then
     eval "$(starship init bash)"
 fi
 if command -v fzf >/dev/null 2>&1; then
-    [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+    eval "$(fzf --bash)"
 fi

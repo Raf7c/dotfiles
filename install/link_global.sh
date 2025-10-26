@@ -24,6 +24,7 @@ ln -sfn "$HOME/.dotfiles/.config/tmux" "$HOME/.config/tmux"
 ln -sfn "$HOME/.dotfiles/zsh/.zshenv" "$HOME/.zshenv"
 ln -sfn "$HOME/.dotfiles/zsh/.zprofile" "$HOME/.zprofile"
 ln -sfn "$HOME/.dotfiles/zsh/.zshrc" "$HOME/.zshrc"
+ln -sfn "$HOME/.dotfiles/bash/.bash_profile" "$HOME/.bash_profile"
 ln -sfn "$HOME/.dotfiles/bash/.bashrc" "$HOME/.bashrc"
 
 # asdf links
