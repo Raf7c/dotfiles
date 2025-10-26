@@ -5,56 +5,62 @@
 
 set -eu
 
+echo "📦 Installing asdf plugins and versions..."
+
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 TOOL_VERSIONS_FILE="$SCRIPT_DIR/../.tool-versions"
 
+# Verify .tool-versions exists
 if [ ! -f "$TOOL_VERSIONS_FILE" ]; then
-    echo "Error: .tool-versions not found at $TOOL_VERSIONS_FILE"
+    printf '%s\n' "❌ .tool-versions not found at $TOOL_VERSIONS_FILE" >&2
     exit 1
 fi
 
+# Verify asdf is available
 if ! command -v asdf >/dev/null 2>&1; then
-    echo "Error: asdf is not installed or not in PATH"
+    printf '%s\n' "❌ asdf is not installed or not in PATH" >&2
     exit 1
 fi
 
-echo "Reading $TOOL_VERSIONS_FILE..."
+echo "📖 Reading $TOOL_VERSIONS_FILE..."
 echo ""
 
+# Process each line in .tool-versions
 while read -r plugin version; do
+    # Skip empty lines and comments
     [ -z "$plugin" ] || [ -z "$version" ] && continue
     [ "$(echo "$plugin" | cut -c1)" = "#" ] && continue
     
-    echo "Processing: $plugin $version"
+    echo "🔧 Processing: $plugin $version"
     
+    # Install plugin if not present
     if ! asdf plugin list | grep -q "^${plugin}$"; then
-        echo "  → Installing plugin: $plugin"
+        echo "  ⬇️ Installing plugin: $plugin"
         if asdf plugin add "$plugin"; then
-            echo "  ✓ Plugin $plugin installed"
+            echo "  ✅ Plugin $plugin installed"
         else
-            echo "  ✗ Failed to install plugin $plugin"
+            echo "  ⚠️ Failed to install plugin $plugin"
             continue
         fi
     else
-        echo "  ✓ Plugin $plugin already installed"
+        echo "  ✅ Plugin $plugin already present"
     fi
     
+    # Install version if not present
     if ! asdf list "$plugin" 2>/dev/null | grep -q "^[[:space:]]*${version}$"; then
-        echo "  → Installing version: $plugin $version"
+        echo "  ⬇️ Installing version: $plugin $version"
         if asdf install "$plugin" "$version"; then
-            echo "  ✓ Version $version installed for $plugin"
+            echo "  ✅ Version $version installed"
         else
-            echo "  ✗ Failed to install version $version for $plugin"
+            echo "  ⚠️ Failed to install version $version"
             continue
         fi
     else
-        echo "  ✓ Version $version already installed for $plugin"
+        echo "  ✅ Version $version already present"
     fi
     
     echo ""
 done < "$TOOL_VERSIONS_FILE"
 
-echo "Installation complete!"
-echo ""
-echo "To set versions globally, run:"
-echo "  asdf reshim"
+echo "✅ asdf installation completed!"
+echo "💡 Run 'asdf reshim' to refresh shims if needed"

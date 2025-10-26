@@ -31,6 +31,9 @@ else
 fi
 sh "$SCRIPT_DIR/install/shell.sh"
 
+echo "🖥️ Installing Tmux plugins..."
+sh "$SCRIPT_DIR/install/tmux-tmp.sh"
+
 echo "⚙️ Configuring macOS..."
 sh "$SCRIPT_DIR/install/macOS/osx.sh"
 
