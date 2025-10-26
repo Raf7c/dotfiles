@@ -3,7 +3,7 @@
 - *MacOS =>* `15.6.1`
 
 ## Software
-- Terminal: [Kitty](https://sw.kovidgoyal.net/kitty/) & [Wezterm](https://wezterm.org/)
+- Terminal: [Ghostty](https://ghostty.org/)
 - Font: [Monaspace](https://monaspace.githubnext.com/)
 - Colorscheme: [Catppuccin](https://github.com/catppuccin/catppuccin)
 - Zshell: [Zinit](https://github.com/zdharma-continuum/zinit)

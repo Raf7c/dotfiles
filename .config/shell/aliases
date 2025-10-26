@@ -39,7 +39,7 @@ alias gla='git log --oneline --all --graph'
 if command -v brew >/dev/null 2>&1; then
     BREW_PREFIX=$(brew --prefix)
     
-    # Détection dynamique de la version GCC installée
+    # Dynamic detection of the installed GCC version
     if brew list gcc &>/dev/null; then
         GCC_PREFIX=$(brew --prefix gcc)
         GCC_VERSION=$(ls "$GCC_PREFIX/bin"/gcc-* 2>/dev/null | head -n1 | grep -oE '[0-9]+$')
