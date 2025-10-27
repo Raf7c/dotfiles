@@ -12,7 +12,7 @@ case "$OSTYPE" in
     fi
     
     # Homebrew configuration
-    export HOMEBREW_BUNDLE_FILE="$DOTFILES/Brewfile"
+    export HOMEBREW_BUNDLE_FILE="${DOTFILES:-$HOME/.dotfiles}/Brewfile"
     export HOMEBREW_NO_AUTO_UPDATE=1
     
     # Add specific tool paths (Apple Silicon only)

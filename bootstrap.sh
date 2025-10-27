@@ -27,10 +27,10 @@ sh "$SCRIPT_DIR/install/macOS/refresh-gcc-cache.sh"
 
 echo "📚 Configuring shell..."
 # Source shell environment if available
-if [ -f ~/.zshenv ]; then
-    . ~/.zshenv
+if [ -f "$SCRIPT_DIR/.config/shell/env" ]; then
+    . "$SCRIPT_DIR/.config/shell/env"
 else
-    echo "⚠️ ~/.zshenv not found, skipping shell environment loading"
+    echo "⚠️ shell/env not found, skipping shell environment loading"
 fi
 sh "$SCRIPT_DIR/install/shell.sh"
 

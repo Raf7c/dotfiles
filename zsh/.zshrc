@@ -2,6 +2,9 @@
 # ~/.zshrc
 # ==========================================
 
+# Load environment variables first
+source "${DOTFILES:-$HOME/.dotfiles}/.config/shell/env"
+
 # History
 HISTSIZE=10000
 SAVEHIST=$HISTSIZE

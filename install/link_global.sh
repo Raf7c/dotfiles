@@ -21,7 +21,6 @@ ln -sfn "$HOME/.dotfiles/.config/bat" "$HOME/.config/bat"
 ln -sfn "$HOME/.dotfiles/.config/tmux" "$HOME/.config/tmux"
 
 # Login shell links
-ln -sfn "$HOME/.dotfiles/zsh/.zshenv" "$HOME/.zshenv"
 ln -sfn "$HOME/.dotfiles/zsh/.zprofile" "$HOME/.zprofile"
 ln -sfn "$HOME/.dotfiles/zsh/.zshrc" "$HOME/.zshrc"
 ln -sfn "$HOME/.dotfiles/bash/.bash_profile" "$HOME/.bash_profile"
