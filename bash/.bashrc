@@ -10,11 +10,13 @@ shopt -s histappend
 HISTCONTROL=ignoreboth:erasedups
 
 # Completions (Apple Silicon)
-if [ "$(uname -s)" = "Darwin" ]; then
-  if [ -r /opt/homebrew/etc/profile.d/bash_completion.sh ]; then
-    . /opt/homebrew/etc/profile.d/bash_completion.sh
-  fi
-fi
+case "$OSTYPE" in
+  darwin*)
+    if [ -r /opt/homebrew/etc/profile.d/bash_completion.sh ]; then
+      . /opt/homebrew/etc/profile.d/bash_completion.sh
+    fi
+    ;;
+esac
 
 # asdf version manager and completions
 if [ -f /opt/homebrew/opt/asdf/libexec/asdf.sh ]; then

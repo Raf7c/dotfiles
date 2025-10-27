@@ -4,7 +4,8 @@
 # ==========================================
 
 # Homebrew (Apple Silicon only)
-if [ "$(uname -s)" = "Darwin" ]; then
+case "$OSTYPE" in
+  darwin*)
     # Initialize Homebrew (Apple Silicon only)
     if [ -x /opt/homebrew/bin/brew ]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -17,4 +18,5 @@ if [ "$(uname -s)" = "Darwin" ]; then
     # Add specific tool paths (Apple Silicon only)
     PATH="/opt/homebrew/opt/gcc/bin:/opt/homebrew/opt/llvm/bin:$PATH"
     export PATH
-fi
+    ;;
+esac

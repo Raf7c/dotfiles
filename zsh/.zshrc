@@ -14,18 +14,19 @@ setopt hist_save_no_dups
 setopt hist_find_no_dups
 
 # Homebrew completions (macOS only)
-if [ "$(uname -s)" = "Darwin" ]; then
+case "$OSTYPE" in
+  darwin*)
     command -v brew >/dev/null 2>&1 && \
     [ -r "/opt/homebrew/share/zsh/site-functions/_brew" ] && \
     FPATH="/opt/homebrew/share/zsh/site-functions:$FPATH"
-fi
+    ;;
+esac
 
-# asdf version manager and completions
+# asdf version manager 
 if [ -f /opt/homebrew/opt/asdf/libexec/asdf.sh ]; then
     . /opt/homebrew/opt/asdf/libexec/asdf.sh
-fi
-if [ -f /opt/homebrew/opt/asdf/etc/bash_completion.d/asdf.bash ]; then
-    . /opt/homebrew/opt/asdf/etc/bash_completion.d/asdf.bash
+    # Use native zsh completions
+    fpath=(${ASDF_DIR}/completions $fpath)
 fi
 
 # Load common aliases
