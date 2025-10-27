@@ -3,12 +3,21 @@
 # Login shell configuration (global aliases)
 # ==========================================
 
+# ============== General ==============
 alias cl="clear"
+
+# ============== cd ==============
+alias cd='z'
+
+# ============== ls ==============
 alias ls='eza --icons'
 alias ll='eza -l --icons --git'
 alias la='eza -la --icons --git'
 alias lt='eza --tree --level=2 --icons'
-alias cd='z'
+
+# ============== Editors ==============
+alias vim='nvim'
+alias vi='nvim'
 
 # ============== Git commands ==============
 alias gi='git init'
