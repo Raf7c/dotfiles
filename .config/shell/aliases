@@ -4,7 +4,11 @@
 # ==========================================
 
 alias cl="clear"
-alias ll="ls -l"
+alias ls='eza --icons'
+alias ll='eza -l --icons --git'
+alias la='eza -la --icons --git'
+alias lt='eza --tree --level=2 --icons'
+alias cd='z'
 
 # ============== Git commands ==============
 alias gi='git init'
