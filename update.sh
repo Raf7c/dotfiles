@@ -20,6 +20,9 @@ if command -v brew >/dev/null 2>&1; then
     brew upgrade
     brew cleanup
     echo "✅ Homebrew updated successfully"
+
+    echo "🔧 Refreshing GCC cache..."
+    sh "$HOME/.dotfiles/install/macOS/refresh-gcc-cache.sh"
 else
     echo "⚠️ Homebrew not found, skipping Homebrew updates"
 fi

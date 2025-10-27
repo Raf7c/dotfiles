@@ -22,6 +22,9 @@ sh "$SCRIPT_DIR/install/link_global.sh"
 echo "🍺 Configuring Homebrew..."
 sh "$SCRIPT_DIR/install/macOS/homebrew.sh"
 
+echo "🔧 Generating GCC cache..."
+sh "$SCRIPT_DIR/install/macOS/refresh-gcc-cache.sh"
+
 echo "📚 Configuring shell..."
 # Source shell environment if available
 if [ -f ~/.zshenv ]; then

@@ -2,9 +2,6 @@
 # ~/.bashrc
 # ==========================================
 
-# Load common environment variables
-[ -f "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/env" ] && . "${XDG_CONFIG_HOME:-${HOME}/.config}/shell/env"
-
 # History
 HISTSIZE=10000
 HISTFILESIZE=$HISTSIZE
