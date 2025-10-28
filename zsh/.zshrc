@@ -1,5 +1,6 @@
 # ==========================================
 # ~/.zshrc
+# Interactive shell configuration
 # ==========================================
 
 # Load environment variables first
