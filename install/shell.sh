@@ -1,6 +1,7 @@
 #!/bin/sh
 # ==========================================
 # ~/shell.sh
+# Shell migration
 # ==========================================
 
 set -eu
@@ -27,10 +28,20 @@ migrate_history() {
         echo "✅ $shell_name history already present"
     fi
     
-    # Cleanup
+    # Cleanup with backup
     if [ -f "$old_file" ]; then
-        rm "$old_file"
-        echo "🧹 Old $old_file removed"
+        # Verify migration succeeded
+        if [ -f "$new_dir/history" ] && [ -s "$new_dir/history" ]; then
+            # Create backup before removal
+            backup_file="${old_file}.backup.$(date +%Y%m%d)"
+            cp "$old_file" "$backup_file"
+            rm "$old_file"
+            echo "🧹 Old $old_file removed"
+            echo "💾 Backup saved: $backup_file"
+            echo "💡 You can delete backup after verifying: rm $backup_file"
+        else
+            echo "⚠️  Migration verification failed, keeping $old_file"
+        fi
     fi
 }
 

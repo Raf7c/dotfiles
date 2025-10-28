@@ -1,6 +1,7 @@
 #!/bin/sh
 # ==========================================
 # ~/link_global.sh 
+# Creating symbolic links
 # ==========================================
 
 set -eu
@@ -12,7 +13,6 @@ mkdir -p "$HOME/.config"
 mkdir -p "$HOME/.local/bin"
 
 # Config links
-ln -sfn "$HOME/.dotfiles/.config/kitty"		"$HOME/.config/kitty"
 ln -sfn "$HOME/.dotfiles/.config/git"		"$HOME/.config/git"
 ln -sfn "$HOME/.dotfiles/.config/starship.toml" "$HOME/.config/starship.toml"
 ln -sfn "$HOME/.dotfiles/.config/ghostty"   "$HOME/.config/ghostty"

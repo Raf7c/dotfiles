@@ -1,6 +1,7 @@
 #!/bin/sh
 # ==========================================
 # ~/asdf-install.sh
+# Installing asdf plugins and versions
 # ==========================================
 
 set -eu
@@ -28,8 +29,11 @@ echo ""
 # Process each line in .tool-versions
 while read -r plugin version; do
     # Skip empty lines and comments
-    [ -z "$plugin" ] || [ -z "$version" ] && continue
-    [ "$(echo "$plugin" | cut -c1)" = "#" ] && continue
+    [ -z "$plugin" ] && continue
+    [ -z "$version" ] && continue
+    case "$plugin" in
+        \#*) continue ;;
+    esac
     
     echo "🔧 Processing: $plugin $version"
     

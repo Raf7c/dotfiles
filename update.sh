@@ -1,9 +1,13 @@
 #!/bin/sh
 # ==========================================
 # ~/update.sh
+# Update environment
 # ==========================================
 
 set -eu
+
+# Start timer
+START_TIME=$(date +%s)
 
 # macOS verification(Darwin)
 if [ "$(uname -s)" != "Darwin" ]; then
@@ -11,7 +15,9 @@ if [ "$(uname -s)" != "Darwin" ]; then
     exit 1
 fi
 
-printf '%s\n' "🚀 macOS Environment Update"
+echo "🚀 macOS Environment Update"
+echo "📅 Started at: $(date '+%Y-%m-%d %H:%M:%S')"
+echo ""
 
 # 1. Homebrew
 if command -v brew >/dev/null 2>&1; then
@@ -39,5 +45,15 @@ else
     printf '%s\n' "⚠️ zsh not found, skipping plugin update"
 fi
 
+# Calculate duration
+END_TIME=$(date +%s)
+DURATION=$((END_TIME - START_TIME))
+MINUTES=$((DURATION / 60))
+SECONDS=$((DURATION % 60))
+
+# Summary
+echo "========================================="
 echo "🎉 Update completed!"
+echo "⏱️  Total time: ${MINUTES}m ${SECONDS}s"
+echo "========================================="
 
