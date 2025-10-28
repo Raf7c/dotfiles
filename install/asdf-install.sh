@@ -27,7 +27,8 @@ echo "📖 Reading $TOOL_VERSIONS_FILE..."
 echo ""
 
 # Process each line in .tool-versions
-while read -r plugin version; do
+# The 'while read || [ -n "$plugin" ]' ensures we read the last line even without trailing newline
+while read -r plugin version || [ -n "$plugin" ]; do
     # Skip empty lines and comments
     [ -z "$plugin" ] && continue
     [ -z "$version" ] && continue
