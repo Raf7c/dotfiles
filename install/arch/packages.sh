@@ -9,27 +9,8 @@ set -eu
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 PACKAGES_DIR="$SCRIPT_DIR/../packages"
 
-echo "📦 Installing packages..."
+# Load unified package installer
+. "$SCRIPT_DIR/../lib/install_packages.sh"
 
-# Update system
-echo "🔄 Updating system..."
-sudo pacman -Syu --noconfirm
-
-# Function to install package with Pacman
-install_pkg() {
-    pkg="$1"
-    [ -z "$pkg" ] && return
-    case "$pkg" in \#*) return ;; esac
-    
-    sudo pacman -S --noconfirm --needed "$pkg" 2>/dev/null || true
-}
-
-# Install Arch packages
-echo "🏔️  Installing Arch packages..."
-while IFS= read -r pkg || [ -n "$pkg" ]; do
-    install_pkg "$pkg"
-done < "$PACKAGES_DIR/arch.txt" || true
-
-# Cleanup
-sudo pacman -Sc --noconfirm 2>/dev/null || true
-echo "✅ Installation complete!"
+# Install packages
+install_packages "arch" "$PACKAGES_DIR"

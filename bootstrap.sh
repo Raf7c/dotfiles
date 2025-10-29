@@ -64,8 +64,16 @@ echo ""
 
 # Common steps
 run_step "Shell migration" "$SCRIPT_DIR/install/common/shell.sh" "optional"
-run_step "Installing Tmux plugins" "$SCRIPT_DIR/install/common/tmux-tmp.sh" "optional"
-run_step "Installing asdf plugins" "$SCRIPT_DIR/install/common/asdf-install.sh" "optional"
+
+# Only if tmux is installed
+if command_exists tmux; then
+    run_step "Installing Tmux plugins" "$SCRIPT_DIR/install/common/tmux-tmp.sh" "optional"
+fi
+
+# Only if asdf is installed and .tool-versions exists
+if command_exists asdf && [ -f "$SCRIPT_DIR/.tool-versions" ]; then
+    run_step "Installing asdf plugins" "$SCRIPT_DIR/install/common/asdf-install.sh" "optional"
+fi
 
 # OS-specific configuration
 case "$OS" in

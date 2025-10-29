@@ -53,29 +53,6 @@ check_os_support() {
     esac
 }
 
-# Get package manager for current OS
-get_package_manager() {
-    local os=$(detect_os)
-    case "$os" in
-        macos) echo "brew" ;;
-        fedora) echo "dnf" ;;
-        arch) echo "pacman" ;;
-        debian|ubuntu) echo "apt" ;;
-        *) echo "" ;;
-    esac
-}
-
-# Get Homebrew path (macOS)
-get_homebrew_path() {
-    if [ -d "/opt/homebrew" ]; then
-        echo "/opt/homebrew"
-    elif [ -d "/usr/local/Homebrew" ]; then
-        echo "/usr/local"
-    else
-        echo ""
-    fi
-}
-
 # Check if a command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
@@ -147,15 +124,5 @@ check_requirements() {
     
     print_success "All requirements met"
     echo ""
-    return 0
-}
-
-# Verify macOS (legacy function for compatibility)
-check_macos() {
-    local os=$(detect_os)
-    if [ "$os" != "macos" ]; then
-        print_error "This script must be run on macOS"
-        return 1
-    fi
     return 0
 }

@@ -34,7 +34,7 @@ done
 
 # Test modern CLI tools
 echo "⚡ Modern CLI tools..."
-for cmd in bat fzf rg fd btop tree zoxide; do
+for cmd in bat eza fzf rg fd btop tree zoxide starship; do
     if command -v "$cmd" >/dev/null 2>&1; then
         print_success "$cmd: $(command -v "$cmd")"
     else
