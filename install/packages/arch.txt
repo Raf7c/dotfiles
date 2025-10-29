@@ -1,0 +1,31 @@
+# Arch Linux packages
+
+# Build tools
+base-devel
+
+# Essential
+git
+curl
+tmux
+gcc
+make
+
+# Modern CLI tools
+bat
+fzf
+ripgrep
+fd
+btop
+tree
+zoxide
+starship
+
+# Development
+asdf
+
+# Applications
+ghostty
+
+# Fonts
+ttf-jetbrains-mono-nerd
+monaspace

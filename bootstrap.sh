@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==========================================
 # ~/bootstrap.sh
-# Dotfiles Installation
+# Cross-platform Dotfiles Installation
 # ==========================================
 
 set -eu
@@ -17,24 +17,43 @@ START_TIME=$(date +%s)
 # Setup logging
 setup_logging "$LOG_FILE"
 
+# Detect OS
+OS=$(detect_os)
+
 echo "========================================="
-echo "🚀 macOS Environment Configuration"
+echo "🚀 Dotfiles Configuration"
+echo "🖥️  System: $OS"
 echo "📝 Logging to: $LOG_FILE"
 echo "📅 Started at: $(date '+%Y-%m-%d %H:%M:%S')"
 echo "========================================="
 echo ""
 
-# Verify macOS
-check_macos || exit 1
+# Check OS support
+check_os_support || exit 1
+echo ""
 
 # Check requirements
 check_requirements git curl || exit 1
 
-# Sequential execution
-run_step "Creating symbolic links" "$SCRIPT_DIR/install/link_global.sh" "critical"
-run_step "Configuring Homebrew" "$SCRIPT_DIR/install/macOS/homebrew.sh" "critical"
-run_step "Generating GCC cache" "$SCRIPT_DIR/install/macOS/refresh-gcc-cache.sh" "optional"
+# Common steps for all platforms
+echo "📦 Common installation steps..."
+run_step "Creating symbolic links" "$SCRIPT_DIR/install/common/link_global.sh" "critical"
 
+# OS-specific package installation
+case "$OS" in
+    macos)
+        run_step "Configuring Homebrew" "$SCRIPT_DIR/install/macOS/homebrew.sh" "critical"
+        run_step "Installing packages" "$SCRIPT_DIR/install/macOS/packages.sh" "critical"
+        ;;
+    fedora)
+        run_step "Installing packages" "$SCRIPT_DIR/install/fedora/packages.sh" "critical"
+        ;;
+    arch)
+        run_step "Installing packages" "$SCRIPT_DIR/install/arch/packages.sh" "critical"
+        ;;
+esac
+
+# Load shell environment
 echo "📚 Configuring shell..."
 if [ -f "$SCRIPT_DIR/.config/shell/env" ]; then
     . "$SCRIPT_DIR/.config/shell/env"
@@ -43,14 +62,24 @@ else
 fi
 echo ""
 
-run_step "Shell migration" "$SCRIPT_DIR/install/shell.sh" "optional"
-run_step "Installing Tmux plugins" "$SCRIPT_DIR/install/tmux-tmp.sh" "optional"
-run_step "Configuring macOS" "$SCRIPT_DIR/install/macOS/osx.sh" "optional"
-run_step "Installing asdf plugins" "$SCRIPT_DIR/install/asdf-install.sh" "optional"
+# Common steps
+run_step "Shell migration" "$SCRIPT_DIR/install/common/shell.sh" "optional"
+run_step "Installing Tmux plugins" "$SCRIPT_DIR/install/common/tmux-tmp.sh" "optional"
+run_step "Installing asdf plugins" "$SCRIPT_DIR/install/common/asdf-install.sh" "optional"
+
+# OS-specific configuration
+case "$OS" in
+    macos)
+        run_step "Refreshing GCC cache" "$SCRIPT_DIR/install/macOS/refresh-gcc-cache.sh" "optional"
+        run_step "Configuring macOS" "$SCRIPT_DIR/install/macOS/osx.sh" "optional"
+        ;;
+esac
 
 # Summary
+echo ""
 echo "========================================="
 echo "🎉 Configuration completed!"
+echo "🖥️  Platform: $OS"
 echo "⏱️  Total time: $(format_duration $START_TIME)"
 echo "📝 Full log: $LOG_FILE"
 print_info "Some changes may require a full restart."

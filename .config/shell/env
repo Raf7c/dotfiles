@@ -1,7 +1,26 @@
 # ==========================================
 # ~/.config/shell/env
-# Login shell configuration (global env)
+# Cross-platform login shell configuration
 # ==========================================
+
+# Detect OS
+case "$(uname -s)" in
+    Darwin*) OS_TYPE="macos" ;;
+    Linux*)
+        if [ -f /etc/os-release ]; then
+            . /etc/os-release
+            case "$ID" in
+                fedora) OS_TYPE="fedora" ;;
+                arch) OS_TYPE="arch" ;;
+                *) OS_TYPE="linux" ;;
+            esac
+        else
+            OS_TYPE="linux"
+        fi
+        ;;
+    *) OS_TYPE="unknown" ;;
+esac
+export OS_TYPE
 
 # XDG Base Directory
 : "${XDG_CONFIG_HOME:=${HOME}/.config}"
@@ -12,6 +31,7 @@
 
 # Personal bin at the beginning
 PATH="${HOME}/.local/bin:${PATH}"
+
 export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME DOTFILES PATH
 
 # Terminal colors
@@ -41,6 +61,23 @@ export ASDF_DATA_DIR="${XDG_DATA_HOME}/asdf"
 export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
 export ASDF_DEFAULTS_ROOT="${XDG_CONFIG_HOME}/asdf"
 
-# Homebrew
-export HOMEBREW_NO_ANALYTICS=1
-export HOMEBREW_NO_AUTO_UPDATE=1
+# OS-specific configuration
+case "$OS_TYPE" in
+    macos)
+        # Homebrew
+        export HOMEBREW_NO_ANALYTICS=1
+        export HOMEBREW_NO_AUTO_UPDATE=1
+        
+        # Initialize Homebrew
+        if [ -x /opt/homebrew/bin/brew ]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        elif [ -x /usr/local/bin/brew ]; then
+            eval "$(/usr/local/bin/brew shellenv)"
+        fi
+        ;;
+    
+    fedora|arch|linux)
+        # Linux-specific environment variables
+        # Add system paths if needed
+        ;;
+esac

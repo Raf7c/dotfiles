@@ -11,6 +11,71 @@ print_warning() { echo "⚠️  $1"; }
 print_info() { echo "💡 $1"; }
 print_step() { echo "▶️  $1"; }
 
+# Detect operating system
+detect_os() {
+    case "$(uname -s)" in
+        Darwin*)
+            echo "macos"
+            ;;
+        Linux*)
+            if [ -f /etc/os-release ]; then
+                . /etc/os-release
+                case "$ID" in
+                    fedora) echo "fedora" ;;
+                    arch) echo "arch" ;;
+                    ubuntu|debian) echo "$ID" ;;
+                    *) echo "linux" ;;
+                esac
+            else
+                echo "linux"
+            fi
+            ;;
+        *)
+            echo "unknown"
+            ;;
+    esac
+}
+
+# Check if OS is supported
+check_os_support() {
+    local os=$(detect_os)
+    case "$os" in
+        macos|fedora|arch)
+            print_success "Supported system: $os"
+            echo "OS=$os"
+            return 0
+            ;;
+        *)
+            print_error "Unsupported system: $os"
+            print_info "Supported systems: macOS, Fedora, Arch Linux"
+            return 1
+            ;;
+    esac
+}
+
+# Get package manager for current OS
+get_package_manager() {
+    local os=$(detect_os)
+    case "$os" in
+        macos) echo "brew" ;;
+        fedora) echo "dnf" ;;
+        arch) echo "pacman" ;;
+        debian|ubuntu) echo "apt" ;;
+        *) echo "" ;;
+    esac
+}
+
+# Get Homebrew path (macOS)
+get_homebrew_path() {
+    if [ -d "/opt/homebrew" ]; then
+        echo "/opt/homebrew"
+    elif [ -d "/usr/local/Homebrew" ]; then
+        echo "/usr/local"
+    else
+        echo ""
+    fi
+}
+
 # Check if a command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
@@ -24,7 +89,8 @@ run_step() {
     
     print_step "$step_name"
     
-    if sh "$script_path"; then
+    # Execute script directly to respect its shebang
+    if "$script_path"; then
         print_success "$step_name completed"
         return 0
     else
@@ -84,12 +150,12 @@ check_requirements() {
     return 0
 }
 
-# Verify macOS
+# Verify macOS (legacy function for compatibility)
 check_macos() {
-    if [ "$(uname -s)" != "Darwin" ]; then
+    local os=$(detect_os)
+    if [ "$os" != "macos" ]; then
         print_error "This script must be run on macOS"
         return 1
     fi
     return 0
 }
-

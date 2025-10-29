@@ -1,35 +1,36 @@
 #!/bin/sh
 # ==========================================
-# ~/homebrew.sh
+# ~/install/macOS/homebrew.sh
+# Install and configure Homebrew
 # ==========================================
 
 set -eu
 
-echo "🔍 Checking Homebrew..."
+echo "🍺 Configuring Homebrew..."
 
-# Initialize Homebrew (Apple Silicon only)
+# Check if Homebrew is installed
 if command -v brew >/dev/null 2>&1; then
-    echo "✅ Homebrew already available"
+    echo "✅ Homebrew already installed: $(brew --version | head -n1)"
+# Check Apple Silicon path
 elif [ -x /opt/homebrew/bin/brew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
-    echo "ℹ️ Homebrew detected and added to PATH"
+    echo "✅ Homebrew found: $(brew --version | head -n1)"
+# Check Intel path
+elif [ -x /usr/local/bin/brew ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+    echo "✅ Homebrew found: $(brew --version | head -n1)"
+# Install Homebrew
 else
-    echo "⬇️ Installing Homebrew..."
+    echo "⬇️  Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    # Initialize after installation (Apple Silicon only)
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+    
+    # Initialize after installation
+    if [ -x /opt/homebrew/bin/brew ]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    elif [ -x /usr/local/bin/brew ]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+    fi
+    
+    echo "✅ Homebrew installed: $(brew --version | head -n1)"
 fi
 
-# Source shell environment to get Homebrew configuration
-echo "🔧 Loading shell environment..."
-[ -f "$HOME/.zprofile" ] && . "$HOME/.zprofile"
-
-echo "✅ Homebrew ready: $(brew --version | head -n1)"
-
-# Install from Brewfile
-BREWFILE="${1:-$HOME/.dotfiles/Brewfile}"
-[ -f "$BREWFILE" ] || { echo "❌ Brewfile not found: $BREWFILE" >&2; exit 1; }
-
-echo "📦 Installing from $BREWFILE..."
-brew bundle --file="$BREWFILE"
-echo "✅ Installation completed!"

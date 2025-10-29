@@ -1,0 +1,42 @@
+# macOS packages
+
+# Essential
+git
+curl
+tmux
+gcc
+make
+eza
+
+# Modern CLI tools
+bat
+fzf
+ripgrep
+fd
+btop
+tree
+zoxide
+starship
+
+# Development
+asdf
+
+# Applications (casks)
+cask:arc
+cask:cleanmymac
+cask:cursor
+cask:discord
+cask:ghostty
+cask:keymapp
+cask:obs
+cask:obsidian
+cask:raycast
+cask:rode-connect
+cask:thebrowsercompany-dia
+cask:utm
+cask:visual-studio-code
+
+# Fonts (casks)
+cask:font-daddy-time-mono-nerd-font
+cask:font-jetbrains-mono-nerd-font
+cask:font-monaspace

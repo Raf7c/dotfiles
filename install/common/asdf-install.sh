@@ -9,7 +9,7 @@ set -eu
 echo "📦 Installing asdf plugins and versions..."
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-TOOL_VERSIONS_FILE="$SCRIPT_DIR/../.tool-versions"
+TOOL_VERSIONS_FILE="$SCRIPT_DIR/../../.tool-versions"
 
 # Verify .tool-versions exists
 if [ ! -f "$TOOL_VERSIONS_FILE" ]; then

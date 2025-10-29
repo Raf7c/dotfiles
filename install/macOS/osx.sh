@@ -7,7 +7,7 @@ set -eu
 
 echo "⚙️ macOS Configuration..."
 
-# Configuration by groups (more readable)
+# Configuration by groups
 echo "📱 Dock..."
 defaults write com.apple.dock autohide -bool true
 defaults write com.apple.dock autohide-time-modifier -float 0
@@ -35,4 +35,4 @@ killall Dock 2>/dev/null || true
 killall Finder 2>/dev/null || true
 killall SystemUIServer 2>/dev/null || true
 
-echo "✅ macOS configuration completed"
+echo "✅ macOS configuration complete"
