@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # ==========================================
 # ~/bootstrap.sh
 # Cross-platform Dotfiles Installation
@@ -14,8 +14,12 @@ START_TIME=$(date +%s)
 # Load utilities
 . "$SCRIPT_DIR/install/lib/utils.sh"
 
-# Setup logging
-setup_logging "$LOG_FILE"
+# Setup logging with tee (sh-compatible)
+if [ "${BOOTSTRAP_LOGGING:-}" != "active" ]; then
+    export BOOTSTRAP_LOGGING="active"
+    "$0" "$@" 2>&1 | tee "$LOG_FILE"
+    exit $?
+fi
 
 # Detect OS
 OS=$(detect_os)

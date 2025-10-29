@@ -6,6 +6,11 @@
 
 set -eu
 
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+# Load utilities
+. "$SCRIPT_DIR/../lib/utils.sh"
+
 echo "🔗 Creating symbolic links..."
 
 # Create directories
@@ -31,3 +36,5 @@ ln -sfn "$HOME/.dotfiles/.tool-versions" "$HOME/.tool-versions"
 
 # Vim links
 ln -sfn "$HOME/.dotfiles/.vimrc" "$HOME/.vimrc"
+
+print_success "Symbolic links created!"

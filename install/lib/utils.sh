@@ -96,9 +96,10 @@ format_duration() {
 
 # Setup logging to file and terminal
 setup_logging() {
-    local log_file="$1"
-    exec > >(tee -a "$log_file")
-    exec 2>&1
+    log_file="$1"
+    # Create or clear log file
+    : > "$log_file"
+    # Note: stdout/stderr will be redirected by run_step function
 }
 
 # Check for required commands

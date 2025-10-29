@@ -6,20 +6,24 @@
 
 set -eu
 
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+# Load utilities
+. "$SCRIPT_DIR/../lib/utils.sh"
+
 echo "📦 Installing asdf plugins and versions..."
 
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 TOOL_VERSIONS_FILE="$SCRIPT_DIR/../../.tool-versions"
 
 # Verify .tool-versions exists
 if [ ! -f "$TOOL_VERSIONS_FILE" ]; then
-    printf '%s\n' "❌ .tool-versions not found at $TOOL_VERSIONS_FILE" >&2
+    print_error ".tool-versions not found at $TOOL_VERSIONS_FILE"
     exit 1
 fi
 
 # Verify asdf is available
 if ! command -v asdf >/dev/null 2>&1; then
-    printf '%s\n' "❌ asdf is not installed or not in PATH" >&2
+    print_error "asdf is not installed or not in PATH"
     exit 1
 fi
 
@@ -42,30 +46,30 @@ while read -r plugin version || [ -n "$plugin" ]; do
     if ! asdf plugin list | grep -q "^${plugin}$"; then
         echo "  ⬇️ Installing plugin: $plugin"
         if asdf plugin add "$plugin"; then
-            echo "  ✅ Plugin $plugin installed"
+            print_success "  Plugin $plugin installed"
         else
-            echo "  ⚠️ Failed to install plugin $plugin"
+            print_warning "  Failed to install plugin $plugin"
             continue
         fi
     else
-        echo "  ✅ Plugin $plugin already present"
+        print_success "  Plugin $plugin already present"
     fi
     
     # Install version if not present
     if ! asdf list "$plugin" 2>/dev/null | grep -q "^[[:space:]]*${version}$"; then
         echo "  ⬇️ Installing version: $plugin $version"
         if asdf install "$plugin" "$version"; then
-            echo "  ✅ Version $version installed"
+            print_success "  Version $version installed"
         else
-            echo "  ⚠️ Failed to install version $version"
+            print_warning "  Failed to install version $version"
             continue
         fi
     else
-        echo "  ✅ Version $version already present"
+        print_success "  Version $version already present"
     fi
     
     echo ""
 done < "$TOOL_VERSIONS_FILE"
 
-echo "✅ asdf installation completed!"
-echo "💡 Run 'asdf reshim' to refresh shims if needed"
+print_success "asdf installation completed!"
+print_info "Run 'asdf reshim' to refresh shims if needed"

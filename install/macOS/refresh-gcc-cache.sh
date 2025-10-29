@@ -5,6 +5,11 @@
 
 set -eu
 
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+# Load utilities
+. "$SCRIPT_DIR/../lib/utils.sh"
+
 echo "🔄 Refreshing GCC cache..."
 
 # Create cache directory
@@ -26,16 +31,16 @@ if command -v brew >/dev/null 2>&1 && brew list gcc &>/dev/null; then
 alias gcc="$GCC_PREFIX/bin/gcc-$GCC_VERSION"
 alias g++="$GCC_PREFIX/bin/g++-$GCC_VERSION"
 EOF
-            echo "✅ GCC cache created: gcc-$GCC_VERSION"
+            print_success "GCC cache created: gcc-$GCC_VERSION"
             echo "📍 Location: $HOME/.cache/gcc_aliases"
         else
-            echo "⚠️  Could not detect GCC version"
+            print_warning "Could not detect GCC version"
         fi
     else
-        echo "⚠️  GCC directory not found: $GCC_PREFIX/bin"
+        print_warning "GCC directory not found: $GCC_PREFIX/bin"
     fi
 else
-    echo "ℹ️  GCC is not installed via Homebrew"
+    print_info "GCC is not installed via Homebrew"
     # Remove cache if it exists
     rm -f "$HOME/.cache/gcc_aliases"
 fi

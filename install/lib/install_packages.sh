@@ -10,7 +10,7 @@ install_packages() {
     local pkg_file="$packages_dir/${os}.txt"
     
     if [ ! -f "$pkg_file" ]; then
-        echo "❌ Package file not found: $pkg_file" >&2
+        print_error "Package file not found: $pkg_file"
         return 1
     fi
     
@@ -20,7 +20,7 @@ install_packages() {
     case "$os" in
         macos)
             if ! command -v brew >/dev/null 2>&1; then
-                echo "❌ Homebrew not available" >&2
+                print_error "Homebrew not available"
                 return 1
             fi
             echo "🍎 Installing macOS packages..."
@@ -43,7 +43,7 @@ install_packages() {
             cleanup_cmd="sudo pacman -Sc --noconfirm"
             ;;
         *)
-            echo "❌ Unsupported OS: $os" >&2
+            print_error "Unsupported OS: $os"
             return 1
             ;;
     esac
@@ -58,15 +58,15 @@ install_packages() {
         if [ "$os" = "macos" ] && echo "$pkg" | grep -q "^cask:"; then
             pkg=$(echo "$pkg" | sed 's/^cask://')
             if $cask_cmd "$pkg" 2>/dev/null; then
-                echo "  ✅ $pkg"
+                printf "  " && print_success "$pkg"
             else
-                echo "  ⚠️  $pkg (skipped)"
+                printf "  " && print_warning "$pkg (skipped)"
             fi
         else
             if $install_cmd "$pkg" 2>/dev/null; then
-                echo "  ✅ $pkg"
+                printf "  " && print_success "$pkg"
             else
-                echo "  ⚠️  $pkg (skipped)"
+                printf "  " && print_warning "$pkg (skipped)"
             fi
         fi
     done < "$pkg_file" || true
@@ -74,6 +74,6 @@ install_packages() {
     # Cleanup
     $cleanup_cmd 2>/dev/null || true
     
-    echo "✅ Installation complete!"
+    print_success "Installation complete!"
     return 0
 }

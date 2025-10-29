@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # ==========================================
 # ~/test.sh
 # Validate dotfiles installation
@@ -6,7 +6,7 @@
 
 set -eu
 
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 . "$SCRIPT_DIR/install/lib/utils.sh"
 
 echo "========================================="

@@ -6,6 +6,11 @@
 
 set -eu
 
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+# Load utilities
+. "$SCRIPT_DIR/../lib/utils.sh"
+
 echo "📚 Shell migration..."
 
 # Helper function for migration (POSIX-compliant)
@@ -19,13 +24,13 @@ migrate_history() {
     if [ ! -f "$new_dir/history" ]; then
         if [ -f "$old_file" ]; then
             cp "$old_file" "$new_dir/history"
-            echo "✅ $shell_name history migrated"
+            print_success "$shell_name history migrated"
         else
             : > "$new_dir/history"
-            echo "✅ Empty $shell_name history created"
+            print_success "Empty $shell_name history created"
         fi
     else
-        echo "✅ $shell_name history already present"
+        print_success "$shell_name history already present"
     fi
     
     # Cleanup with backup
@@ -38,9 +43,9 @@ migrate_history() {
             rm "$old_file"
             echo "🧹 Old $old_file removed"
             echo "💾 Backup saved: $backup_file"
-            echo "💡 You can delete backup after verifying: rm $backup_file"
+            print_info "You can delete backup after verifying: rm $backup_file"
         else
-            echo "⚠️  Migration verification failed, keeping $old_file"
+            print_warning "Migration verification failed, keeping $old_file"
         fi
     fi
 }
@@ -53,6 +58,6 @@ migrate_history "Bash" "$HOME/.bash_history" "$HOME/.local/share/bash"
 
 # Cache directories
 mkdir -p "$HOME/.cache/zsh" "$HOME/.cache/bash"
-echo "✅ Cache directories ready"
+print_success "Cache directories ready"
 
-echo "✅ Shell migration completed"
+print_success "Shell migration completed"

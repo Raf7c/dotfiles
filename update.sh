@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # ==========================================
 # ~/update.sh
 # Cross-platform environment update

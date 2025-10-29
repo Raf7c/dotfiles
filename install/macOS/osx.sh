@@ -5,6 +5,11 @@
 
 set -eu
 
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+# Load utilities
+. "$SCRIPT_DIR/../lib/utils.sh"
+
 echo "⚙️ macOS Configuration..."
 
 # Configuration by groups
@@ -35,4 +40,4 @@ killall Dock 2>/dev/null || true
 killall Finder 2>/dev/null || true
 killall SystemUIServer 2>/dev/null || true
 
-echo "✅ macOS configuration complete"
+print_success "macOS configuration complete"

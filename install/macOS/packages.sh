@@ -6,7 +6,7 @@
 
 set -eu
 
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 PACKAGES_DIR="$SCRIPT_DIR/../packages"
 
 # Load unified package installer
