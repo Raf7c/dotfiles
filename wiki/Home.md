@@ -1,6 +1,6 @@
 # 🏠 Dotfiles Wiki
 
-> Configuration cross-platform pour développeurs (macOS · Fedora · Arch)
+> Configuration cross-platform pour développeurs (macOS · Arch)
 
 ## 🚀 Démarrage rapide
 
@@ -10,7 +10,7 @@ cd ~/.dotfiles
 ./bootstrap.sh
 ```
 
-✨ Le script détecte automatiquement ton OS (macOS/Fedora/Arch) !
+✨ Le script détecte automatiquement ton OS (macOS/Arch) !
 
 ---
 
@@ -20,7 +20,7 @@ cd ~/.dotfiles
 
 | Fonctionnalité | Description |
 |----------------|-------------|
-| 🌍 **Multi-plateforme** | Détection auto de l'OS (macOS, Fedora, Arch) |
+| 🌍 **Multi-plateforme** | Détection auto de l'OS (macOS, Arch) |
 | 🚀 **Performance** | Démarrage shell < 200ms |
 | 📦 **Installation auto** | Gestion complète des erreurs |
 | 🏠 **Conforme XDG** | Home directory propre |

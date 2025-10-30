@@ -51,15 +51,12 @@ install/
 │   └── install_packages.sh → Installation unifiée des paquets
 ├── packages/
 │   ├── macos.txt         → Paquets macOS (+ cask: pour applications)
-│   ├── fedora.txt        → Paquets Fedora
 │   └── arch.txt          → Paquets Arch Linux
 ├── macOS/
 │   ├── homebrew.sh       → Installation/configuration Homebrew
 │   ├── packages.sh       → Installation paquets macOS
 │   ├── osx.sh            → Préférences système
 │   └── refresh-gcc-cache.sh → Cache performance
-├── fedora/
-│   └── packages.sh       → Installation paquets Fedora
 ├── arch/
 │   └── packages.sh       → Installation paquets Arch
 ├── link_global.sh        → Gestion des liens symboliques
@@ -70,7 +67,7 @@ install/
 
 **Détection automatique de l'OS :**
 - `utils.sh` détecte l'OS via `uname -s` et `/etc/os-release`
-- Variable `OS_TYPE` exportée : `macos`, `fedora`, `arch`, ou `linux`
+- Variable `OS_TYPE` exportée : `macos`, `arch`, ou `linux`
 - Scripts compatibles POSIX sh (pas bash-spécifique)
 
 ---
@@ -101,7 +98,7 @@ export PAGER="less"
 export LESS="-R -F -X"
 
 # OS
-export OS_TYPE  # macos|fedora|arch|linux
+export OS_TYPE  # macos|arch|linux
 
 # Historique
 HISTFILE="$XDG_DATA_HOME/zsh/history"
@@ -138,9 +135,8 @@ HISTSIZE=10000
 │
 ├── install/              # Scripts par OS
 │   ├── lib/              # Fonctions communes
-│   ├── packages/         # Listes paquets (macos/fedora/arch)
+│   ├── packages/         # Listes paquets (macos/arch)
 │   ├── macOS/
-│   ├── fedora/
 │   └── arch/
 │
 ├── .config/

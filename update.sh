@@ -61,18 +61,6 @@ case "$OS" in
         fi
         ;;
     
-    fedora)
-        echo "🎩 Updating Fedora packages..."
-        echo "🔄 Updating system packages..."
-        if sudo dnf update -y; then
-            sudo dnf autoremove -y
-            print_success "Fedora packages updated successfully"
-        else
-            print_warning "Fedora update failed"
-        fi
-        echo ""
-        ;;
-    
     arch)
         echo "🏔️  Updating Arch packages..."
         echo "🔄 Updating system packages..."

@@ -21,7 +21,6 @@ detect_os() {
             if [ -f /etc/os-release ]; then
                 . /etc/os-release
                 case "$ID" in
-                    fedora) echo "fedora" ;;
                     arch) echo "arch" ;;
                     ubuntu|debian) echo "$ID" ;;
                     *) echo "linux" ;;
@@ -40,14 +39,14 @@ detect_os() {
 check_os_support() {
     local os=$(detect_os)
     case "$os" in
-        macos|fedora|arch)
+        macos|arch)
             print_success "Supported system: $os"
             echo "OS=$os"
             return 0
             ;;
         *)
             print_error "Unsupported system: $os"
-            print_info "Supported systems: macOS, Fedora, Arch Linux"
+            print_info "Supported systems: macOS, Arch Linux"
             return 1
             ;;
     esac

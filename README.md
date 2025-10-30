@@ -2,7 +2,7 @@
 
 Cross-platform configuration for modern development environments.
 
-**Supported:** macOS · Fedora · Arch Linux
+**Supported:** macOS · Arch Linux
 
 [📚 Complete Wiki](https://github.com/Raf7c/dotfiles/wiki)
 
@@ -25,11 +25,6 @@ Cross-platform configuration for modern development environments.
 - **Architecture**: Apple Silicon (M1/M2/M3/M4) or Intel
 - **Required tools**: git, curl (Xcode Command Line Tools)
 
-### Fedora
-- **Version**: Fedora 38 or higher
-- **Required tools**: git, curl, dnf
-- **Access**: sudo privileges
-
 ### Arch Linux
 - **Version**: Latest rolling release
 - **Required tools**: git, curl, pacman
@@ -50,7 +45,7 @@ cd ~/.dotfiles
 - ✅ Detects your operating system automatically
 - ✅ Verifies system requirements
 - ✅ Creates symbolic links for all configurations
-- ✅ Installs packages (Homebrew/DNF/Pacman)
+- ✅ Installs packages (Homebrew/Pacman)
 - ✅ Configures Zsh, Tmux, Git, and OS-specific preferences
 - ✅ Sets up performance optimizations
 
@@ -85,7 +80,7 @@ cd ~/.dotfiles
 `bat` · `eza` · `fzf` · `ripgrep` · `fd` · `btop` · `zoxide` · `tree` · `starship` · `git` · `gcc` · `make`
 
 ### Features
-- ✅ **Cross-platform** - macOS, Fedora, Arch Linux
+- ✅ **Cross-platform** - macOS, Arch Linux
 - ✅ **XDG compliant** - Clean home directory
 - ✅ **Performance optimized** - Shell startup <200ms
 - ✅ **Modular scripts** - Easy to customize
@@ -138,7 +133,6 @@ Updates Homebrew packages, Zsh plugins, Tmux plugins, and asdf.
 - **Compatibility:** Apple Silicon · Intel · macOS 12.0+
 
 ### Linux
-- **Fedora 40** - Workstation Edition
 - **Arch Linux** - Rolling Release (2024)
 - **Compatibility:** x86_64 architecture
 
@@ -164,6 +158,6 @@ This project is open source and available under the [MIT License](LICENSE).
 
 **[📚 Complete Documentation](https://github.com/Raf7c/dotfiles/wiki)** · **[🚀 Get Started](https://github.com/Raf7c/dotfiles/wiki/Installation)** · **[💬 Issues](https://github.com/Raf7c/dotfiles/issues)**
 
-Built with ❤️ for macOS · Linux · Cross-platform environments ·
+Built with ❤️ for macOS · Arch Linux · Cross-platform environments ·
 
 </div>

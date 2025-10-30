@@ -19,7 +19,6 @@ Adapter le dotfiles à tes besoins.
 | OS | Fichier |
 |----|---------|
 | macOS | `install/packages/macos.txt` |
-| Fedora | `install/packages/fedora.txt` |
 | Arch | `install/packages/arch.txt` |
 
 **Format :**

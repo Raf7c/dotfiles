@@ -54,14 +54,6 @@ case "$OS" in
             FAILED=1
         fi
         ;;
-    fedora)
-        if command -v dnf >/dev/null 2>&1; then
-            print_success "DNF: $(dnf --version | head -n1)"
-        else
-            print_error "DNF: NOT FOUND"
-            FAILED=1
-        fi
-        ;;
     arch)
         if command -v pacman >/dev/null 2>&1; then
             print_success "Pacman: $(pacman --version | head -n1)"

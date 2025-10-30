@@ -295,7 +295,7 @@ zprof
 ```bash
 # Vérifier OS_TYPE
 echo $OS_TYPE
-# → macos / fedora / arch
+# → macos / arch
 
 # Vérifier XDG
 echo $XDG_CONFIG_HOME

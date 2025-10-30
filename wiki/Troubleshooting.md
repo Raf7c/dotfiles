@@ -24,9 +24,6 @@ chmod +x bootstrap.sh && ./bootstrap.sh
 # macOS
 xcode-select --install
 
-# Fedora
-sudo dnf install -y git curl
-
 # Arch
 sudo pacman -S git curl
 ```

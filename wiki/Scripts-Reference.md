@@ -22,7 +22,7 @@ Documentation des scripts d'installation.
 ```
 
 **Étapes :**
-1. Détection OS (macOS/Fedora/Arch)
+1. Détection OS (macOS/Arch)
 2. Vérification prérequis (git, curl)
 3. Liens symboliques
 4. Gestionnaire paquets (Homebrew si macOS)
@@ -48,7 +48,6 @@ Documentation des scripts d'installation.
 
 **Actions (selon OS) :**
 - **macOS** : Homebrew + cache GCC
-- **Fedora** : DNF update
 - **Arch** : Pacman update
 - **Tous** : asdf, Zinit, Tmux plugins
 
@@ -131,7 +130,7 @@ python 3.14.0
 **Fonctions communes**
 
 ```bash
-detect_os()       # Détecte OS (macos|fedora|arch)
+detect_os()       # Détecte OS (macos|arch)
 command_exists()  # Vérifie commande
 print_success()   # Message ✅
 print_error()     # Message ❌
@@ -147,14 +146,13 @@ run_step()        # Exécute script avec gestion erreur
 
 ```bash
 install_packages() {
-    local os="$1"           # macos | fedora | arch
+    local os="$1"           # macos | arch
     local packages_dir="$2"
 }
 ```
 
 **Commandes par OS :**
 - **macOS** : `brew install` / `brew install --cask`
-- **Fedora** : `sudo dnf install -y -q`
 - **Arch** : `sudo pacman -S --noconfirm --needed`
 
 ---
@@ -180,14 +178,6 @@ bat
 cask:ghostty
 cask:font-jetbrains-mono-nerd-font
 ```
-
----
-
-### Fedora
-
-| Script | Description |
-|--------|-------------|
-| `packages.sh` | `sudo dnf install` depuis `fedora.txt` |
 
 ---
 

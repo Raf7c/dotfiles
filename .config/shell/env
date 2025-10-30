@@ -10,7 +10,6 @@ case "$(uname -s)" in
         if [ -f /etc/os-release ]; then
             . /etc/os-release
             case "$ID" in
-                fedora) OS_TYPE="fedora" ;;
                 arch) OS_TYPE="arch" ;;
                 *) OS_TYPE="linux" ;;
             esac
@@ -76,7 +75,7 @@ case "$OS_TYPE" in
         fi
         ;;
     
-    fedora|arch|linux)
+    arch|linux)
         # Linux-specific environment variables
         # Add system paths if needed
         ;;

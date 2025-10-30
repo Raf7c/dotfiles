@@ -49,9 +49,6 @@ case "$OS" in
         run_step "Configuring Homebrew" "$SCRIPT_DIR/install/macOS/homebrew.sh" "critical"
         run_step "Installing packages" "$SCRIPT_DIR/install/macOS/packages.sh" "critical"
         ;;
-    fedora)
-        run_step "Installing packages" "$SCRIPT_DIR/install/fedora/packages.sh" "critical"
-        ;;
     arch)
         run_step "Installing packages" "$SCRIPT_DIR/install/arch/packages.sh" "critical"
         ;;

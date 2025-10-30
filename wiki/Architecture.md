@@ -14,7 +14,7 @@ Architecture technique du dotfiles.
 ## 🎯 Vue d'ensemble
 
 **Principes :**
-- **Portable** : macOS, Fedora, Arch Linux
+- **Portable** : macOS, Arch Linux
 - **Modulaire** : Scripts à responsabilité unique
 - **Performant** : Shell startup < 200ms
 - **Idempotent** : Safe de relancer plusieurs fois
@@ -60,7 +60,6 @@ install/
 ├── lib/utils.sh              # Fonctions communes
 ├── link_global.sh            # Liens symboliques
 ├── macOS/packages.sh         # Paquets macOS
-├── fedora/packages.sh        # Paquets Fedora
 └── arch/packages.sh          # Paquets Arch
 ```
 
@@ -102,8 +101,7 @@ esac
 if [ -f /etc/os-release ]; then
     . /etc/os-release
     case "$ID" in
-        fedora) OS_TYPE="fedora" ;;
-        arch)   OS_TYPE="arch" ;;
+        arch) OS_TYPE="arch" ;;
     esac
 fi
 
@@ -113,9 +111,8 @@ export OS_TYPE
 **Utilisation :**
 ```bash
 case "$OS_TYPE" in
-    macos)  sh install/macOS/packages.sh ;;
-    fedora) sh install/fedora/packages.sh ;;
-    arch)   sh install/arch/packages.sh ;;
+    macos) sh install/macOS/packages.sh ;;
+    arch)  sh install/arch/packages.sh ;;
 esac
 ```
 
@@ -136,7 +133,6 @@ esac
 │   │
 │   ├── packages/
 │   │   ├── macos.txt             # Paquets macOS
-│   │   ├── fedora.txt            # Paquets Fedora
 │   │   └── arch.txt              # Paquets Arch
 │   │
 │   ├── common/
@@ -151,7 +147,6 @@ esac
 │   │   ├── osx.sh                # Préférences système
 │   │   └── refresh-gcc-cache.sh  # Cache GCC
 │   │
-│   ├── fedora/packages.sh
 │   └── arch/packages.sh
 │
 └── .config/

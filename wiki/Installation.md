@@ -1,6 +1,6 @@
 # 📦 Installation
 
-Guide d'installation complet pour configurer l'environnement de développement cross-platfor (macOS, Fedora, Arch Linux).
+Guide d'installation complet pour configurer l'environnement de développement cross-platform (macOS, Arch Linux).
 
 ## 📋 Table des matières
 
@@ -34,22 +34,6 @@ Cela installe automatiquement : `git`, `curl`, compilateurs de base
 **Vérification :**
 ```bash
 git --version && curl --version && sw_vers
-```
-
-#### Fedora
-- **Version :** Fedora 38, 39, 40
-- **Architecture :** x86_64
-- **Espace disque :** ~3 GB
-
-**Installation des outils requis :**
-```bash
-# Installer git et curl
-sudo dnf install -y git curl
-```
-
-**Vérification :**
-```bash
-git --version && curl --version && cat /etc/fedora-release
 ```
 
 #### Arch Linux
@@ -108,7 +92,7 @@ Le script `bootstrap.sh` effectue les actions suivantes dans l'ordre :
 
 ```
 1. 🔍 Vérification système
-   └─ Détecte l'OS (macOS, Fedora, Arch)
+   └─ Détecte l'OS (macOS, Arch)
    └─ Vérifie git + curl
 
 2. 🔗 Liens symboliques
@@ -116,7 +100,6 @@ Le script `bootstrap.sh` effectue les actions suivantes dans l'ordre :
 
 3. 📦 Gestionnaire de paquets
    └─ macOS : Installe/configure Homebrew
-   └─ Fedora : Utilise DNF
    └─ Arch : Utilise Pacman
    └─ Installe les paquets depuis install/packages/
 
@@ -131,7 +114,6 @@ Le script `bootstrap.sh` effectue les actions suivantes dans l'ordre :
 
 7. ⚙️ Configuration spécifique à l'OS
    └─ macOS : Cache GCC + Préférences système (Dock, Finder)
-   └─ Fedora : Configuration système si nécessaire
    └─ Arch : Configuration système si nécessaire
 ```
 
@@ -264,8 +246,7 @@ cd ~/.dotfiles
 # 1. Vérifier le gestionnaire de paquets
 # macOS:
 brew --version && brew list
-# Fedora:
-dnf --version && dnf list installed
+
 # Arch:
 pacman --version && pacman -Q
 
@@ -539,9 +520,6 @@ exec zsh
 # macOS
 brew install starship zoxide fzf bat eza ripgrep fd
 
-# Fedora
-sudo dnf install starship zoxide fzf bat eza ripgrep fd-find
-
 # Arch
 sudo pacman -S starship zoxide fzf bat eza ripgrep fd
 ```
@@ -692,17 +670,6 @@ eval "$(/usr/local/bin/brew shellenv)"     # Intel
 
 # Puis relancer bootstrap
 ./bootstrap.sh
-```
-
-### Fedora
-
-#### Erreur : "Cannot find a valid baseurl for repo"
-
-**Solution :**
-```bash
-# Mettre à jour les dépôts
-sudo dnf clean all
-sudo dnf update --refresh
 ```
 
 ### Arch Linux

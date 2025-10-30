@@ -30,7 +30,6 @@ Les **dotfiles** sont les fichiers de configuration Unix/Linux qui commencent pa
 ### Puis-je utiliser ces dotfiles sur Linux ?
 
 **Oui !** Support complet pour :
-- ✅ **Fedora 38+** (DNF)
 - ✅ **Arch Linux** (Pacman + AUR via yay)
 - ✅ **macOS 12.0+** (Homebrew)
 
@@ -46,7 +45,6 @@ Le script `bootstrap.sh` détecte automatiquement votre système d'exploitation 
 ### Quelle distribution Linux est supportée ?
 
 **Actuellement supportées :**
-- ✅ **Fedora 38, 39, 40** - Installation via DNF
 - ✅ **Arch Linux** - Installation via Pacman
 - ✅ **Dérivés Arch** - Manjaro, EndeavourOS (via Pacman)
 

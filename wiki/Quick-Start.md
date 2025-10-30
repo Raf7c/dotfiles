@@ -17,16 +17,6 @@ xcode-select --install
 </details>
 
 <details>
-<summary><b>Fedora</b></summary>
-
-```bash
-# Git et curl (normalement déjà installés)
-sudo dnf install git curl -y
-```
-
-</details>
-
-<details>
 <summary><b>Arch Linux</b></summary>
 
 ```bash
@@ -54,7 +44,7 @@ cd ~/.dotfiles
 ```
 
 **Le script va automatiquement :**
-- ✅ Détecter votre OS (macOS/Fedora/Arch)
+- ✅ Détecter votre OS (macOS/Arch)
 - ✅ Installer le gestionnaire de paquets (Homebrew si macOS)
 - ✅ Installer tous les paquets nécessaires
 - ✅ Créer les liens symboliques

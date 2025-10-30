@@ -28,13 +28,6 @@ install_packages() {
             cask_cmd="brew install --cask"
             cleanup_cmd="brew cleanup -q"
             ;;
-        fedora)
-            echo "🔄 Updating system..."
-            sudo dnf update -y -q
-            echo "📦 Installing Fedora packages..."
-            install_cmd="sudo dnf install -y -q"
-            cleanup_cmd="sudo dnf autoremove -y -q"
-            ;;
         arch)
             echo "🔄 Updating system..."
             sudo pacman -Syu --noconfirm

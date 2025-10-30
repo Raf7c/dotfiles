@@ -32,5 +32,5 @@
 ---
 
 **Plateformes:**  
-macOS · Fedora · Arch
+macOS · Arch
 
