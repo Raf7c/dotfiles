@@ -74,6 +74,8 @@ exec zsh
 ✅ All critical checks passed!
 ```
 
+> **📦 Note Arch Linux :** Certains outils optionnels (`asdf`, `ghostty`, `zoxide`, `monaspace`) sont des packages AUR. Installez-les manuellement
+
 ---
 
 ## 🎯 Premiers pas

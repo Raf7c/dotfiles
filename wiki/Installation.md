@@ -213,6 +213,8 @@ git config --global user.email "votre.email@example.com"
 
 ### 5. Installer les versions de langages (asdf)
 
+> **Note Arch Linux :** `asdf` est un package AUR. Installez-le manuellement avant de continuer.
+
 ```bash
 # Vérifier asdf
 asdf --version

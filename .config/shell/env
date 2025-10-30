@@ -40,8 +40,12 @@ export TERM="xterm-256color"
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 
-# Editor
-export EDITOR="vim"
+# Editor (Intelligent detection of nvim/vim)
+if command -v nvim >/dev/null 2>&1; then
+    export EDITOR="nvim"
+else
+    export EDITOR="vim"
+fi
 export VISUAL="$EDITOR"
 export GIT_EDITOR="$EDITOR"
 

@@ -1,4 +1,5 @@
-# Arch Linux packages
+# Arch Linux packages (Official repos only)
+# Note: asdf, ghostty, zoxide, monaspace are AUR packages - install manually
 
 # Build tools
 base-devel
@@ -12,20 +13,13 @@ make
 
 # Modern CLI tools
 bat
+eza
 fzf
 ripgrep
 fd
 btop
 tree
-zoxide
 starship
-
-# Development
-asdf
-
-# Applications
-ghostty
 
 # Fonts
 ttf-jetbrains-mono-nerd
-monaspace

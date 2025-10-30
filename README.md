@@ -74,7 +74,7 @@ cd ~/.dotfiles
 - **Terminal:** [Ghostty](https://ghostty.org/) with [Catppuccin](https://github.com/catppuccin/catppuccin) theme
 - **Shell:** [Zsh](https://www.zsh.org/) + [Zinit](https://github.com/zdharma-continuum/zinit) + [Starship](https://starship.rs/)
 - **Multiplexer:** [Tmux](https://github.com/tmux/tmux) with TPM plugins
-- **Editor:** [Vim](https://www.vim.org/) / [Neovim](https://neovim.io/) via [asdf](https://asdf-vm.com/)
+- **Editor:** [Neovim](https://neovim.io/) via [asdf](https://asdf-vm.com/)
 
 ### CLI Utilities
 `bat` · `eza` · `fzf` · `ripgrep` · `fd` · `btop` · `zoxide` · `tree` · `starship` · `git` · `gcc` · `make`
@@ -105,7 +105,7 @@ cd ~/.dotfiles
 
 ### 🔧 Developer Experience
 - **XDG compliant** - Clean `$HOME` directory
-- **Smart aliases** - `cd` → zoxide, `ls` → eza
+- **Smart aliases** - `cd` → zoxide (si installé), `ls` → eza
 - **Git shortcuts** - 20+ productivity aliases
 - **Tmux prefix** - `Ctrl+Space` (more ergonomic)
 

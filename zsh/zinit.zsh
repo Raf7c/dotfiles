@@ -32,8 +32,17 @@ compinit -C -d "$XDG_CACHE_HOME/zsh/.zcompdump"
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' menu no
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null || ls --color $realpath'
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null || ls --color $realpath'
+
+# fzf-tab preview (with fallback if eza is not installed)
+if command -v eza &>/dev/null; then
+    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null'
+    # Preview for zoxide only if installed
+    if command -v zoxide &>/dev/null; then
+        zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null'
+    fi
+else
+    zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color=always $realpath 2>/dev/null'
+fi
 
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
