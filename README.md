@@ -1,21 +1,12 @@
 # 🏠 dotfiles
 
-Personal configuration for macOS development environment.
+Cross-platform configuration for modern development environments.
 
- [📚 Complete Wiki](../../wiki)
+**Supported:** macOS · Fedora · Arch Linux
+
+[📚 Complete Wiki](https://github.com/Raf7c/dotfiles/wiki)
 
 ---
-
-## ⚡ Quick Start
-
-```bash
-# Clone and install
-git clone https://github.com/your-username/.dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
-./bootstrap.sh
-```
-
-**Installation time:** 1-2 minutes | **Shell startup:** <200ms
 
 ---
 
@@ -29,16 +20,26 @@ cd ~/.dotfiles
 
 ## 🔧 Prerequisites
 
-- **Operating System**: macOS 15.0 or higher
+### macOS
+- **Version**: macOS 12.0 or higher
 - **Architecture**: Apple Silicon (M1/M2/M3/M4) or Intel
-- **Access**: Administrator rights for installation
-- **Required tools**: git, curl (installed via Xcode Command Line Tools)
+- **Required tools**: git, curl (Xcode Command Line Tools)
+
+### Fedora
+- **Version**: Fedora 38 or higher
+- **Required tools**: git, curl, dnf
+- **Access**: sudo privileges
+
+### Arch Linux
+- **Version**: Latest rolling release
+- **Required tools**: git, curl, pacman
+- **Access**: sudo privileges
 
 ## 🚀 Quick Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/.dotfiles.git ~/.dotfiles
+git clone https://github.com/Raf7c/dotfiles.git ~/.dotfiles
 
 # Launch installation
 cd ~/.dotfiles
@@ -46,30 +47,31 @@ cd ~/.dotfiles
 ```
 
 **What it does:**
+- ✅ Detects your operating system automatically
 - ✅ Verifies system requirements
 - ✅ Creates symbolic links for all configurations
-- ✅ Installs Homebrew + all packages
-- ✅ Configures Zsh, Tmux, Git, and macOS preferences
+- ✅ Installs packages (Homebrew/DNF/Pacman)
+- ✅ Configures Zsh, Tmux, Git, and OS-specific preferences
 - ✅ Sets up performance optimizations
 
-> **📝 Log:** `~/.dotfiles/install.log` | **⏱️ Duration:** 1 min | **🔄 Idempotent:** Safe to re-run
+> **📝 Log:** `~/.dotfiles/install.log` | **⏱️ Duration:** 3-10 min | **🔄 Idempotent:** Safe to re-run
 
-**Detailed guide:** [📦 Installation Wiki](../../wiki/Installation)
+**Detailed guide:** [📦 Installation Wiki](https://github.com/Raf7c/dotfiles/wiki/Installation)
 
 ## 📚 Documentation
 
-**[📖 Complete Wiki →](../../wiki)**
+**[📖 Complete Wiki →](https://github.com/Raf7c/dotfiles/wiki)**
 
 | 📄 Guide | 📝 Description |
 |---------|---------------|
-| [Installation](../../wiki/Installation) | Step-by-step setup guide |
-| [Configuration](../../wiki/Configuration) | Architecture & structure |
-| [Zsh Setup](../../wiki/Zsh-Configuration) | Shell, plugins, optimizations |
-| [Tmux Setup](../../wiki/Tmux-Configuration) | Terminal multiplexer config |
-| [Performance](../../wiki/Performance-Optimizations) | Speed optimizations & benchmarks |
-| [Troubleshooting](../../wiki/Troubleshooting) | Common issues & solutions |
-| [FAQ](../../wiki/FAQ) | Frequently asked questions |
-| [Scripts Reference](../../wiki/Scripts-Reference) | Documentation of all scripts |
+| [Installation](https://github.com/Raf7c/dotfiles/wiki/Installation) | Step-by-step setup guide |
+| [Configuration](https://github.com/Raf7c/dotfiles/wiki/Configuration) | Architecture & structure |
+| [Zsh Setup](https://github.com/Raf7c/dotfiles/wiki/Zsh-Configuration) | Shell, plugins, optimizations |
+| [Tmux Setup](https://github.com/Raf7c/dotfiles/wiki/Tmux-Configuration) | Terminal multiplexer config |
+| [Performance](https://github.com/Raf7c/dotfiles/wiki/Performance-Optimizations) | Speed optimizations & benchmarks |
+| [Troubleshooting](https://github.com/Raf7c/dotfiles/wiki/Troubleshooting) | Common issues & solutions |
+| [FAQ](https://github.com/Raf7c/dotfiles/wiki/FAQ) | Frequently asked questions |
+| [Scripts Reference](https://github.com/Raf7c/dotfiles/wiki/Scripts-Reference) | Documentation of all scripts |
 
 ## 🛠️ What's Included
 
@@ -77,19 +79,21 @@ cd ~/.dotfiles
 - **Terminal:** [Ghostty](https://ghostty.org/) with [Catppuccin](https://github.com/catppuccin/catppuccin) theme
 - **Shell:** [Zsh](https://www.zsh.org/) + [Zinit](https://github.com/zdharma-continuum/zinit) + [Starship](https://starship.rs/)
 - **Multiplexer:** [Tmux](https://github.com/tmux/tmux) with TPM plugins
-- **Editor:** [Neovim](https://neovim.io/) via [asdf](https://asdf-vm.com/)
+- **Editor:** [Vim](https://www.vim.org/) / [Neovim](https://neovim.io/) via [asdf](https://asdf-vm.com/)
 
 ### CLI Utilities
-`bat` · `fzf` · `ripgrep` · `fd` · `eza` · `zoxide` · `tree` · `git` · `gcc`
+`bat` · `eza` · `fzf` · `ripgrep` · `fd` · `btop` · `zoxide` · `tree` · `starship` · `git` · `gcc` · `make`
 
 ### Features
+- ✅ **Cross-platform** - macOS, Fedora, Arch Linux
 - ✅ **XDG compliant** - Clean home directory
 - ✅ **Performance optimized** - Shell startup <200ms
 - ✅ **Modular scripts** - Easy to customize
+- ✅ **POSIX sh** - Maximum portability
 - ✅ **Comprehensive logging** - Full installation logs
 - ✅ **Idempotent** - Safe to re-run anytime
 
-**[📄 Full software list →](Brewfile)**
+**[📄 Package lists →](install/packages/)**
 
 ## ⚙️ Key Features
 
@@ -110,7 +114,7 @@ cd ~/.dotfiles
 - **Git shortcuts** - 20+ productivity aliases
 - **Tmux prefix** - `Ctrl+Space` (more ergonomic)
 
-**[📖 Detailed configuration →](../../wiki/Configuration)**
+**[📖 Detailed configuration →](https://github.com/Raf7c/dotfiles/wiki/Configuration)**
 
 ## 🔄 Updates
 
@@ -122,24 +126,29 @@ cd ~/.dotfiles
 Updates Homebrew packages, Zsh plugins, Tmux plugins, and asdf.  
 **Duration:** 30s - 5min
 
-**[📖 Update guide →](../../wiki/Installation#updates)**
+**[📖 Update guide →](https://github.com/Raf7c/dotfiles/wiki/Installation#updates)**
 
 ---
 
 ## 💻 Tested On
 
+### macOS
 - **Mac mini M1** (16GB) - macOS Sequoia 15.2
 - **MacBook Pro M1 Max** (64GB) - macOS Sequoia 15.2
+- **Compatibility:** Apple Silicon · Intel · macOS 12.0+
 
-**Compatibility:** Apple Silicon · Intel Macs · macOS 12.0+
+### Linux
+- **Fedora 40** - Workstation Edition
+- **Arch Linux** - Rolling Release (2024)
+- **Compatibility:** x86_64 architecture
 
 ---
 
 ## 🐛 Need Help?
 
-- **[🔧 Troubleshooting Guide](../../wiki/Troubleshooting)** - Common issues & solutions
-- **[❓ FAQ](../../wiki/FAQ)** - Frequently asked questions
-- **[📝 Issues](../../issues)** - Report bugs or request features
+- **[🔧 Troubleshooting Guide](https://github.com/Raf7c/dotfiles/wiki/Troubleshooting)** - Common issues & solutions
+- **[❓ FAQ](https://github.com/Raf7c/dotfiles/wiki/FAQ)** - Frequently asked questions
+- **[📝 Issues](https://github.com/Raf7c/dotfiles/issues)** - Report bugs or request features
 
 ## 📝 License
 
@@ -153,8 +162,8 @@ This project is open source and available under the [MIT License](LICENSE).
 
 <div align="center">
 
-**[📚 Complete Documentation](../../wiki)** · **[🚀 Get Started](../../wiki/Installation)** · **[💬 Issues](../../issues)**
+**[📚 Complete Documentation](https://github.com/Raf7c/dotfiles/wiki)** · **[🚀 Get Started](https://github.com/Raf7c/dotfiles/wiki/Installation)** · **[💬 Issues](https://github.com/Raf7c/dotfiles/issues)**
 
-Built with ❤️ for macOS ·
+Built with ❤️ for macOS · Linux · Cross-platform environments ·
 
 </div>
