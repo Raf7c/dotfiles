@@ -9,7 +9,7 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 # Load utilities
-. "$SCRIPT_DIR/../lib/utils.sh"
+. "$SCRIPT_DIR/../../lib/utils.sh"
 
 echo "📦 Installing Tmux Plugin Manager..."
 

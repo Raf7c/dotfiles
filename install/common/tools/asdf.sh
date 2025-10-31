@@ -9,11 +9,11 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 # Load utilities
-. "$SCRIPT_DIR/../lib/utils.sh"
+. "$SCRIPT_DIR/../../lib/utils.sh"
 
 echo "📦 Installing asdf plugins and versions..."
 
-TOOL_VERSIONS_FILE="$SCRIPT_DIR/../../.tool-versions"
+TOOL_VERSIONS_FILE="$SCRIPT_DIR/../../../.tool-versions"
 
 # Verify .tool-versions exists
 if [ ! -f "$TOOL_VERSIONS_FILE" ]; then

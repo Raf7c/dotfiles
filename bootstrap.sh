@@ -50,7 +50,7 @@ if check_submodules "$SCRIPT_DIR"; then
     echo ""
 fi
 
-run_step "Creating symbolic links" "$SCRIPT_DIR/install/common/link_global.sh" "critical"
+run_step "Creating symbolic links" "$SCRIPT_DIR/install/common/setup/link_global.sh" "critical"
 
 # OS-specific package installation
 # Configure Homebrew on macOS (required before package installation)
@@ -69,11 +69,11 @@ fi
 echo ""
 
 # Common steps
-run_step "Shell migration" "$SCRIPT_DIR/install/common/shell.sh" "optional"
+run_step "Shell migration" "$SCRIPT_DIR/install/common/shell/shell.sh" "optional"
 
 # Install optional tools (only if prerequisites exist)
-run_if_exists "tmux" "Installing Tmux plugins" "$SCRIPT_DIR/install/common/tmux-tmp.sh" "optional"
-run_if_exists_and_file "asdf" "$SCRIPT_DIR/.tool-versions" "Installing asdf plugins" "$SCRIPT_DIR/install/common/asdf-install.sh" "optional"
+run_if_exists "tmux" "Installing Tmux plugins" "$SCRIPT_DIR/install/common/tools/tmux.sh" "optional"
+run_if_exists_and_file "asdf" "$SCRIPT_DIR/.tool-versions" "Installing asdf plugins" "$SCRIPT_DIR/install/common/tools/asdf.sh" "optional"
 
 # OS-specific configuration
 if [ "$OS" = "macos" ]; then
