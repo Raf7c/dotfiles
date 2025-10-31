@@ -105,7 +105,7 @@ compinit -C -d "$XDG_CACHE_HOME/zsh/.zcompdump"
 
 | Plugin | Description | Mode |
 |--------|-------------|------|
-| **zsh-completions** | Complétions 200+ commandes (docker, npm, cargo...) | Sync |
+| **zsh-completions** | Complétions 200+ commandes (docker, npm, pip...) | Sync |
 | **zsh-autosuggestions** | Suggestions depuis historique (`→` pour accepter) | Async |
 | **zsh-syntax-highlighting** | Coloration syntaxique (vert=valide, rouge=invalide) | Async |
 | **fzf-tab** | Complétions interactives avec preview | Normal |
@@ -159,7 +159,7 @@ zstyle ':completion:*' menu no                           # Utilise fzf-tab
 **Sources :**
 - Built-ins: `cd`, `kill`, `ssh`
 - Homebrew: `brew`, `git`
-- zsh-completions: `docker`, `npm`, `cargo`, `pip`
+- zsh-completions: `docker`, `npm`, `pip`
 - asdf: `asdf`
 
 **Usage :** `<TAB>` pour compléter avec fzf-tab interactif

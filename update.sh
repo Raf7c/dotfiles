@@ -29,27 +29,6 @@ echo ""
 check_os_support || exit 1
 echo ""
 
-# Generic update function
-update_tool() {
-    local tool="$1"
-    local emoji="$2"
-    local description="$3"
-    shift 3
-    local update_cmd="$@"
-    
-    if command_exists "$tool"; then
-        echo "$emoji Updating $description..."
-        if eval "$update_cmd"; then
-            print_success "$description updated successfully"
-        else
-            print_warning "$description update failed"
-        fi
-    else
-        print_warning "$tool not found, skipping $description"
-    fi
-    echo ""
-}
-
 # Update package manager (utilise module package_manager.sh)
 echo ""
 update_packages_for_os "$OS"
@@ -67,22 +46,13 @@ if check_submodules "$SCRIPT_DIR"; then
     update_submodules "$SCRIPT_DIR"
 fi
 
-# Update common tools
+# Update common tools (utilise update_tool depuis utils.sh)
 update_tool "asdf" "📦" "asdf plugins" "asdf plugin update --all"
-
 update_tool "zsh" "🐚" "Zsh plugins" "zsh -i -c 'zinit self-update && zinit update' 2>/dev/null"
 
+# Update Tmux plugins (if TPM exists)
 if command_exists tmux && [ -d "$HOME/.config/tmux/plugins/tpm" ]; then
     update_tool "tmux" "🖥️" "tmux plugins" "'$HOME/.config/tmux/plugins/tpm/bin/update_plugins' all"
-fi
-
-if command_exists cargo; then
-    update_tool "cargo-install-update" "🦀" "Cargo packages" "cargo install-update -a"
-    
-    if ! command_exists cargo-install-update; then
-        print_info "Install cargo-update for automatic updates: cargo install cargo-update"
-        echo ""
-    fi
 fi
 
 # Summary

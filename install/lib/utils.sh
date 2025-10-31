@@ -159,3 +159,24 @@ run_if_exists_and_file() {
         fi
     fi
 }
+
+# Generic update function for tools
+update_tool() {
+    local tool="$1"
+    local emoji="$2"
+    local description="$3"
+    shift 3
+    local update_cmd="$@"
+    
+    if command_exists "$tool"; then
+        echo "$emoji Updating $description..."
+        if eval "$update_cmd"; then
+            print_success "$description updated successfully"
+        else
+            print_warning "$description update failed"
+        fi
+    else
+        print_warning "$tool not found, skipping $description"
+    fi
+    echo ""
+}
