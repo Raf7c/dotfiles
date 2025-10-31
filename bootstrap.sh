@@ -41,6 +41,18 @@ check_requirements git curl || exit 1
 
 # Common steps for all platforms
 echo "📦 Common installation steps..."
+
+# Initialize git submodules (e.g., Neovim config)
+if [ -f "$SCRIPT_DIR/.gitmodules" ]; then
+    print_step "Initializing git submodules"
+    if (cd "$SCRIPT_DIR" && git submodule update --init --recursive); then
+        print_success "Git submodules initialized"
+    else
+        print_warning "Git submodules initialization failed, continuing..."
+    fi
+    echo ""
+fi
+
 run_step "Creating symbolic links" "$SCRIPT_DIR/install/common/link_global.sh" "critical"
 
 # OS-specific package installation

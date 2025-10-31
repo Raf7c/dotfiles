@@ -33,7 +33,8 @@ sudo pacman -S git curl
 ### 1. Cloner le dépôt
 
 ```bash
-git clone https://github.com/your-username/.dotfiles.git ~/.dotfiles
+# Cloner avec les sous-modules (inclut la config Neovim)
+git clone --recurse-submodules https://github.com/Raf7c/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ```
 

@@ -33,8 +33,8 @@ Cross-platform configuration for modern development environments.
 ## 🚀 Quick Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/Raf7c/dotfiles.git ~/.dotfiles
+# Clone the repository with submodules (includes Neovim config)
+git clone --recurse-submodules https://github.com/Raf7c/dotfiles.git ~/.dotfiles
 
 # Launch installation
 cd ~/.dotfiles
@@ -74,7 +74,7 @@ cd ~/.dotfiles
 - **Terminal:** [Ghostty](https://ghostty.org/) with [Catppuccin](https://github.com/catppuccin/catppuccin) theme
 - **Shell:** [Zsh](https://www.zsh.org/) + [Zinit](https://github.com/zdharma-continuum/zinit) + [Starship](https://starship.rs/)
 - **Multiplexer:** [Tmux](https://github.com/tmux/tmux) with TPM plugins
-- **Editor:** [Neovim](https://neovim.io/) via [asdf](https://asdf-vm.com/)
+- **Editor:** [Neovim](https://neovim.io/) configuration via [Git submodule](https://github.com/Raf7c/neovim)
 
 ### CLI Utilities
 `bat` · `eza` · `fzf` · `ripgrep` · `fd` · `btop` · `zoxide` · `tree` · `starship` · `git` · `gcc` · `make`
@@ -108,6 +108,7 @@ cd ~/.dotfiles
 - **Smart aliases** - `cd` → zoxide (si installé), `ls` → eza
 - **Git shortcuts** - 20+ productivity aliases
 - **Tmux prefix** - `Ctrl+Space` (more ergonomic)
+- **Neovim config** - Managed as Git submodule for easy updates
 
 **[📖 Detailed configuration →](https://github.com/Raf7c/dotfiles/wiki/Configuration)**
 
@@ -118,7 +119,14 @@ cd ~/.dotfiles
 ./update.sh
 ```
 
-Updates Homebrew packages, Zsh plugins, Tmux plugins, and asdf.  
+Updates Homebrew packages, Zsh plugins, Tmux plugins, and asdf.
+
+**Update Neovim config (submodule):**
+```bash
+cd ~/.dotfiles
+git submodule update --remote --merge
+```
+
 **Duration:** 30s - 5min
 
 **[📖 Update guide →](https://github.com/Raf7c/dotfiles/wiki/Installation#updates)**
