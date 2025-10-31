@@ -126,3 +126,36 @@ check_requirements() {
     echo ""
     return 0
 }
+
+# Run a step only if a command exists
+run_if_exists() {
+    local tool="$1"
+    local description="$2"
+    local script_path="$3"
+    local critical="${4:-optional}"
+    
+    if command_exists "$tool"; then
+        run_step "$description" "$script_path" "$critical"
+    else
+        print_info "$tool not found, skipping $description"
+    fi
+}
+
+# Run a step only if a command exists AND a file exists
+run_if_exists_and_file() {
+    local tool="$1"
+    local file_path="$2"
+    local description="$3"
+    local script_path="$4"
+    local critical="${5:-optional}"
+    
+    if command_exists "$tool" && [ -f "$file_path" ]; then
+        run_step "$description" "$script_path" "$critical"
+    else
+        if ! command_exists "$tool"; then
+            print_info "$tool not found, skipping $description"
+        elif [ ! -f "$file_path" ]; then
+            print_info "$file_path not found, skipping $description"
+        fi
+    fi
+}

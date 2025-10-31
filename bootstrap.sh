@@ -46,56 +46,40 @@ echo "📦 Common installation steps..."
 # Initialize git submodules (e.g., Neovim config)
 if check_submodules "$SCRIPT_DIR"; then
     print_step "Initializing git submodules"
-    if init_submodules "$SCRIPT_DIR"; then
-        print_success "Git submodules initialized"
-    else
-        print_warning "Git submodules initialization failed, continuing..."
-    fi
+    init_submodules "$SCRIPT_DIR" || print_warning "Git submodules initialization failed, continuing..."
     echo ""
 fi
 
 run_step "Creating symbolic links" "$SCRIPT_DIR/install/common/link_global.sh" "critical"
 
 # OS-specific package installation
-case "$OS" in
-    macos)
-        run_step "Configuring Homebrew" "$SCRIPT_DIR/install/macOS/homebrew.sh" "critical"
-        run_step "Installing packages" "$SCRIPT_DIR/install/macOS/packages.sh" "critical"
-        ;;
-    arch)
-        run_step "Installing packages" "$SCRIPT_DIR/install/arch/packages.sh" "critical"
-        ;;
-esac
+# Configure Homebrew on macOS (required before package installation)
+if [ "$OS" = "macos" ]; then
+    run_step "Configuring Homebrew" "$SCRIPT_DIR/install/macOS/homebrew.sh" "critical"
+fi
+
+# Install packages (unified for all OS)
+run_step "Installing packages" "$SCRIPT_DIR/install/${OS}/packages.sh" "critical"
 
 # Load shell environment
 echo "📚 Configuring shell..."
 if [ -f "$SCRIPT_DIR/.config/shell/env" ]; then
     . "$SCRIPT_DIR/.config/shell/env"
-else
-    print_warning "shell/env not found, skipping shell environment loading"
 fi
 echo ""
 
 # Common steps
 run_step "Shell migration" "$SCRIPT_DIR/install/common/shell.sh" "optional"
 
-# Only if tmux is installed
-if command_exists tmux; then
-    run_step "Installing Tmux plugins" "$SCRIPT_DIR/install/common/tmux-tmp.sh" "optional"
-fi
-
-# Only if asdf is installed and .tool-versions exists
-if command_exists asdf && [ -f "$SCRIPT_DIR/.tool-versions" ]; then
-    run_step "Installing asdf plugins" "$SCRIPT_DIR/install/common/asdf-install.sh" "optional"
-fi
+# Install optional tools (only if prerequisites exist)
+run_if_exists "tmux" "Installing Tmux plugins" "$SCRIPT_DIR/install/common/tmux-tmp.sh" "optional"
+run_if_exists_and_file "asdf" "$SCRIPT_DIR/.tool-versions" "Installing asdf plugins" "$SCRIPT_DIR/install/common/asdf-install.sh" "optional"
 
 # OS-specific configuration
-case "$OS" in
-    macos)
-        run_step "Refreshing GCC cache" "$SCRIPT_DIR/install/macOS/refresh-gcc-cache.sh" "optional"
-        run_step "Configuring macOS" "$SCRIPT_DIR/install/macOS/osx.sh" "optional"
-        ;;
-esac
+if [ "$OS" = "macos" ]; then
+    run_step "Refreshing GCC cache" "$SCRIPT_DIR/install/macOS/refresh-gcc-cache.sh" "optional"
+    run_step "Configuring macOS" "$SCRIPT_DIR/install/macOS/osx.sh" "optional"
+fi
 
 # Summary
 echo ""
