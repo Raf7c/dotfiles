@@ -12,6 +12,8 @@ START_TIME=$(date +%s)
 
 # Load utilities
 . "$SCRIPT_DIR/install/lib/utils.sh"
+. "$SCRIPT_DIR/install/lib/package_manager.sh"
+. "$SCRIPT_DIR/install/lib/git.sh"
 
 # Detect OS
 OS=$(detect_os)
@@ -48,33 +50,22 @@ update_tool() {
     echo ""
 }
 
-# Update package manager
-case "$OS" in
-    macos)
-        echo "🍎 Updating macOS packages..."
-        update_tool "brew" "🍺" "Homebrew" "brew update && brew upgrade && brew cleanup"
-        
-        if [ -f "$SCRIPT_DIR/install/macOS/refresh-gcc-cache.sh" ]; then
-            echo "🔧 Refreshing GCC cache..."
-            sh "$SCRIPT_DIR/install/macOS/refresh-gcc-cache.sh" || print_warning "GCC cache refresh failed"
-            echo ""
-        fi
-        ;;
-    
-    arch)
-        echo "🏔️  Updating Arch packages..."
-        echo "🔄 Updating system packages..."
-        if sudo pacman -Syu --noconfirm; then
-            sudo pacman -Sc --noconfirm 2>/dev/null || true
-            print_success "Arch packages updated successfully"
-        else
-            print_warning "Arch update failed"
-        fi
-        echo ""
-        
-        update_tool "yay" "📦" "AUR packages" "yay -Syu --noconfirm"
-        ;;
-esac
+# Update package manager (utilise module package_manager.sh)
+echo ""
+update_packages_for_os "$OS"
+
+# Refresh GCC cache on macOS
+if [ "$OS" = "macos" ] && [ -f "$SCRIPT_DIR/install/macOS/refresh-gcc-cache.sh" ]; then
+    echo "🔧 Refreshing GCC cache..."
+    sh "$SCRIPT_DIR/install/macOS/refresh-gcc-cache.sh" || print_warning "GCC cache refresh failed"
+    echo ""
+fi
+
+# Update git submodules
+if check_submodules "$SCRIPT_DIR"; then
+    echo ""
+    update_submodules "$SCRIPT_DIR"
+fi
 
 # Update common tools
 update_tool "asdf" "📦" "asdf plugins" "asdf plugin update --all"

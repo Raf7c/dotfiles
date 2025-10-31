@@ -12,8 +12,8 @@ PACKAGES_DIR="$SCRIPT_DIR/../packages"
 # Load utilities
 . "$SCRIPT_DIR/../lib/utils.sh"
 
-# Load unified package installer
-. "$SCRIPT_DIR/../lib/install_packages.sh"
+# Load unified package manager
+. "$SCRIPT_DIR/../lib/package_manager.sh"
 
 # Install packages
 install_packages "arch" "$PACKAGES_DIR"

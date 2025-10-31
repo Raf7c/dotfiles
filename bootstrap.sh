@@ -13,6 +13,7 @@ START_TIME=$(date +%s)
 
 # Load utilities
 . "$SCRIPT_DIR/install/lib/utils.sh"
+. "$SCRIPT_DIR/install/lib/git.sh"
 
 # Setup logging with tee (sh-compatible)
 if [ "${BOOTSTRAP_LOGGING:-}" != "active" ]; then
@@ -43,9 +44,9 @@ check_requirements git curl || exit 1
 echo "📦 Common installation steps..."
 
 # Initialize git submodules (e.g., Neovim config)
-if [ -f "$SCRIPT_DIR/.gitmodules" ]; then
+if check_submodules "$SCRIPT_DIR"; then
     print_step "Initializing git submodules"
-    if (cd "$SCRIPT_DIR" && git submodule update --init --recursive); then
+    if init_submodules "$SCRIPT_DIR"; then
         print_success "Git submodules initialized"
     else
         print_warning "Git submodules initialization failed, continuing..."
