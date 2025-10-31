@@ -53,9 +53,6 @@ export GIT_EDITOR="$EDITOR"
 export PAGER="less"
 export LESS="-R -F -X"
 
-# Historique
-export HISTTIMEFORMAT="%F %T "
-
 # XDG Cleanup
 export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
 

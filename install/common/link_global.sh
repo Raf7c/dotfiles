@@ -17,13 +17,10 @@ echo "🔗 Creating symbolic links..."
 mkdir -p "$HOME/.config"
 mkdir -p "$HOME/.local/bin"
 
-# Config links
-ln -sfn "$HOME/.dotfiles/.config/git"		"$HOME/.config/git"
-ln -sfn "$HOME/.dotfiles/.config/starship.toml" "$HOME/.config/starship.toml"
-ln -sfn "$HOME/.dotfiles/.config/ghostty"   "$HOME/.config/ghostty"
-ln -sfn "$HOME/.dotfiles/.config/shell" "$HOME/.config/shell"
-ln -sfn "$HOME/.dotfiles/.config/bat" "$HOME/.config/bat"
-ln -sfn "$HOME/.dotfiles/.config/tmux" "$HOME/.config/tmux"
+# Config links (simplified with loop)
+for item in git starship.toml ghostty shell bat tmux; do
+    ln -sfn "$HOME/.dotfiles/.config/$item" "$HOME/.config/$item"
+done
 
 # Login shell links
 ln -sfn "$HOME/.dotfiles/zsh/.zprofile" "$HOME/.zprofile"

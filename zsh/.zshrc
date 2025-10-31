@@ -26,10 +26,18 @@ case "$OSTYPE" in
     ;;
 esac
 
-# asdf version manager 
-if [ -f /opt/homebrew/opt/asdf/libexec/asdf.sh ]; then
+# asdf version manager (cross-platform)
+if [ -n "${ASDF_DATA_DIR:-}" ] && [ -f "${ASDF_DATA_DIR}/asdf.sh" ]; then
+    . "${ASDF_DATA_DIR}/asdf.sh"
+    fpath=(${ASDF_DIR}/completions $fpath)
+elif [ -f "${HOME}/.asdf/asdf.sh" ]; then
+    . "${HOME}/.asdf/asdf.sh"
+    fpath=(${ASDF_DIR}/completions $fpath)
+elif [ -f /opt/homebrew/opt/asdf/libexec/asdf.sh ]; then
     . /opt/homebrew/opt/asdf/libexec/asdf.sh
-    # Use native zsh completions
+    fpath=(${ASDF_DIR}/completions $fpath)
+elif [ -f /usr/local/opt/asdf/libexec/asdf.sh ]; then
+    . /usr/local/opt/asdf/libexec/asdf.sh
     fpath=(${ASDF_DIR}/completions $fpath)
 fi
 
@@ -39,13 +47,10 @@ fi
 # Load zinit if available
 [ -f "${DOTFILES:-$HOME/.dotfiles}/zsh/zinit.zsh" ] && . "${DOTFILES:-$HOME/.dotfiles}/zsh/zinit.zsh"
 
-# Shell integrations
-if command -v starship >/dev/null 2>&1; then
-    eval "$(starship init zsh)"
-fi
-if command -v fzf >/dev/null 2>&1; then
-    eval "$(fzf --zsh)"
-fi
-if command -v zoxide >/dev/null 2>&1; then
-    eval "$(zoxide init zsh)"
-fi
+# Shell integrations (centralized function)
+load_integrations() {
+    command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
+    command -v fzf >/dev/null 2>&1 && eval "$(fzf --zsh)"
+    command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+}
+load_integrations

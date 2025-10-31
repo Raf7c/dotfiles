@@ -13,10 +13,13 @@ if command -v zoxide >/dev/null 2>&1; then
 fi
 
 # ============== ls ==============
-alias ls='eza --icons'
-alias ll='eza -l --icons --git'
-alias la='eza -la --icons --git'
-alias lt='eza --tree --level=2 --icons'
+# Use eza if available, otherwise fallback to ls
+if command -v eza >/dev/null 2>&1; then
+    alias ls='eza --icons'
+    alias ll='eza -l --icons --git'
+    alias la='eza -la --icons --git'
+    alias lt='eza --tree --level=2 --icons'
+fi
 
 # ============== Editors ==============
 alias vi='nvim'

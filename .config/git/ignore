@@ -6,3 +6,5 @@
 *~
 *.backup.*
 install.log
+.config/tmux/plugins/
+!.config/tmux/plugins/.gitkeep

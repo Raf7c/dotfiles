@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # ==========================================
 # install/lib/utils.sh
 # Utility functions for installation scripts
