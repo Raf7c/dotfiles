@@ -23,6 +23,7 @@ fi
 
 # ============== Editors ==============
 alias vi='nvim'
+alias v='nvim'
 
 # ============== Git commands ==============
 alias gi='git init'

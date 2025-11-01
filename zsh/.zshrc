@@ -53,7 +53,6 @@ load_integrations() {
     command -v fzf >/dev/null 2>&1 && eval "$(fzf --zsh)"
     # Initialize zoxide last to avoid conflicts
     if command -v zoxide >/dev/null 2>&1; then
-        export _ZO_DOCTOR=0 2>/dev/null  # Suppress zoxide doctor message
         eval "$(zoxide init zsh)"
     fi
 }
