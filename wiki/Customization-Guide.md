@@ -18,19 +18,27 @@ Adapter le dotfiles à tes besoins.
 
 | OS | Fichier |
 |----|---------|
-| macOS | `install/packages/macos.txt` |
-| Arch | `install/packages/arch.txt` |
+| macOS | `Brewfile` (à la racine) |
+| Arch | `src/arch/arch.txt` |
 
-**Format :**
+**Format macOS (Brewfile) :**
+```bash
+# CLI
+brew "git"
+brew "curl"
+brew "nom-nouveau-paquet"
+
+# Applications (casks)
+cask "docker"
+cask "font-jetbrains-mono-nerd-font"
+```
+
+**Format Arch (arch.txt) :**
 ```bash
 # CLI
 git
 curl
 nom-nouveau-paquet
-
-# macOS apps (cask:)
-cask:docker
-cask:font-jetbrains-mono-nerd-font
 ```
 
 ### Installer
@@ -38,7 +46,7 @@ cask:font-jetbrains-mono-nerd-font
 ```bash
 ./bootstrap.sh  # Réinstallation complète
 # ou
-sh install/macOS/packages.sh  # macOS uniquement
+sh src/macOS/packages.sh  # macOS uniquement
 ```
 
 ---

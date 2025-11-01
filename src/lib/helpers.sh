@@ -1,6 +1,6 @@
 #!/bin/sh
 # ==========================================
-# install/lib/helpers.sh
+# src/lib/helpers.sh
 # Additional helper functions
 # ==========================================
 #
@@ -8,7 +8,6 @@
 # - ensure_directory()   : Crée dossier si absent
 # - backup_file()          : Backup avant modification
 # - safe_link()            : Crée lien avec vérification
-# - log_action()           : Log structuré avec niveaux
 #
 
 # Crée un dossier s'il n'existe pas
@@ -66,25 +65,3 @@ safe_link() {
         return 1
     fi
 }
-
-# Log structuré avec niveaux
-log_action() {
-    local message="$1"
-    local level="${2:-info}"
-    
-    case "$level" in
-        info)
-            print_info "$message"
-            ;;
-        success)
-            print_success "$message"
-            ;;
-        warning)
-            print_warning "$message"
-            ;;
-        error)
-            print_error "$message"
-            ;;
-    esac
-}
-

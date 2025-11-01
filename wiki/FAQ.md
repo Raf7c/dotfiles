@@ -87,7 +87,7 @@ cp -r ~/.config ~/dotfiles-backup/
 
 ```bash
 # Seulement les liens symboliques
-sh install/link_global.sh
+sh src/link_global.sh
 
 # Seulement Zsh (après liens)
 # Rien de spécifique, juste relancer le shell
@@ -227,7 +227,7 @@ Appeler `brew --prefix gcc` est lent (~50ms). Le cache évite cet appel à chaqu
 
 **Régénérer :**
 ```bash
-sh ~/.dotfiles/install/macOS/refresh-gcc-cache.sh
+sh ~/.dotfiles/src/macOS/refresh-gcc-cache.sh
 ```
 
 ---

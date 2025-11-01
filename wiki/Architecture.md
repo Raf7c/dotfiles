@@ -56,7 +56,7 @@ source file.sh
 **Principe :** Un script = une responsabilité
 
 ```
-install/
+src/
 ├── lib/utils.sh              # Fonctions communes
 ├── link_global.sh            # Liens symboliques
 ├── macOS/packages.sh         # Paquets macOS
@@ -111,8 +111,8 @@ export OS_TYPE
 **Utilisation :**
 ```bash
 case "$OS_TYPE" in
-    macos) sh install/macOS/packages.sh ;;
-    arch)  sh install/arch/packages.sh ;;
+    macos) sh src/macOS/packages.sh ;;
+    arch)  sh src/arch/packages.sh ;;
 esac
 ```
 
@@ -126,28 +126,32 @@ esac
 ├── update.sh             # Mise à jour
 ├── test.sh               # Tests
 │
-├── install/
+├── Brewfile                      # Paquets macOS (auto-maintenu)
+├── src/
 │   ├── lib/
 │   │   ├── utils.sh              # Fonctions communes
-│   │   └── install_packages.sh   # Installation unifiée
-│   │
-│   ├── packages/
-│   │   ├── macos.txt             # Paquets macOS
-│   │   └── arch.txt              # Paquets Arch
-│   │
-│   ├── common/
-│   │   ├── link_global.sh        # Liens symboliques
-│   │   ├── shell.sh              # Migration shell XDG
-│   │   ├── tmux-tmp.sh           # TPM
-│   │   └── asdf-install.sh       # asdf plugins
+│   │   ├── package_manager.sh    # Installation unifiée
+│   │   ├── git.sh                # Git submodules
+│   │   └── helpers.sh            # Helpers (backup, symlink)
 │   │
 │   ├── macOS/
 │   │   ├── homebrew.sh           # Homebrew
-│   │   ├── packages.sh           # Install paquets
+│   │   ├── packages.sh           # Install paquets (Brewfile)
 │   │   ├── osx.sh                # Préférences système
 │   │   └── refresh-gcc-cache.sh  # Cache GCC
 │   │
-│   └── arch/packages.sh
+│   ├── arch/
+│   │   ├── packages.sh           # Install paquets
+│   │   └── arch.txt              # Paquets Arch
+│   │
+│   └── common/
+│       ├── setup/
+│       │   └── link_global.sh    # Liens symboliques
+│       ├── shell/
+│       │   └── shell.sh          # Migration shell XDG
+│       └── tools/
+│           ├── tmux.sh           # TPM
+│           └── asdf.sh           # asdf plugins
 │
 └── .config/
     ├── shell/

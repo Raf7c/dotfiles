@@ -50,7 +50,7 @@ Chargé à chaque shell : Config + Plugins + Intégrations
 source ~/.config/shell/env
 
 # 2. Historique
-HISTFILE="$XDG_DATA_HOME/zsh/history"
+HISTFILE="$XDG_STATE_HOME/zsh/history"
 HISTSIZE=10000
 setopt sharehistory hist_ignore_all_dups
 
@@ -128,7 +128,7 @@ $ cd ~/<TAB>  # Ouvre interface interactive avec preview eza
 **Config :** 10000 lignes · Fichier XDG · Partagé entre sessions · Sans doublons
 
 ```bash
-HISTFILE="$XDG_DATA_HOME/zsh/history"
+HISTFILE="$XDG_STATE_HOME/zsh/history"
 HISTSIZE=10000
 setopt sharehistory hist_ignore_all_dups
 ```

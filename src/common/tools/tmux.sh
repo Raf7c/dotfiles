@@ -1,6 +1,6 @@
 #!/bin/sh
 # ==========================================
-# ~/tmux-tmp.sh
+# ~/.dotfiles/src/common/tools/tmux.sh
 # Installing Tmux plugins
 # ==========================================
 

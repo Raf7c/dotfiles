@@ -12,8 +12,8 @@ LOG_FILE="$HOME/.dotfiles/install.log"
 START_TIME=$(date +%s)
 
 # Load utilities
-. "$SCRIPT_DIR/install/lib/utils.sh"
-. "$SCRIPT_DIR/install/lib/git.sh"
+. "$SCRIPT_DIR/src/lib/utils.sh"
+. "$SCRIPT_DIR/src/lib/git.sh"
 
 # Setup logging with tee (sh-compatible)
 if [ "${BOOTSTRAP_LOGGING:-}" != "active" ]; then
@@ -50,16 +50,16 @@ if check_submodules "$SCRIPT_DIR"; then
     echo ""
 fi
 
-run_step "Creating symbolic links" "$SCRIPT_DIR/install/common/setup/link_global.sh" "critical"
+run_step "Creating symbolic links" "$SCRIPT_DIR/src/common/setup/link_global.sh" "critical"
 
 # OS-specific package installation
 # Configure Homebrew on macOS (required before package installation)
 if [ "$OS" = "macos" ]; then
-    run_step "Configuring Homebrew" "$SCRIPT_DIR/install/macOS/homebrew.sh" "critical"
+    run_step "Configuring Homebrew" "$SCRIPT_DIR/src/macOS/homebrew.sh" "critical"
 fi
 
 # Install packages (unified for all OS)
-run_step "Installing packages" "$SCRIPT_DIR/install/${OS}/packages.sh" "critical"
+run_step "Installing packages" "$SCRIPT_DIR/src/${OS}/packages.sh" "critical"
 
 # Load shell environment
 echo "📚 Configuring shell..."
@@ -69,16 +69,16 @@ fi
 echo ""
 
 # Common steps
-run_step "Shell migration" "$SCRIPT_DIR/install/common/shell/shell.sh" "optional"
+run_step "Shell migration" "$SCRIPT_DIR/src/common/shell/shell.sh" "optional"
 
 # Install optional tools (only if prerequisites exist)
-run_if_exists "tmux" "Installing Tmux plugins" "$SCRIPT_DIR/install/common/tools/tmux.sh" "optional"
-run_if_exists_and_file "asdf" "$SCRIPT_DIR/.tool-versions" "Installing asdf plugins" "$SCRIPT_DIR/install/common/tools/asdf.sh" "optional"
+run_if_exists "tmux" "Installing Tmux plugins" "$SCRIPT_DIR/src/common/tools/tmux.sh" "optional"
+run_if_exists_and_file "asdf" "$SCRIPT_DIR/.tool-versions" "Installing asdf plugins" "$SCRIPT_DIR/src/common/tools/asdf.sh" "optional"
 
 # OS-specific configuration
 if [ "$OS" = "macos" ]; then
-    run_step "Refreshing GCC cache" "$SCRIPT_DIR/install/macOS/refresh-gcc-cache.sh" "optional"
-    run_step "Configuring macOS" "$SCRIPT_DIR/install/macOS/osx.sh" "optional"
+    run_step "Refreshing GCC cache" "$SCRIPT_DIR/src/macOS/refresh-gcc-cache.sh" "optional"
+    run_step "Configuring macOS" "$SCRIPT_DIR/src/macOS/osx.sh" "optional"
 fi
 
 # Summary

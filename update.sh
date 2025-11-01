@@ -11,12 +11,17 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 START_TIME=$(date +%s)
 
 # Load utilities
-. "$SCRIPT_DIR/install/lib/utils.sh"
-. "$SCRIPT_DIR/install/lib/package_manager.sh"
-. "$SCRIPT_DIR/install/lib/git.sh"
+. "$SCRIPT_DIR/src/lib/utils.sh"
+. "$SCRIPT_DIR/src/lib/package_manager.sh"
+. "$SCRIPT_DIR/src/lib/git.sh"
 
 # Detect OS
 OS=$(detect_os)
+
+# Load shell environment for PATH and other variables
+if [ -f "$SCRIPT_DIR/.config/shell/env" ]; then
+    . "$SCRIPT_DIR/.config/shell/env"
+fi
 
 echo "========================================="
 echo "🚀 Dotfiles Environment Update"
@@ -33,10 +38,16 @@ echo ""
 echo ""
 update_packages_for_os "$OS"
 
+# Sync Brewfile with installed packages (macOS only)
+if [ "$OS" = "macos" ]; then
+    echo ""
+    sync_brewfile
+fi
+
 # Refresh GCC cache on macOS
-if [ "$OS" = "macos" ] && [ -f "$SCRIPT_DIR/install/macOS/refresh-gcc-cache.sh" ]; then
+if [ "$OS" = "macos" ] && [ -f "$SCRIPT_DIR/src/macOS/refresh-gcc-cache.sh" ]; then
     echo "🔧 Refreshing GCC cache..."
-    sh "$SCRIPT_DIR/install/macOS/refresh-gcc-cache.sh" || print_warning "GCC cache refresh failed"
+    sh "$SCRIPT_DIR/src/macOS/refresh-gcc-cache.sh" || print_warning "GCC cache refresh failed"
     echo ""
 fi
 
@@ -52,7 +63,8 @@ update_tool "zsh" "🐚" "Zsh plugins" "zsh -i -c 'zinit self-update && zinit up
 
 # Update Tmux plugins (if TPM exists)
 if command_exists tmux && [ -d "$HOME/.config/tmux/plugins/tpm" ]; then
-    update_tool "tmux" "🖥️" "tmux plugins" "'$HOME/.config/tmux/plugins/tpm/bin/update_plugins' all"
+    TPM_UPDATE_CMD="$HOME/.config/tmux/plugins/tpm/bin/update_plugins"
+    update_tool "tmux" "🖥️" "tmux plugins" "$TPM_UPDATE_CMD all"
 fi
 
 # Summary

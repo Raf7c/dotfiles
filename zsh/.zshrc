@@ -9,7 +9,7 @@ source "${DOTFILES:-$HOME/.dotfiles}/.config/shell/env"
 # History
 HISTSIZE=10000
 SAVEHIST=$HISTSIZE
-HISTFILE="${XDG_DATA_HOME}/zsh/history"
+HISTFILE="${XDG_STATE_HOME:-${HOME}/.local/state}/zsh/history"
 setopt appendhistory
 setopt sharehistory
 setopt hist_ignore_space
@@ -51,6 +51,10 @@ fi
 load_integrations() {
     command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
     command -v fzf >/dev/null 2>&1 && eval "$(fzf --zsh)"
-    command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+    # Initialize zoxide last to avoid conflicts
+    if command -v zoxide >/dev/null 2>&1; then
+        export _ZO_DOCTOR=0 2>/dev/null  # Suppress zoxide doctor message
+        eval "$(zoxide init zsh)"
+    fi
 }
 load_integrations

@@ -7,7 +7,7 @@
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-. "$SCRIPT_DIR/install/lib/utils.sh"
+. "$SCRIPT_DIR/src/lib/utils.sh"
 
 echo "========================================="
 echo "🧪 Testing dotfiles installation"

@@ -1,6 +1,6 @@
 #!/bin/sh
 # ==========================================
-# install/lib/git.sh
+# src/lib/git.sh
 # Git operations and submodules management
 # ==========================================
 #

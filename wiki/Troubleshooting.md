@@ -57,7 +57,7 @@ exec zsh
 
 **Historique vide :**
 ```bash
-mkdir -p ~/.local/share/zsh
+mkdir -p ~/.local/state/zsh
 echo $HISTFILE
 ```
 

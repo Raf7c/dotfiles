@@ -56,11 +56,11 @@ alias gla='git log --oneline --all --graph'
 # macOS specific aliases
 if command -v brew >/dev/null 2>&1; then
     # Load cached GCC aliases (fast!)
-    # Regenerate cache with: sh ~/.dotfiles/install/macOS/refresh-gcc-cache.sh
+    # Regenerate cache with: sh ~/.dotfiles/src/macOS/refresh-gcc-cache.sh
     if [ -f "$HOME/.cache/gcc_aliases" ]; then
         . "$HOME/.cache/gcc_aliases"
     fi
     
     # Update Homebrew and refresh GCC cache automatically
-    alias brewup='brew update && brew upgrade && brew cleanup && sh ~/.dotfiles/install/macOS/refresh-gcc-cache.sh'
+    alias brewup='brew update && brew upgrade && brew cleanup && sh ~/.dotfiles/src/macOS/refresh-gcc-cache.sh'
 fi

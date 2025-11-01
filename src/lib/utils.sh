@@ -1,6 +1,6 @@
 #!/bin/sh
 # ==========================================
-# install/lib/utils.sh
+# src/lib/utils.sh
 # Utility functions for installation scripts
 # ==========================================
 
@@ -91,14 +91,6 @@ format_duration() {
     local minutes=$((duration / 60))
     local seconds=$((duration % 60))
     echo "${minutes}m ${seconds}s"
-}
-
-# Setup logging to file and terminal
-setup_logging() {
-    log_file="$1"
-    # Create or clear log file
-    : > "$log_file"
-    # Note: stdout/stderr will be redirected by run_step function
 }
 
 # Check for required commands

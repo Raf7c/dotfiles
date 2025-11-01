@@ -84,7 +84,7 @@ Documentation des scripts d'installation.
 **Crée les liens symboliques**
 
 ```bash
-sh install/link_global.sh
+sh src/common/setup/link_global.sh
 ```
 
 **Liens :** `.config/git`, `.config/tmux`, `.config/shell`, `.zshrc`, `.tool-versions`, etc.
@@ -93,15 +93,18 @@ sh install/link_global.sh
 
 ### shell.sh
 
-**Migre historique shell vers XDG**
+**Migre historique shell vers XDG_STATE_HOME**
 
-- Zsh : `~/.zsh_history` → `~/.local/share/zsh/history`
-- Bash : `~/.bash_history` → `~/.local/share/bash/history`
+- Zsh : `~/.zsh_history` → `~/.local/state/zsh/history`
+- Bash : `~/.bash_history` → `~/.local/state/bash/history`
 - Backup automatique avant suppression
+- Migration automatique depuis `~/.local/share/` si nécessaire
+
+**Emplacement :** `src/common/shell/shell.sh`
 
 ---
 
-### tmux-tmp.sh
+### tmux.sh
 
 **Installe Tmux Plugin Manager**
 
@@ -109,9 +112,11 @@ Clone TPM dans `~/.config/tmux/plugins/tpm`
 
 **Post-install :** `Ctrl+Space I` dans Tmux
 
+**Emplacement :** `src/common/tools/tmux.sh`
+
 ---
 
-### asdf-install.sh
+### asdf.sh
 
 **Installe plugins asdf depuis `.tool-versions`**
 
@@ -120,6 +125,8 @@ Clone TPM dans `~/.config/tmux/plugins/tpm`
 neovim 0.11.4
 python 3.14.0
 ```
+
+**Emplacement :** `src/common/tools/asdf.sh`
 
 ---
 
@@ -140,19 +147,20 @@ run_step()        # Exécute script avec gestion erreur
 
 ---
 
-### install_packages.sh
+### package_manager.sh
 
 **Installation unifiée paquets**
 
 ```bash
 install_packages() {
     local os="$1"           # macos | arch
-    local packages_dir="$2"
+    local packages_dir_or_file="$2"
+    local pkg_file="${3:-}" # Optionnel (Arch)
 }
 ```
 
 **Commandes par OS :**
-- **macOS** : `brew install` / `brew install --cask`
+- **macOS** : `brew bundle install --file=Brewfile`
 - **Arch** : `sudo pacman -S --noconfirm --needed`
 
 ---
@@ -164,19 +172,19 @@ install_packages() {
 | Script | Description |
 |--------|-------------|
 | `homebrew.sh` | Installe Homebrew |
-| `packages.sh` | Installe paquets depuis `macos.txt` |
+| `packages.sh` | Installe paquets depuis `Brewfile` |
 | `osx.sh` | Configure préférences système (Dock, Finder, screenshots) |
 | `refresh-gcc-cache.sh` | Génère cache aliases GCC (évite `brew --prefix`) |
 
-**Format macos.txt :**
+**Format Brewfile :**
 ```bash
 # Paquets
-git
-bat
+brew "git"
+brew "bat"
 
-# Apps (cask:)
-cask:ghostty
-cask:font-jetbrains-mono-nerd-font
+# Apps (casks)
+cask "ghostty"
+cask "font-jetbrains-mono-nerd-font"
 ```
 
 ---
@@ -185,7 +193,7 @@ cask:font-jetbrains-mono-nerd-font
 
 | Script | Description |
 |--------|-------------|
-| `packages.sh` | `sudo pacman -S` depuis `arch.txt` |
+| `packages.sh` | `sudo pacman -S` depuis `src/arch/arch.txt` |
 
 ---
 
@@ -194,7 +202,7 @@ cask:font-jetbrains-mono-nerd-font
 ```bash
 # Mode verbose
 bash -x ./bootstrap.sh
-sh -x install/link_global.sh
+sh -x src/common/setup/link_global.sh
 
 # Vérifier syntaxe
 sh -n bootstrap.sh

@@ -88,7 +88,7 @@ cd ~/.dotfiles
 - ✅ **Comprehensive logging** - Full installation logs
 - ✅ **Idempotent** - Safe to re-run anytime
 
-**[📄 Package lists →](install/packages/)**
+**[📄 Package lists →](Brewfile)** (macOS) · **[📄 Arch packages →](src/arch/arch.txt)**
 
 ## ⚙️ Key Features
 

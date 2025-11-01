@@ -1,6 +1,6 @@
 #!/bin/sh
 # ==========================================
-# ~/asdf-install.sh
+# ~/.dotfiles/src/common/tools/asdf.sh
 # Installing asdf plugins and versions
 # ==========================================
 

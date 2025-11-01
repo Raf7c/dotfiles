@@ -101,7 +101,7 @@ Le script `bootstrap.sh` effectue les actions suivantes dans l'ordre :
 3. 📦 Gestionnaire de paquets
    └─ macOS : Installe/configure Homebrew
    └─ Arch : Utilise Pacman
-   └─ Installe les paquets depuis install/packages/
+   └─ Installe les paquets depuis src/packages/
 
 4. 📚 Migration shell
    └─ Déplace l'historique vers XDG directories
@@ -367,7 +367,7 @@ brew list
 brew list | xargs brew reinstall
 
 # Option 2: Désinstaller et réinstaller Homebrew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/src/HEAD/uninstall.sh)"
 # Puis relancer bootstrap.sh
 ```
 
@@ -406,7 +406,7 @@ nvim bootstrap.sh
 
 # Commenter la section tmux :
 # run_step "Installing Tmux plugins" \
-#     "$SCRIPT_DIR/install/tmux-tmp.sh" \
+#     "$SCRIPT_DIR/src/tmux-tmp.sh" \
 #     "optional"
 
 # 3. Lancer installation
@@ -550,10 +550,10 @@ ln -sf ~/.dotfiles/.config/git ~/.config/git
 ln -sf ~/.dotfiles/.config/tmux ~/.config/tmux
 
 # 3. Installer TPM
-sh ~/.dotfiles/install/tmux-tmp.sh
+sh ~/.dotfiles/src/tmux-tmp.sh
 
 # 4. Installer asdf
-sh ~/.dotfiles/install/asdf-install.sh
+sh ~/.dotfiles/src/asdf-install.sh
 ```
 
 ---
@@ -693,7 +693,7 @@ sudo pacman -Syu
 ```bash
 # Donner les permissions d'exécution
 chmod +x bootstrap.sh update.sh test.sh
-chmod +x install/**/*.sh
+chmod +x src/**/*.sh
 ```
 
 ### Zinit ne charge pas les plugins
@@ -711,7 +711,7 @@ exec zsh
 ```bash
 # Réinstaller TPM
 rm -rf ~/.config/tmux/plugins/tpm
-sh ~/.dotfiles/install/tmux-tmp.sh
+sh ~/.dotfiles/src/tmux-tmp.sh
 
 # Dans Tmux : Ctrl+Space + I
 ```

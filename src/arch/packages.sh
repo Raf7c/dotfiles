@@ -1,13 +1,13 @@
 #!/bin/sh
 # ==========================================
-# ~/install/macOS/packages.sh
-# Install packages on macOS with Homebrew
+# ~/.dotfiles/src/arch/packages.sh
+# Install packages on Arch Linux with Pacman
 # ==========================================
 
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-PACKAGES_DIR="$SCRIPT_DIR/../packages"
+ARCH_PACKAGES="$SCRIPT_DIR/arch.txt"
 
 # Load utilities
 . "$SCRIPT_DIR/../lib/utils.sh"
@@ -16,4 +16,4 @@ PACKAGES_DIR="$SCRIPT_DIR/../packages"
 . "$SCRIPT_DIR/../lib/package_manager.sh"
 
 # Install packages
-install_packages "macos" "$PACKAGES_DIR"
+install_packages "arch" "$SCRIPT_DIR" "$ARCH_PACKAGES"

@@ -1,6 +1,6 @@
 #!/bin/sh
 # ==========================================
-# ~/install/macOS/homebrew.sh
+# ~/.dotfiles/src/macOS/homebrew.sh
 # Install and configure Homebrew
 # ==========================================
 

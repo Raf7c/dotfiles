@@ -39,7 +39,7 @@ alias gcc="/opt/homebrew/opt/gcc/bin/gcc-15"
 alias g++="/opt/homebrew/opt/gcc/bin/g++-15"
 ```
 
-**Régénérer :** `brewup` ou `sh ~/.dotfiles/install/macOS/refresh-gcc-cache.sh`
+**Régénérer :** `brewup` ou `sh ~/.dotfiles/src/macOS/refresh-gcc-cache.sh`
 
 ---
 

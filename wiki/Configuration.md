@@ -45,25 +45,31 @@ Tous les fichiers suivent la [spécification XDG](https://specifications.freedes
 ### ✅ Multi-plateforme
 
 ```
-install/
+src/
 ├── lib/
-│   ├── utils.sh          → Fonctions utilitaires (détection OS, print_*)
-│   └── install_packages.sh → Installation unifiée des paquets
-├── packages/
-│   ├── macos.txt         → Paquets macOS (+ cask: pour applications)
-│   └── arch.txt          → Paquets Arch Linux
+│   ├── utils.sh              → Fonctions utilitaires (détection OS, print_*)
+│   └── package_manager.sh    → Installation unifiée des paquets
 ├── macOS/
-│   ├── homebrew.sh       → Installation/configuration Homebrew
-│   ├── packages.sh       → Installation paquets macOS
-│   ├── osx.sh            → Préférences système
-│   └── refresh-gcc-cache.sh → Cache performance
+│   ├── homebrew.sh           → Installation/configuration Homebrew
+│   ├── packages.sh           → Installation paquets macOS (Brewfile)
+│   ├── osx.sh                → Préférences système
+│   └── refresh-gcc-cache.sh  → Cache performance
 ├── arch/
-│   └── packages.sh       → Installation paquets Arch
-├── link_global.sh        → Gestion des liens symboliques
-├── shell.sh              → Migration historique shell
-├── tmux-tmp.sh           → Installation TPM
-└── asdf-install.sh       → Installation plugins asdf
+│   ├── packages.sh           → Installation paquets Arch
+│   └── arch.txt              → Paquets Arch Linux
+└── common/
+    ├── setup/
+    │   └── link_global.sh    → Gestion des liens symboliques
+    ├── shell/
+    │   └── shell.sh          → Migration historique shell
+    └── tools/
+        ├── tmux.sh           → Installation TPM
+        └── asdf.sh           → Installation plugins asdf
 ```
+
+**Fichiers de packages :**
+- **macOS :** `Brewfile` (à la racine) - Automatiquement maintenu avec `brew bundle dump`
+- **Arch :** `src/arch/arch.txt`
 
 **Détection automatique de l'OS :**
 - `utils.sh` détecte l'OS via `uname -s` et `/etc/os-release`
@@ -101,7 +107,7 @@ export LESS="-R -F -X"
 export OS_TYPE  # macos|arch|linux
 
 # Historique
-HISTFILE="$XDG_DATA_HOME/zsh/history"
+HISTFILE="$XDG_STATE_HOME/zsh/history"
 HISTSIZE=10000
 ```
 
@@ -133,7 +139,7 @@ HISTSIZE=10000
 ├── update.sh             # Mise à jour
 ├── test.sh               # Validation
 │
-├── install/              # Scripts par OS
+├── src/              # Scripts par OS
 │   ├── lib/              # Fonctions communes
 │   ├── packages/         # Listes paquets (macos/arch)
 │   ├── macOS/

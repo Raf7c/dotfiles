@@ -1,13 +1,12 @@
 #!/bin/sh
 # ==========================================
-# ~/install/arch/packages.sh
-# Install packages on Arch Linux with Pacman
+# ~/.dotfiles/src/macOS/packages.sh
+# Install packages on macOS with Homebrew
 # ==========================================
 
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-PACKAGES_DIR="$SCRIPT_DIR/../packages"
 
 # Load utilities
 . "$SCRIPT_DIR/../lib/utils.sh"
@@ -16,4 +15,5 @@ PACKAGES_DIR="$SCRIPT_DIR/../packages"
 . "$SCRIPT_DIR/../lib/package_manager.sh"
 
 # Install packages
-install_packages "arch" "$PACKAGES_DIR"
+# For macOS, packages_dir is used to find Brewfile relative path
+install_packages "macos" "$SCRIPT_DIR"

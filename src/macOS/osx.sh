@@ -1,6 +1,7 @@
 #!/bin/sh
 # ==========================================
-# ~/osx.sh
+# ~/.dotfiles/src/macOS/osx.sh
+# macOS system preferences configuration
 # ==========================================
 
 set -eu
