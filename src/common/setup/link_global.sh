@@ -19,7 +19,7 @@ ensure_directory "$HOME/.config"
 ensure_directory "$HOME/.local/bin"
 
 # Config links (with safe_link)
-for item in git ghostty shell bat tmux; do
+for item in git ghostty shell bat tmux nvim; do
     safe_link "$HOME/.dotfiles/.config/$item" "$HOME/.config/$item"
 done
 
