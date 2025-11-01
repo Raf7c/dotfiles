@@ -41,7 +41,6 @@ check_os_support() {
     case "$os" in
         macos|arch)
             print_success "Supported system: $os"
-            echo "OS=$os"
             return 0
             ;;
         *)

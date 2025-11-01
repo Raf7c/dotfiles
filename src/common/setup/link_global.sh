@@ -19,9 +19,12 @@ ensure_directory "$HOME/.config"
 ensure_directory "$HOME/.local/bin"
 
 # Config links (with safe_link)
-for item in git starship.toml ghostty shell bat tmux; do
+for item in git ghostty shell bat tmux; do
     safe_link "$HOME/.dotfiles/.config/$item" "$HOME/.config/$item"
 done
+
+# Starship config (file, not directory)
+safe_link "$HOME/.dotfiles/.config/starship.toml" "$HOME/.config/starship.toml"
 
 # Login shell links
 safe_link "$HOME/.dotfiles/zsh/.zprofile" "$HOME/.zprofile"

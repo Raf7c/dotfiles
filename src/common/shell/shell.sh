@@ -10,6 +10,7 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 # Load utilities
 . "$SCRIPT_DIR/../../lib/utils.sh"
+. "$SCRIPT_DIR/../../lib/helpers.sh"
 
 echo "📚 Shell migration..."
 
@@ -37,13 +38,11 @@ migrate_history() {
     if [ -f "$old_file" ]; then
         # Verify migration succeeded
         if [ -f "$new_dir/history" ] && [ -s "$new_dir/history" ]; then
-            # Create backup before removal
-            backup_file="${old_file}.backup.$(date +%Y%m%d)"
-            if cp "$old_file" "$backup_file"; then
-                echo "💾 Backup saved: $backup_file"
+            # Create backup before removal using helper function
+            if backup_file "$old_file" >/dev/null 2>&1; then
                 if rm "$old_file"; then
                     echo "🧹 Old $old_file removed"
-                    print_info "You can delete backup after verifying: rm $backup_file"
+                    print_info "Backup created before removal"
                 else
                     print_warning "Failed to remove $old_file"
                 fi

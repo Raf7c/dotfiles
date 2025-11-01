@@ -16,4 +16,4 @@ ARCH_PACKAGES="$SCRIPT_DIR/arch.txt"
 . "$SCRIPT_DIR/../lib/package_manager.sh"
 
 # Install packages
-install_packages "arch" "$SCRIPT_DIR" "$ARCH_PACKAGES"
+install_packages "arch" "$ARCH_PACKAGES"

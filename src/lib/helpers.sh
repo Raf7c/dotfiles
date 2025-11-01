@@ -16,9 +16,6 @@ ensure_directory() {
     if [ ! -d "$dir" ]; then
         mkdir -p "$dir"
         print_success "Directory created: $dir"
-        return 0
-    else
-        return 0
     fi
 }
 
@@ -45,15 +42,23 @@ safe_link() {
     if [ -L "$link_name" ]; then
         local current_target=$(readlink "$link_name")
         if [ "$current_target" != "$target" ]; then
-            backup_file "$link_name" >/dev/null 2>&1
-            rm "$link_name"
+            if backup_file "$link_name" >/dev/null 2>&1; then
+                rm "$link_name"
+            else
+                print_warning "Backup failed, but continuing..."
+                rm "$link_name"
+            fi
         else
             print_info "Link already exists: $link_name"
             return 0
         fi
     elif [ -e "$link_name" ]; then
-        backup_file "$link_name" >/dev/null 2>&1
-        rm -rf "$link_name"
+        if backup_file "$link_name" >/dev/null 2>&1; then
+            rm -rf "$link_name"
+        else
+            print_warning "Backup failed, but continuing..."
+            rm -rf "$link_name"
+        fi
     fi
     
     # Créer le lien

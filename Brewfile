@@ -30,6 +30,8 @@ cask "keymapp"
 cask "raycast"
 cask "utm"
 cask "docker"
+cask "obsidian"
+cask "figma"
 
 # Fonts (casks)
 cask "font-daddy-time-mono-nerd-font"

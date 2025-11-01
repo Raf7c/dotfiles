@@ -45,10 +45,8 @@ if [ "$OS" = "macos" ]; then
 fi
 
 # Refresh GCC cache on macOS
-if [ "$OS" = "macos" ] && [ -f "$SCRIPT_DIR/src/macOS/refresh-gcc-cache.sh" ]; then
-    echo "🔧 Refreshing GCC cache..."
-    sh "$SCRIPT_DIR/src/macOS/refresh-gcc-cache.sh" || print_warning "GCC cache refresh failed"
-    echo ""
+if [ "$OS" = "macos" ]; then
+    run_step "Refreshing GCC cache" "$SCRIPT_DIR/src/macOS/refresh-gcc-cache.sh" "optional"
 fi
 
 # Update git submodules

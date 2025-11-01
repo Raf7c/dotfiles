@@ -13,22 +13,20 @@
 # Installation packages depuis Brewfile (macOS) ou fichier .txt (Arch)
 install_packages() {
     local os="$1"
-    local packages_dir_or_file="$2"
-    local pkg_file="${3:-}"  # Optional for macOS
+    local pkg_file="${2:-}"  # Required for Arch, empty for macOS
     
     echo "📦 Installing packages..."
     
     # Configure commands once based on OS
     case "$os" in
         macos)
+            # Use Brewfile directly from dotfiles root
             if ! command -v brew >/dev/null 2>&1; then
                 print_error "Homebrew not available"
                 return 1
             fi
             echo "🍎 Installing macOS packages..."
             
-            # Use Brewfile
-            # packages_dir_or_file is src/macOS (from packages.sh), Brewfile is at root (../.. from src/macOS)
             local brewfile="${DOTFILES:-$HOME/.dotfiles}/Brewfile"
             if [ ! -f "$brewfile" ]; then
                 print_error "Brewfile not found: $brewfile"
@@ -48,7 +46,6 @@ install_packages() {
             fi
             ;;
         arch)
-            # pkg_file is now the direct path to arch.txt
             if [ ! -f "$pkg_file" ]; then
                 print_error "Package file not found: $pkg_file"
                 return 1
