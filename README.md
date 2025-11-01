@@ -1,8 +1,8 @@
 # 🏠 dotfiles
 
-Cross-platform configuration for modern development environments.
+macOS configuration for modern development environments.
 
-**Supported:** macOS · Arch Linux
+**Supported:** macOS 
 
 [📚 Complete Wiki](https://github.com/Raf7c/dotfiles/wiki)
 
@@ -25,11 +25,6 @@ Cross-platform configuration for modern development environments.
 - **Architecture**: Apple Silicon (M1/M2/M3/M4) or Intel
 - **Required tools**: git, curl (Xcode Command Line Tools)
 
-### Arch Linux
-- **Version**: Latest rolling release
-- **Required tools**: git, curl, pacman
-- **Access**: sudo privileges
-
 ## 🚀 Quick Installation
 
 ```bash
@@ -45,8 +40,8 @@ cd ~/.dotfiles
 - ✅ Detects your operating system automatically
 - ✅ Verifies system requirements
 - ✅ Creates symbolic links for all configurations
-- ✅ Installs packages (Homebrew/Pacman)
-- ✅ Configures Zsh, Tmux, Git, and OS-specific preferences
+- ✅ Installs packages via Homebrew
+- ✅ Configures Zsh, Tmux, Git, and macOS-specific preferences
 - ✅ Sets up performance optimizations
 
 > **📝 Log:** `~/.dotfiles/install.log` | **⏱️ Duration:** 3-10 min | **🔄 Idempotent:** Safe to re-run
@@ -80,7 +75,7 @@ cd ~/.dotfiles
 `bat` · `eza` · `fzf` · `ripgrep` · `fd` · `btop` · `zoxide` · `tree` · `starship` · `git` · `gcc` · `make`
 
 ### Features
-- ✅ **Cross-platform** - macOS, Arch Linux
+- ✅ **macOS focused** - Optimized for macOS with automatic OS detection
 - ✅ **XDG compliant** - Clean home directory
 - ✅ **Performance optimized** - Shell startup <200ms
 - ✅ **Modular scripts** - Easy to customize
@@ -88,7 +83,7 @@ cd ~/.dotfiles
 - ✅ **Comprehensive logging** - Full installation logs
 - ✅ **Idempotent** - Safe to re-run anytime
 
-**[📄 Package lists →](Brewfile)** (macOS) · **[📄 Arch packages →](src/arch/arch.txt)**
+**[📄 Package lists →](Brewfile)** (macOS)
 
 ## ⚙️ Key Features
 
@@ -140,10 +135,6 @@ git submodule update --remote --merge
 - **MacBook Pro M1 Max** (64GB) - macOS Sequoia 15.2
 - **Compatibility:** Apple Silicon · Intel · macOS 12.0+
 
-### Linux
-- **Arch Linux** - Rolling Release (2024)
-- **Compatibility:** x86_64 architecture
-
 ---
 
 ## 🐛 Need Help?
@@ -166,6 +157,6 @@ This project is open source and available under the [MIT License](LICENSE).
 
 **[📚 Complete Documentation](https://github.com/Raf7c/dotfiles/wiki)** · **[🚀 Get Started](https://github.com/Raf7c/dotfiles/wiki/Installation)** · **[💬 Issues](https://github.com/Raf7c/dotfiles/issues)**
 
-Built with ❤️ for macOS · Arch Linux · Cross-platform environments ·
+Built with ❤️ for macOS
 
 </div>

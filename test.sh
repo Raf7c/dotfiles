@@ -54,13 +54,8 @@ case "$OS" in
             FAILED=1
         fi
         ;;
-    arch)
-        if command -v pacman >/dev/null 2>&1; then
-            print_success "Pacman: $(pacman --version | head -n1)"
-        else
-            print_error "Pacman: NOT FOUND"
-            FAILED=1
-        fi
+    *)
+        print_info "No package manager check for: $OS"
         ;;
 esac
 echo ""

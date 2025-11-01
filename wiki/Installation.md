@@ -1,6 +1,6 @@
 # 📦 Installation
 
-Guide d'installation complet pour configurer l'environnement de développement cross-platform (macOS, Arch Linux).
+Guide d'installation complet pour configurer l'environnement de développement macOS.
 
 ## 📋 Table des matières
 
@@ -16,9 +16,9 @@ Guide d'installation complet pour configurer l'environnement de développement c
 
 ### 🖥️ Systèmes supportés
 
-Le script `bootstrap.sh` détecte automatiquement le système et installe les outils appropriés.
+Le script `bootstrap.sh` détecte automatiquement le système d'exploitation mais n'installe que sur macOS.
 
-#### macOS
+#### macOS (Supporté)
 - **Version :** macOS 12.0+ (Monterey ou supérieur)
 - **Architecture :** Apple Silicon (M1/M2/M3/M4) ou Intel
 - **Espace disque :** ~5 GB
@@ -36,21 +36,9 @@ Cela installe automatiquement : `git`, `curl`, compilateurs de base
 git --version && curl --version && sw_vers
 ```
 
-#### Arch Linux
-- **Version :** Rolling release (2024+)
-- **Architecture :** x86_64
-- **Espace disque :** ~2 GB
+#### Autres systèmes
 
-**Installation des outils requis :**
-```bash
-# Installer git et curl
-sudo pacman -S --needed git curl
-```
-
-**Vérification :**
-```bash
-git --version && curl --version && cat /etc/os-release
-```
+⚠️ **Note :** Le script détecte automatiquement le système d'exploitation mais n'installe que sur macOS. Sur Linux ou autres systèmes, l'installation s'arrêtera avec un message d'erreur indiquant que seul macOS est supporté.
 
 ---
 
@@ -92,16 +80,15 @@ Le script `bootstrap.sh` effectue les actions suivantes dans l'ordre :
 
 ```
 1. 🔍 Vérification système
-   └─ Détecte l'OS (macOS, Arch)
+   └─ Détecte l'OS (macOS uniquement supporté)
    └─ Vérifie git + curl
 
 2. 🔗 Liens symboliques
    └─ Crée les liens ~/.config, ~/.zshrc, etc.
 
-3. 📦 Gestionnaire de paquets
-   └─ macOS : Installe/configure Homebrew
-   └─ Arch : Utilise Pacman
-   └─ Installe les paquets depuis src/packages/
+3. 📦 Gestionnaire de paquets (macOS uniquement)
+   └─ Installe/configure Homebrew
+   └─ Installe les paquets depuis Brewfile
 
 4. 📚 Migration shell
    └─ Déplace l'historique vers XDG directories
@@ -112,9 +99,8 @@ Le script `bootstrap.sh` effectue les actions suivantes dans l'ordre :
 6. 🔧 Plugins asdf
    └─ Installe versions depuis .tool-versions (si asdf installé)
 
-7. ⚙️ Configuration spécifique à l'OS
-   └─ macOS : Cache GCC + Préférences système (Dock, Finder)
-   └─ Arch : Configuration système si nécessaire
+7. ⚙️ Configuration macOS
+   └─ Cache GCC + Préférences système (Dock, Finder)
 ```
 
 ### Étape 3 : Lancer l'installation
@@ -213,8 +199,6 @@ git config --global user.email "votre.email@example.com"
 
 ### 5. Installer les versions de langages (asdf)
 
-> **Note Arch Linux :** `asdf` est un package AUR. Installez-le manuellement avant de continuer.
-
 ```bash
 # Vérifier asdf
 asdf --version
@@ -246,11 +230,8 @@ cd ~/.dotfiles
 
 ```bash
 # 1. Vérifier le gestionnaire de paquets
-# macOS:
+# Vérifier Homebrew
 brew --version && brew list
-
-# Arch:
-pacman --version && pacman -Q
 
 # 2. Vérifier les packages CLI
 fzf --version
@@ -521,9 +502,6 @@ exec zsh
 
 # macOS
 brew install starship zoxide fzf bat eza ripgrep fd
-
-# Arch
-sudo pacman -S starship zoxide fzf bat eza ripgrep fd
 ```
 
 **Vérifier l'installation :**
@@ -558,9 +536,9 @@ sh ~/.dotfiles/src/asdf-install.sh
 
 ---
 
-### Cas 4 : Installation sur une machine de production
+### Cas 4 : Installation sur une machine macOS de production
 
-**Situation :** Serveur de production, vous voulez seulement les configs essentielles.
+**Situation :** Serveur macOS de production, vous voulez seulement les configs essentielles.
 
 **Approche minimaliste :**
 
@@ -672,17 +650,6 @@ eval "$(/usr/local/bin/brew shellenv)"     # Intel
 
 # Puis relancer bootstrap
 ./bootstrap.sh
-```
-
-### Arch Linux
-
-#### Erreur : "failed to prepare transaction"
-
-**Solution :**
-```bash
-# Mettre à jour les clés GPG
-sudo pacman -Sy archlinux-keyring
-sudo pacman -Syu
 ```
 
 ### Tous les systèmes

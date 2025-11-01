@@ -1,16 +1,16 @@
 # 🏠 Dotfiles Wiki
 
-> Configuration cross-platform pour développeurs (macOS · Arch)
+> Configuration macOS pour développeurs (avec détection automatique de l'OS)
 
 ## 🚀 Démarrage rapide
 
 ```bash
-git clone https://github.com/your-username/.dotfiles.git ~/.dotfiles
+git clone --recurse-submodules https://github.com/Raf7c/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ./bootstrap.sh
 ```
 
-✨ Le script détecte automatiquement ton OS (macOS/Arch) !
+✨ Le script détecte automatiquement l'OS et installe uniquement sur macOS !
 
 ---
 
@@ -20,7 +20,7 @@ cd ~/.dotfiles
 
 | Fonctionnalité | Description |
 |----------------|-------------|
-| 🌍 **Multi-plateforme** | Détection auto de l'OS (macOS, Arch) |
+| 🖥️ **macOS** | Configuration optimisée pour macOS (avec détection auto de l'OS) |
 | 🚀 **Performance** | Démarrage shell < 200ms |
 | 📦 **Installation auto** | Gestion complète des erreurs |
 | 🏠 **Conforme XDG** | Home directory propre |

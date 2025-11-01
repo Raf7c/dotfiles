@@ -18,16 +18,7 @@ detect_os() {
             echo "macos"
             ;;
         Linux*)
-            if [ -f /etc/os-release ]; then
-                . /etc/os-release
-                case "$ID" in
-                    arch) echo "arch" ;;
-                    ubuntu|debian) echo "$ID" ;;
-                    *) echo "linux" ;;
-                esac
-            else
-                echo "linux"
-            fi
+            echo "linux"
             ;;
         *)
             echo "unknown"
@@ -39,13 +30,13 @@ detect_os() {
 check_os_support() {
     local os=$(detect_os)
     case "$os" in
-        macos|arch)
+        macos)
             print_success "Supported system: $os"
             return 0
             ;;
         *)
             print_error "Unsupported system: $os"
-            print_info "Supported systems: macOS, Arch Linux"
+            print_info "Supported systems: macOS only"
             return 1
             ;;
     esac

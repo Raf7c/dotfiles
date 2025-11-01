@@ -29,7 +29,7 @@ Tous les fichiers suivent la [spécification XDG](https://specifications.freedes
 ~/.local/state/ → Fichiers d'état
 ```
 
-**Avantages :** Home propre · Sauvegarde facile · Standard cross-platform
+**Avantages :** Home propre · Sauvegarde facile · Standard moderne
 
 ### ✅ Modularité
 
@@ -42,21 +42,18 @@ Tous les fichiers suivent la [spécification XDG](https://specifications.freedes
 └── ghostty/   → Terminal
 ```
 
-### ✅ Multi-plateforme
+### ✅ macOS uniquement
 
 ```
 src/
 ├── lib/
 │   ├── utils.sh              → Fonctions utilitaires (détection OS, print_*)
-│   └── package_manager.sh    → Installation unifiée des paquets
+│   └── package_manager.sh    → Installation des paquets via Homebrew
 ├── macOS/
 │   ├── homebrew.sh           → Installation/configuration Homebrew
 │   ├── packages.sh           → Installation paquets macOS (Brewfile)
 │   ├── osx.sh                → Préférences système
 │   └── refresh-gcc-cache.sh  → Cache performance
-├── arch/
-│   ├── packages.sh           → Installation paquets Arch
-│   └── arch.txt              → Paquets Arch Linux
 └── common/
     ├── setup/
     │   └── link_global.sh    → Gestion des liens symboliques
@@ -69,12 +66,12 @@ src/
 
 **Fichiers de packages :**
 - **macOS :** `Brewfile` (à la racine) - Automatiquement maintenu avec `brew bundle dump`
-- **Arch :** `src/arch/arch.txt`
 
 **Détection automatique de l'OS :**
-- `utils.sh` détecte l'OS via `uname -s` et `/etc/os-release`
-- Variable `OS_TYPE` exportée : `macos`, `arch`, ou `linux`
+- `utils.sh` détecte l'OS via `uname -s`
+- Variable `OS_TYPE` exportée : `macos` (supporté), `linux` ou `unknown` (non supportés)
 - Scripts compatibles POSIX sh (pas bash-spécifique)
+- L'installation ne se poursuit que si macOS est détecté
 
 ---
 
@@ -104,7 +101,7 @@ export PAGER="less"
 export LESS="-R -F -X"
 
 # OS
-export OS_TYPE  # macos|arch|linux
+export OS_TYPE  # macos (supporté) | linux | unknown (non supportés)
 
 # Historique
 HISTFILE="$XDG_STATE_HOME/zsh/history"
@@ -139,11 +136,10 @@ HISTSIZE=10000
 ├── update.sh             # Mise à jour
 ├── test.sh               # Validation
 │
-├── src/              # Scripts par OS
+├── src/              # Scripts macOS
 │   ├── lib/              # Fonctions communes
-│   ├── packages/         # Listes paquets (macos/arch)
 │   ├── macOS/
-│   └── arch/
+│   └── common/
 │
 ├── .config/
 │   ├── git/              # Config Git

@@ -56,10 +56,8 @@ run_step "Creating symbolic links" "$SCRIPT_DIR/src/common/setup/link_global.sh"
 # Configure Homebrew on macOS (required before package installation)
 if [ "$OS" = "macos" ]; then
     run_step "Configuring Homebrew" "$SCRIPT_DIR/src/macOS/homebrew.sh" "critical"
+    run_step "Installing packages" "$SCRIPT_DIR/src/macOS/packages.sh" "critical"
 fi
-
-# Install packages (unified for all OS)
-run_step "Installing packages" "$SCRIPT_DIR/src/${OS}/packages.sh" "critical"
 
 # Load shell environment
 echo "📚 Configuring shell..."
