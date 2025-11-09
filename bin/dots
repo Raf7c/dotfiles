@@ -1,0 +1,66 @@
+#!/bin/sh
+# ==========================================
+# ~/.dotfiles/bin/dots
+# Gestionnaire principal pour les dotfiles
+# ==========================================
+
+set -eu
+
+DOTS_ROOT=${DOTS_ROOT:-$HOME/.dotfiles}
+MAX_INSTALL_ATTEMPTS=${MAX_INSTALL_ATTEMPTS:-3}
+
+if [ ! -d "$DOTS_ROOT" ]; then
+    printf '❌ Répertoire dotfiles introuvable : %s\n' "$DOTS_ROOT" >&2
+    exit 1
+fi
+
+. "$DOTS_ROOT/src/lib/dots/log.sh"
+. "$DOTS_ROOT/src/lib/dots/core.sh"
+. "$DOTS_ROOT/src/lib/dots/install.sh"
+. "$DOTS_ROOT/src/lib/dots/commands.sh"
+
+usage() {
+    cat <<EOF
+Usage: dots <command> [options]
+
+Commandes disponibles :
+  install    Installation interactive (choix 1=setup minimale, 2=setup complet)
+  update     Mise à jour de la configuration locale
+  check      Vérifier les liens (spécifier setup_minimale|setup_complet)
+  help       Afficher cette aide
+EOF
+}
+
+if [ $# -eq 0 ]; then
+    usage
+    exit 1
+fi
+
+command="$1"
+shift || true
+
+case "$command" in
+    install|-install|-i)
+        if ! cmd_install "$@"; then
+            exit 1
+        fi
+        ;;
+    update|-update|-u)
+        if ! cmd_update "$@"; then
+            exit 1
+        fi
+        ;;
+    check|-check)
+        if ! cmd_check "$@"; then
+            exit 1
+        fi
+        ;;
+    help|-help|-h)
+        usage
+        ;;
+    *)
+        log_error "Commande inconnue : $command"
+        usage >&2
+        exit 1
+        ;;
+esac

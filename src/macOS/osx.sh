@@ -6,39 +6,43 @@
 
 set -eu
 
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+DOTS_ROOT=${DOTS_ROOT:-$HOME/.dotfiles}
+LOG_INIT="$DOTS_ROOT/src/lib/dots/log_init.sh"
+if [ -f "$LOG_INIT" ]; then
+    . "$LOG_INIT"
+else
+    log_info() { printf 'ℹ️  %s\n' "$*"; }
+    log_error() { printf '❌ %s\n' "$*" >&2; }
+    log_success() { printf '✅ %s\n' "$*"; }
+fi
 
-# Load utilities
-. "$SCRIPT_DIR/../lib/utils.sh"
+log_info "⚙️  Configuration de macOS..."
 
-echo "⚙️ macOS Configuration..."
-
-# Configuration by groups
-echo "📱 Dock..."
+log_info "📱 Dock..."
 defaults write com.apple.dock autohide -bool true
 defaults write com.apple.dock autohide-time-modifier -float 0
 defaults write com.apple.dock autohide-delay -float 0.0
 defaults write com.apple.dock mru-spaces -bool false
 defaults write com.apple.dock show-recents -bool false
 
-echo "📁 Finder..."
+log_info "📁 Finder..."
 defaults write com.apple.finder FXPreferredViewStyle -string "clmv"
 defaults write com.apple.finder AppleShowAllFiles -bool true
 defaults write com.apple.finder AppleShowAllExtensions -bool true
 
-echo "🌐 System..."
+log_info "🌐 Système..."
 defaults write NSGlobalDomain AppleICUForce24HourTime -bool true
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 
-echo "📸 Screenshots..."
+log_info "📸 Captures d'écran..."
 mkdir -p "$HOME/Pictures/screenshots"
 defaults write com.apple.screencapture location -string "$HOME/Pictures/screenshots"
 defaults write com.apple.screencapture type -string "png"
 
-echo "🔄 Restarting services..."
+log_info "🔄 Redémarrage des services..."
 killall Dock 2>/dev/null || true
 killall Finder 2>/dev/null || true
 killall SystemUIServer 2>/dev/null || true
 
-print_success "macOS configuration complete"
+log_success "Configuration macOS terminée"

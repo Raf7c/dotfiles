@@ -6,36 +6,40 @@
 
 set -eu
 
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+DOTS_ROOT=${DOTS_ROOT:-$HOME/.dotfiles}
+LOG_INIT="$DOTS_ROOT/src/lib/dots/log_init.sh"
+if [ -f "$LOG_INIT" ]; then
+    . "$LOG_INIT"
+else
+    log_info() { printf 'ℹ️  %s\n' "$*"; }
+    log_error() { printf '❌ %s\n' "$*" >&2; }
+    log_success() { printf '✅ %s\n' "$*"; }
+fi
 
-# Load utilities
-. "$SCRIPT_DIR/../lib/utils.sh"
+log_info "🍺 Configuration de Homebrew..."
 
-echo "🍺 Configuring Homebrew..."
-
-# Check if Homebrew is installed
 if command -v brew >/dev/null 2>&1; then
-    print_success "Homebrew already installed: $(brew --version | head -n1)"
-# Check Apple Silicon path
+    brew_info=$(brew --version | head -n1)
+    log_success "Homebrew déjà installé : $brew_info"
 elif [ -x /opt/homebrew/bin/brew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
-    print_success "Homebrew found: $(brew --version | head -n1)"
-# Check Intel path
+    brew_info=$(brew --version | head -n1)
+    log_success "Homebrew détecté : $brew_info"
 elif [ -x /usr/local/bin/brew ]; then
     eval "$(/usr/local/bin/brew shellenv)"
-    print_success "Homebrew found: $(brew --version | head -n1)"
-# Install Homebrew
+    brew_info=$(brew --version | head -n1)
+    log_success "Homebrew détecté : $brew_info"
 else
-    echo "⬇️  Installing Homebrew..."
+    log_info "⬇️  Installation de Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    
-    # Initialize after installation
+
     if [ -x /opt/homebrew/bin/brew ]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
     elif [ -x /usr/local/bin/brew ]; then
         eval "$(/usr/local/bin/brew shellenv)"
     fi
-    
-    print_success "Homebrew installed: $(brew --version | head -n1)"
+
+    brew_info=$(brew --version | head -n1)
+    log_success "Homebrew installé : $brew_info"
 fi
 

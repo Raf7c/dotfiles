@@ -6,13 +6,35 @@
 
 set -eu
 
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+DOTS_ROOT=${DOTS_ROOT:-$HOME/.dotfiles}
+LOG_INIT="$DOTS_ROOT/src/lib/dots/log_init.sh"
+if [ -f "$LOG_INIT" ]; then
+    . "$LOG_INIT"
+else
+    log_info() { printf 'ℹ️  %s\n' "$*"; }
+    log_error() { printf '❌ %s\n' "$*" >&2; }
+    log_success() { printf '✅ %s\n' "$*"; }
+fi
 
-# Load utilities
-. "$SCRIPT_DIR/../lib/utils.sh"
+log_info "📦 Installation des paquets Homebrew..."
 
-# Load unified package manager
-. "$SCRIPT_DIR/../lib/package_manager.sh"
+if ! command -v brew >/dev/null 2>&1; then
+    log_error "Homebrew n'est pas disponible. Lance d'abord homebrew.sh"
+    exit 1
+fi
 
-# Install packages
-install_packages "macos"
+BREWFILE="$DOTS_ROOT/Brewfile"
+
+if [ ! -f "$BREWFILE" ]; then
+    log_error "Brewfile introuvable : $BREWFILE"
+    exit 1
+fi
+
+log_info "📖 Lecture de $BREWFILE"
+
+if brew bundle --file="$BREWFILE"; then
+    log_success "Paquets installés à partir du Brewfile"
+else
+    log_error "brew bundle a retourné une erreur"
+    exit 1
+fi
