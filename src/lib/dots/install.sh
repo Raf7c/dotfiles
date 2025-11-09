@@ -101,6 +101,16 @@ cmd_install() {
         return 1
     fi
 
+    if [ ! -e "$DOTS_ROOT/.config/nvim/.git" ]; then
+        if ! run_step "Initialisation des sous-modules git" git -C "$DOTS_ROOT" submodule update --init --recursive; then
+            return 1
+        fi
+        if [ ! -e "$DOTS_ROOT/.config/nvim/.git" ]; then
+            log_error "Impossible d'initialiser le sous-module Neovim"
+            return 1
+        fi
+    fi
+
     print_os_info "$os"
 
     selection=""
