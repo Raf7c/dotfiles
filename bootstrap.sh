@@ -7,6 +7,9 @@ DOTS_ROOT="$SCRIPT_DIR"
 
 echo "🚀 Installation des dotfiles..."
 
+echo "📦 Initialisation des sous-modules Git..."
+git submodule update --init --recursive
+
 echo "🔗 Création des liens symboliques..."
 sh "$DOTS_ROOT/src/setup/link_global.sh"
 

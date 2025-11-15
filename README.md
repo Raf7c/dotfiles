@@ -36,15 +36,16 @@ cd ~/.dotfiles
 ./bootstrap.sh
 ```
 
-**What it does:**
-- ✅ Detects your operating system automatically
-- ✅ Verifies system requirements
-- ✅ Creates symbolic links for all configurations
-- ✅ Installs packages via Homebrew
-- ✅ Configures Zsh, Tmux, Git, and macOS-specific preferences
-- ✅ Sets up performance optimizations
+**What it does (in order):**
+1. 🔗 Creates symbolic links for all configurations
+2. 📦 Installs/configures Homebrew and packages from `Brewfile`
+3. 📚 Migrates shell history to XDG directories
+4. 🔌 Installs Tmux Plugin Manager
+5. 🔧 Installs asdf plugins and versions from `.tool-versions`
+6. ⚙️ Configures macOS system preferences
+7. 🔄 Generates GCC cache
 
-> **📝 Log:** `~/.dotfiles/install.log` | **⏱️ Duration:** 3-10 min | **🔄 Idempotent:** Safe to re-run
+> **⏱️ Duration:** 3-10 min | **🔄 Idempotent:** Safe to re-run anytime
 
 **Detailed guide:** [📦 Installation Wiki](https://github.com/Raf7c/dotfiles/wiki/Installation)
 
@@ -78,9 +79,9 @@ cd ~/.dotfiles
 - ✅ **macOS focused** - Optimized for macOS with automatic OS detection
 - ✅ **XDG compliant** - Clean home directory
 - ✅ **Performance optimized** - Shell startup <200ms
-- ✅ **Modular scripts** - Easy to customize
+- ✅ **Modular scripts** - Easy to customize, minimal dependencies
 - ✅ **POSIX sh** - Maximum portability
-- ✅ **Comprehensive logging** - Full installation logs
+- ✅ **Simplified** - No external logging dependencies
 - ✅ **Idempotent** - Safe to re-run anytime
 
 **[📄 Package lists →](Brewfile)** (macOS)
@@ -109,12 +110,19 @@ cd ~/.dotfiles
 
 ## 🔄 Updates
 
+Since `bootstrap.sh` is idempotent, you can simply re-run it to update everything:
+
 ```bash
 cd ~/.dotfiles
-./update.sh
+./bootstrap.sh
 ```
 
-Updates Homebrew packages, Zsh plugins, Tmux plugins, and asdf.
+This will update:
+- ✅ Homebrew packages (from `Brewfile`)
+- ✅ asdf plugins and versions (from `.tool-versions`)
+- ✅ Tmux Plugin Manager (if needed)
+- ✅ macOS system preferences
+- ✅ GCC cache
 
 **Update Neovim config (submodule):**
 ```bash
