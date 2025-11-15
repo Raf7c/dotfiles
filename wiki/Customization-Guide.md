@@ -46,7 +46,7 @@ nom-nouveau-paquet
 ```bash
 ./bootstrap.sh  # Réinstallation complète
 # ou
-sh src/macOS/packages.sh  # macOS uniquement
+sh src/macOS/homebrew.sh  # macOS uniquement (Homebrew + paquets)
 ```
 
 ---

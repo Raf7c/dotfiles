@@ -57,8 +57,8 @@ vi            # nvim (Neovim)
 
 ### Dotfiles
 ```bash
-cd ~/.dotfiles && ./update.sh  # Mettre à jour dotfiles
-cd ~/.dotfiles && ./test.sh    # Tester installation
+cd ~/.dotfiles && ./bootstrap.sh  # Réinstaller (idempotent)
+cd ~/.dotfiles && ./test.sh       # Tester installation
 ```
 
 ### macOS
@@ -238,7 +238,7 @@ cd ~/.dotfiles
 ./bootstrap.sh
 
 # Mise à jour
-./update.sh
+./bootstrap.sh
 
 # Test
 ./test.sh

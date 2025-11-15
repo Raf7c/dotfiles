@@ -46,29 +46,22 @@ Tous les fichiers suivent la [spécification XDG](https://specifications.freedes
 
 ```
 src/
-├── lib/
-│   ├── utils.sh              → Fonctions utilitaires (détection OS, print_*)
-│   └── package_manager.sh    → Installation des paquets via Homebrew
-├── macOS/
-│   ├── homebrew.sh           → Installation/configuration Homebrew
-│   ├── packages.sh           → Installation paquets macOS (Brewfile)
-│   ├── osx.sh                → Préférences système
-│   └── refresh-gcc-cache.sh  → Cache performance
-└── common/
-    ├── setup/
-    │   └── link_global.sh    → Gestion des liens symboliques
-    ├── shell/
-    │   └── shell.sh          → Migration historique shell
-    └── tools/
-        ├── tmux.sh           → Installation TPM
-        └── asdf.sh           → Installation plugins asdf
+├── setup/
+│   ├── link_global.sh        → Gestion des liens symboliques
+│   ├── migration_shell.sh    → Migration historique shell
+│   ├── tmux.sh              → Installation TPM
+│   └── asdf.sh              → Installation plugins asdf
+└── macOS/
+    ├── homebrew.sh           → Installation/configuration Homebrew + paquets (Brewfile)
+    ├── osx.sh                → Préférences système
+    └── refresh-gcc-cache.sh  → Cache performance
 ```
 
 **Fichiers de packages :**
 - **macOS :** `Brewfile` (à la racine) - Automatiquement maintenu avec `brew bundle dump`
 
 **Détection automatique de l'OS :**
-- `utils.sh` détecte l'OS via `uname -s`
+- Les scripts sont simplifiés et ne dépendent plus de bibliothèques externes
 - Variable `OS_TYPE` exportée : `macos` (supporté), `linux` ou `unknown` (non supportés)
 - Scripts compatibles POSIX sh (pas bash-spécifique)
 - L'installation ne se poursuit que si macOS est détecté
@@ -133,7 +126,6 @@ HISTSIZE=10000
 ```
 ~/.dotfiles/
 ├── bootstrap.sh          # Installation principale
-├── update.sh             # Mise à jour
 ├── test.sh               # Validation
 │
 ├── src/              # Scripts macOS
@@ -219,7 +211,7 @@ Tout est lié depuis `~/.dotfiles/` vers `~/.config/` et `~/`
 
 ```bash
 cd ~/.dotfiles
-./update.sh  # Met à jour : Homebrew, Zinit, Tmux, asdf
+./bootstrap.sh  # Réinstallation complète (idempotent)
 ```
 
 ---

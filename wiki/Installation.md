@@ -79,28 +79,34 @@ cd ~/.dotfiles
 Le script `bootstrap.sh` effectue les actions suivantes dans l'ordre :
 
 ```
-1. 🔍 Vérification système
-   └─ Détecte l'OS (macOS uniquement supporté)
-   └─ Vérifie git + curl
-
-2. 🔗 Liens symboliques
+1. 🔗 Liens symboliques
    └─ Crée les liens ~/.config, ~/.zshrc, etc.
+   └─ Script: src/setup/link_global.sh
 
-3. 📦 Gestionnaire de paquets (macOS uniquement)
+2. 📦 Homebrew et paquets
    └─ Installe/configure Homebrew
    └─ Installe les paquets depuis Brewfile
+   └─ Script: src/macOS/homebrew.sh
 
-4. 📚 Migration shell
+3. 📚 Migration shell
    └─ Déplace l'historique vers XDG directories
+   └─ Script: src/setup/migration_shell.sh
 
-5. 📦 Tmux Plugin Manager
-   └─ Clone TPM pour les plugins Tmux (si tmux installé)
+4. 📦 Tmux Plugin Manager
+   └─ Clone TPM pour les plugins Tmux
+   └─ Script: src/setup/tmux.sh
 
-6. 🔧 Plugins asdf
-   └─ Installe versions depuis .tool-versions (si asdf installé)
+5. 🔧 Plugins asdf
+   └─ Installe versions depuis .tool-versions
+   └─ Script: src/setup/asdf.sh
 
-7. ⚙️ Configuration macOS
-   └─ Cache GCC + Préférences système (Dock, Finder)
+6. ⚙️ Configuration macOS
+   └─ Préférences système (Dock, Finder, screenshots)
+   └─ Script: src/macOS/osx.sh
+
+7. 🔄 Cache GCC
+   └─ Génère les aliases GCC
+   └─ Script: src/macOS/refresh-gcc-cache.sh
 ```
 
 ### Étape 3 : Lancer l'installation
@@ -327,10 +333,9 @@ cd ~/.dotfiles
 
 **Sortie attendue :**
 ```
-▶️  Configuring Homebrew
-🍺 Configuring Homebrew...
-✅ Homebrew already installed: Homebrew 4.2.0
-✅ Configuring Homebrew completed
+📦 Installation de Homebrew et des paquets...
+✅ Homebrew déjà installé
+✅ Paquets installés depuis Brewfile
 ```
 
 **Vérification :**
@@ -387,7 +392,7 @@ nvim bootstrap.sh
 
 # Commenter la section tmux :
 # run_step "Installing Tmux plugins" \
-#     "$SCRIPT_DIR/src/tmux-tmp.sh" \
+#     "$SCRIPT_DIR/src/setup/tmux.sh" \
 #     "optional"
 
 # 3. Lancer installation
@@ -528,10 +533,10 @@ ln -sf ~/.dotfiles/.config/git ~/.config/git
 ln -sf ~/.dotfiles/.config/tmux ~/.config/tmux
 
 # 3. Installer TPM
-sh ~/.dotfiles/src/tmux-tmp.sh
+sh ~/.dotfiles/src/setup/tmux.sh
 
 # 4. Installer asdf
-sh ~/.dotfiles/src/asdf-install.sh
+sh ~/.dotfiles/src/setup/asdf.sh
 ```
 
 ---
@@ -659,7 +664,7 @@ eval "$(/usr/local/bin/brew shellenv)"     # Intel
 **Solution :**
 ```bash
 # Donner les permissions d'exécution
-chmod +x bootstrap.sh update.sh test.sh
+chmod +x bootstrap.sh test.sh
 chmod +x src/**/*.sh
 ```
 
@@ -678,7 +683,7 @@ exec zsh
 ```bash
 # Réinstaller TPM
 rm -rf ~/.config/tmux/plugins/tpm
-sh ~/.dotfiles/src/tmux-tmp.sh
+sh ~/.dotfiles/src/setup/tmux.sh
 
 # Dans Tmux : Ctrl+Space + I
 ```

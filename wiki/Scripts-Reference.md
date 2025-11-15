@@ -21,40 +21,20 @@ Documentation des scripts d'installation.
 ./bootstrap.sh
 ```
 
-**Étapes :**
-1. Détection OS (macOS/Arch)
-2. Vérification prérequis (git, curl)
-3. Liens symboliques
-4. Gestionnaire paquets (Homebrew si macOS)
-5. Installation paquets
-6. Migration shell vers XDG
-7. Tmux Plugin Manager
-8. Plugins asdf
-9. Config OS (GCC cache macOS)
+**Étapes (dans l'ordre) :**
+1. Liens symboliques (`src/setup/link_global.sh`)
+2. Homebrew et paquets (`src/macOS/homebrew.sh`)
+3. Migration shell vers XDG (`src/setup/migration_shell.sh`)
+4. Tmux Plugin Manager (`src/setup/tmux.sh`)
+5. Plugins asdf (`src/setup/asdf.sh`)
+6. Configuration macOS (`src/macOS/osx.sh`)
+7. Cache GCC (`src/macOS/refresh-gcc-cache.sh`)
 
-**Log :** `~/.dotfiles/install.log`  
 **Durée :** 3-10 min  
 **Idempotent :** ✅ Oui
 
 ---
 
-### update.sh
-
-**Met à jour paquets et plugins**
-
-```bash
-./update.sh
-```
-
-**Actions (selon OS) :**
-- **macOS** : Homebrew + cache GCC
-- **Arch** : Pacman update
-- **Tous** : asdf, Zinit, Tmux plugins
-
-**Durée :** 30s - 5 min  
-**Fréquence :** Hebdomadaire
-
----
 
 ### test.sh
 
@@ -84,23 +64,25 @@ Documentation des scripts d'installation.
 **Crée les liens symboliques**
 
 ```bash
-sh src/common/setup/link_global.sh
+sh src/setup/link_global.sh
 ```
 
 **Liens :** `.config/git`, `.config/tmux`, `.config/shell`, `.zshrc`, `.tool-versions`, etc.
 
+**Emplacement :** `src/setup/link_global.sh`
+
 ---
 
-### shell.sh
+### migration_shell.sh
 
 **Migre historique shell vers XDG_STATE_HOME**
 
 - Zsh : `~/.zsh_history` → `~/.local/state/zsh/history`
 - Bash : `~/.bash_history` → `~/.local/state/bash/history`
-- Backup automatique avant suppression
 - Migration automatique depuis `~/.local/share/` si nécessaire
+- Crée un fichier vide si l'historique n'existe pas
 
-**Emplacement :** `src/common/shell/shell.sh`
+**Emplacement :** `src/setup/migration_shell.sh`
 
 ---
 
@@ -108,11 +90,11 @@ sh src/common/setup/link_global.sh
 
 **Installe Tmux Plugin Manager**
 
-Clone TPM dans `~/.config/tmux/plugins/tpm`
+Clone TPM dans `~/.config/tmux/plugins/tpm` si absent.
 
 **Post-install :** `Ctrl+Space I` dans Tmux
 
-**Emplacement :** `src/common/tools/tmux.sh`
+**Emplacement :** `src/setup/tmux.sh`
 
 ---
 
@@ -126,44 +108,10 @@ neovim 0.11.4
 python 3.14.0
 ```
 
-**Emplacement :** `src/common/tools/asdf.sh`
+**Emplacement :** `src/setup/asdf.sh`
 
 ---
 
-## 📚 Utilitaires
-
-### utils.sh
-
-**Fonctions communes**
-
-```bash
-detect_os()       # Détecte OS (macos|arch)
-command_exists()  # Vérifie commande
-print_success()   # Message ✅
-print_error()     # Message ❌
-print_warning()   # Message ⚠️
-run_step()        # Exécute script avec gestion erreur
-```
-
----
-
-### package_manager.sh
-
-**Installation unifiée paquets**
-
-```bash
-install_packages() {
-    local os="$1"           # macos | arch
-    local packages_dir_or_file="$2"
-    local pkg_file="${3:-}" # Optionnel (Arch)
-}
-```
-
-**Commandes par OS :**
-- **macOS** : `brew bundle install --file=Brewfile`
-- **Arch** : `sudo pacman -S --noconfirm --needed`
-
----
 
 ## 🖥️ Scripts OS
 
@@ -171,8 +119,7 @@ install_packages() {
 
 | Script | Description |
 |--------|-------------|
-| `homebrew.sh` | Installe Homebrew |
-| `packages.sh` | Installe paquets depuis `Brewfile` |
+| `homebrew.sh` | Installe Homebrew et paquets depuis `Brewfile` |
 | `osx.sh` | Configure préférences système (Dock, Finder, screenshots) |
 | `refresh-gcc-cache.sh` | Génère cache aliases GCC (évite `brew --prefix`) |
 
@@ -201,8 +148,8 @@ cask "font-jetbrains-mono-nerd-font"
 
 ```bash
 # Mode verbose
-bash -x ./bootstrap.sh
-sh -x src/common/setup/link_global.sh
+sh -x ./bootstrap.sh
+sh -x src/setup/link_global.sh
 
 # Vérifier syntaxe
 sh -n bootstrap.sh

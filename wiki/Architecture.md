@@ -22,13 +22,13 @@ Architecture technique du dotfiles.
 **Flux d'installation :**
 ```
 bootstrap.sh
-  1. Détection OS (uname + /etc/os-release)
-  2. Vérification prérequis (git, curl)
-  3. Liens symboliques (.config/)
-  4. Installation paquets (brew/dnf/pacman)
-  5. Configuration shell (historique XDG)
-  6. Plugins (Tmux TPM, asdf)
-  7. Config OS (macOS: GCC cache)
+  1. Liens symboliques (.config/)
+  2. Homebrew et paquets (Brewfile)
+  3. Migration shell (historique XDG)
+  4. Tmux Plugin Manager
+  5. Plugins asdf
+  6. Configuration macOS (Dock, Finder, screenshots)
+  7. Cache GCC
 ```
 
 ---
@@ -57,10 +57,17 @@ source file.sh
 
 ```
 src/
-├── lib/utils.sh              # Fonctions communes
-├── link_global.sh            # Liens symboliques
-├── macOS/packages.sh         # Paquets macOS
-└── arch/packages.sh          # Paquets Arch
+├── setup/
+│   ├── link_global.sh        # Liens symboliques
+│   ├── migration_shell.sh    # Migration historique XDG
+│   ├── tmux.sh              # Tmux Plugin Manager
+│   └── asdf.sh              # Plugins asdf
+├── macOS/
+│   ├── homebrew.sh          # Homebrew + paquets
+│   ├── osx.sh               # Préférences système
+│   └── refresh-gcc-cache.sh # Cache GCC
+└── arch/
+    └── packages.sh          # Paquets Arch
 ```
 
 ### Idempotence
@@ -111,7 +118,7 @@ export OS_TYPE
 **Utilisation :**
 ```bash
 case "$OS_TYPE" in
-    macos) sh src/macOS/packages.sh ;;
+    macos) sh src/macOS/homebrew.sh ;;
     arch)  sh src/arch/packages.sh ;;
 esac
 ```
@@ -123,35 +130,26 @@ esac
 ```
 .dotfiles/
 ├── bootstrap.sh          # Point d'entrée
-├── update.sh             # Mise à jour
 ├── test.sh               # Tests
 │
-├── Brewfile                      # Paquets macOS (auto-maintenu)
+├── Brewfile              # Paquets macOS (auto-maintenu)
+├── .tool-versions        # Versions asdf
+│
 ├── src/
-│   ├── lib/
-│   │   ├── utils.sh              # Fonctions communes
-│   │   ├── package_manager.sh    # Installation unifiée
-│   │   ├── git.sh                # Git submodules
-│   │   └── helpers.sh            # Helpers (backup, symlink)
+│   ├── setup/
+│   │   ├── link_global.sh      # Liens symboliques
+│   │   ├── migration_shell.sh  # Migration historique XDG
+│   │   ├── tmux.sh            # Tmux Plugin Manager
+│   │   └── asdf.sh            # Plugins asdf
 │   │
 │   ├── macOS/
-│   │   ├── homebrew.sh           # Homebrew
-│   │   ├── packages.sh           # Install paquets (Brewfile)
-│   │   ├── osx.sh                # Préférences système
-│   │   └── refresh-gcc-cache.sh  # Cache GCC
+│   │   ├── homebrew.sh         # Homebrew + paquets (Brewfile)
+│   │   ├── osx.sh              # Préférences système
+│   │   └── refresh-gcc-cache.sh # Cache GCC
 │   │
-│   ├── arch/
-│   │   ├── packages.sh           # Install paquets
-│   │   └── arch.txt              # Paquets Arch
-│   │
-│   └── common/
-│       ├── setup/
-│       │   └── link_global.sh    # Liens symboliques
-│       ├── shell/
-│       │   └── shell.sh          # Migration shell XDG
-│       └── tools/
-│           ├── tmux.sh           # TPM
-│           └── asdf.sh           # asdf plugins
+│   └── arch/
+│       ├── packages.sh         # Install paquets
+│       └── arch.txt            # Paquets Arch
 │
 └── .config/
     ├── shell/

@@ -123,7 +123,7 @@ tmux kill-session -t <name>  # Tuer
 
 **TPM** = Tmux Plugin Manager
 
-**Installation** via `src/tmux-tmp.sh`
+**Installation** via `src/setup/tmux.sh`
 
 | Plugin | Description | Raccourcis |
 |--------|-------------|------------|
@@ -194,7 +194,7 @@ set -g @plugin 'tmux-plugins/tmux-yank'
 ### Plugins ne s'installent pas
 ```bash
 rm -rf ~/.config/tmux/plugins/tpm
-sh ~/.dotfiles/src/tmux-tmp.sh
+sh ~/.dotfiles/src/setup/tmux.sh
 # Dans Tmux : Ctrl+Space + I
 ```
 

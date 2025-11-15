@@ -97,9 +97,9 @@ ga .            # git add .
 gcm "message"   # git commit
 gp              # git push
 
-# Mise à jour
+# Réinstallation (idempotent)
 cd ~/.dotfiles
-./update.sh
+./bootstrap.sh
 ```
 
 ### Raccourcis importants
