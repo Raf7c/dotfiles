@@ -22,6 +22,8 @@ brew "fd"
 # Development Tools
 brew "asdf"
 
+# Ai
+brew "opencod"
 
 # Applications - Development & IDEs
 cask "cursor"
@@ -29,6 +31,8 @@ cask "visual-studio-code"
 cask "jetbrains-toolbox"
 cask "docker"
 cask "utm"
+
+cask "cleanmymac"
 
 # Applications - Terminal
 cask "ghostty"
