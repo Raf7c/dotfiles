@@ -53,7 +53,7 @@ load_integrations() {
     command -v fzf >/dev/null 2>&1 && eval "$(fzf --zsh)"
     # Initialize zoxide last to avoid conflicts
     if command -v zoxide >/dev/null 2>&1; then
-        eval "$(zoxide init zsh)"
+        eval "$(zoxide init zsh --cmd cd)"
     fi
 }
 load_integrations
