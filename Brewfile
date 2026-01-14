@@ -51,7 +51,7 @@ cask "figma"
 
 # Applications - Browser
 cask "arc"
-cask "thebrowsercompany-dia"
+#cask "thebrowsercompany-dia"
 
 # Fonts
 cask "font-daddy-time-mono-nerd-font"

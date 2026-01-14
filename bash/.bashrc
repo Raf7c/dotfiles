@@ -24,19 +24,17 @@ case "$OSTYPE" in
     ;;
 esac
 
-# asdf version manager (cross-platform)
-if [ -n "${ASDF_DATA_DIR:-}" ] && [ -f "${ASDF_DATA_DIR}/asdf.sh" ]; then
-    . "${ASDF_DATA_DIR}/asdf.sh"
-    [ -f "${ASDF_DIR}/etc/bash_completion.d/asdf.bash" ] && . "${ASDF_DIR}/etc/bash_completion.d/asdf.bash"
-elif [ -f "${HOME}/.asdf/asdf.sh" ]; then
-    . "${HOME}/.asdf/asdf.sh"
-    [ -f "${HOME}/.asdf/etc/bash_completion.d/asdf.bash" ] && . "${HOME}/.asdf/etc/bash_completion.d/asdf.bash"
-elif command -v brew >/dev/null 2>&1; then
-    ASDF_PATH=$(brew --prefix asdf 2>/dev/null || echo "")
-    if [ -n "$ASDF_PATH" ] && [ -f "${ASDF_PATH}/libexec/asdf.sh" ]; then
-        . "${ASDF_PATH}/libexec/asdf.sh"
-        [ -f "${ASDF_PATH}/etc/bash_completion.d/asdf.bash" ] && . "${ASDF_PATH}/etc/bash_completion.d/asdf.bash"
-    fi
+
+
+
+
+
+
+
+# asdf version manager
+if [ -d "$HOME/.asdf" ]; then
+    export PATH="$HOME/.asdf/shims:$PATH"
+    [ -f "$HOME/.asdf/completions/asdf.bash" ] && . "$HOME/.asdf/completions/asdf.bash"
 fi
 
 # Load common aliases
@@ -48,7 +46,6 @@ load_integrations() {
     command -v fzf >/dev/null 2>&1 && eval "$(fzf --bash)"
     # Initialize zoxide last to avoid conflicts
     if command -v zoxide >/dev/null 2>&1; then
-        export _ZO_DOCTOR=0 2>/dev/null  # Suppress zoxide doctor message
         eval "$(zoxide init bash --cmd cd)"
     fi
 }

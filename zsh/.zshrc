@@ -26,19 +26,19 @@ case "$OSTYPE" in
     ;;
 esac
 
-# asdf version manager (cross-platform)
-if [ -n "${ASDF_DATA_DIR:-}" ] && [ -f "${ASDF_DATA_DIR}/asdf.sh" ]; then
-    . "${ASDF_DATA_DIR}/asdf.sh"
+
+
+
+
+
+
+
+# asdf version manager
+if [ -d "$HOME/.asdf" ]; then
+    export PATH="$HOME/.asdf/shims:$PATH"
+    export ASDF_DIR="$HOME/.asdf"
     fpath=(${ASDF_DIR}/completions $fpath)
-elif [ -f "${HOME}/.asdf/asdf.sh" ]; then
-    . "${HOME}/.asdf/asdf.sh"
-    fpath=(${ASDF_DIR}/completions $fpath)
-elif [ -f /opt/homebrew/opt/asdf/libexec/asdf.sh ]; then
-    . /opt/homebrew/opt/asdf/libexec/asdf.sh
-    fpath=(${ASDF_DIR}/completions $fpath)
-elif [ -f /usr/local/opt/asdf/libexec/asdf.sh ]; then
-    . /usr/local/opt/asdf/libexec/asdf.sh
-    fpath=(${ASDF_DIR}/completions $fpath)
+    autoload -Uz compinit && compinit
 fi
 
 # Load common aliases
