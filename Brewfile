@@ -13,7 +13,7 @@ brew "zoxide"
 brew "starship"
 brew "ripgrep"
 brew "fd"
-
+brew "xz"
 # Development Tools
 brew "asdf"
 
