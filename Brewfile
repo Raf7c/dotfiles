@@ -25,7 +25,8 @@ cask "utm"
 
 # Applications - Terminal
 cask "ghostty"
-
+cask "warp"
+cask "wezterm"
 # Applications - Productivity
 cask "raycast"
 cask "keymapp"
