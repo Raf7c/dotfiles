@@ -27,6 +27,8 @@ cask "utm"
 cask "ghostty"
 cask "warp"
 cask "wezterm"
+cask "kitty"
+
 # Applications - Productivity
 cask "raycast"
 cask "keymapp"

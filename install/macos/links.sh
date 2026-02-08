@@ -22,6 +22,9 @@ echo "Lien créé : $HOME/.config/starship.toml -> $DOTS_ROOT/.config/starship.t
 ln -sfn "$DOTS_ROOT/.config/ghostty" "$HOME/.config/ghostty"
 echo "Lien créé : $HOME/.config/ghostty -> $DOTS_ROOT/.config/ghostty"
 
+ln -sfn "$DOTS_ROOT/.config/kitty" "$HOME/.config/kitty"
+echo "Lien créé : $HOME/.config/kitty -> $DOTS_ROOT/.config/kitty"
+
 ln -sfn "$DOTS_ROOT/.config/bat" "$HOME/.config/bat"
 echo "Lien créé : $HOME/.config/bat -> $DOTS_ROOT/.config/bat"
 
