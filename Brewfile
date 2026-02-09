@@ -1,13 +1,8 @@
-# Homebrew Brewfile
-# Automatically maintained with: brew bundle dump
-# Install with: brew bundle
-# Sync with: ./update.sh (automatic) or: brew bundle dump --file=Brewfile --force
-
-
 # System Essentials
 brew "git"
-brew "gcc"
 brew "tmux"
+brew "zsh"
+brew "bash"
 
 # CLI Tools
 brew "eza"
@@ -18,14 +13,13 @@ brew "zoxide"
 brew "starship"
 brew "ripgrep"
 brew "fd"
-
+brew "xz"
 # Development Tools
 brew "asdf"
 
 # Ai
 
 # Applications - Development & IDEs
-cask "cursor"
 cask "visual-studio-code"
 cask "jetbrains-toolbox"
 cask "utm"
@@ -34,6 +28,9 @@ cask "cleanmymac"
 
 # Applications - Terminal
 cask "ghostty"
+cask "warp"
+cask "wezterm"
+cask "kitty"
 
 # Applications - Productivity
 cask "raycast"

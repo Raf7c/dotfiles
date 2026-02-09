@@ -1,25 +1,11 @@
-# ==========================================
-# ~/.config/shell/env
-# Cross-platform login shell configuration
-# ==========================================
-
-# Detect OS
-case "$(uname -s)" in
-    Darwin*) OS_TYPE="macos" ;;
-    Linux*)
-        if [ -f /etc/os-release ]; then
-            . /etc/os-release
-            case "$ID" in
-                arch) OS_TYPE="arch" ;;
-                *) OS_TYPE="linux" ;;
-            esac
-        else
-            OS_TYPE="linux"
-        fi
-        ;;
-    *) OS_TYPE="unknown" ;;
-esac
-export OS_TYPE
+# Shell env (bash & zsh)
+# Apple Silicon / Homebrew — detection via uname for Bash and Zsh
+if [ "$(uname -s)" = "Darwin" ]; then
+  if [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  fi
+  export HOMEBREW_NO_AUTO_UPDATE=1
+fi
 
 # XDG Base Directory
 : "${XDG_CONFIG_HOME:=${HOME}/.config}"
@@ -27,11 +13,17 @@ export OS_TYPE
 : "${XDG_DATA_HOME:=${HOME}/.local/share}"
 : "${XDG_STATE_HOME:=${HOME}/.local/state}"
 : "${DOTFILES:=${HOME}/.dotfiles}"
+export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME DOTFILES
 
-# Personal bin at the beginning
+# User binaries first in PATH
 PATH="${HOME}/.local/bin:${PATH}"
 
-export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME DOTFILES PATH
+# asdf — XDG path then shims on PATH
+# https://asdf-vm.com/guide/getting-started.html
+export ASDF_DATA_DIR="${XDG_DATA_HOME}/asdf"
+export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
+export ASDF_DEFAULTS_ROOT="${XDG_CONFIG_HOME}/asdf"
+export PATH="${ASDF_DATA_DIR}/shims:$PATH"
 
 # Terminal colors
 export TERM="xterm-256color"
@@ -40,11 +32,11 @@ export TERM="xterm-256color"
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 
-# Editor (Intelligent detection of nvim/vim)
+# Editor (nvim if present, else vim)
 if command -v nvim >/dev/null 2>&1; then
-    export EDITOR="nvim"
+  export EDITOR="nvim"
 else
-    export EDITOR="vim"
+  export EDITOR="vim"
 fi
 export VISUAL="$EDITOR"
 export GIT_EDITOR="$EDITOR"
@@ -52,35 +44,4 @@ export GIT_EDITOR="$EDITOR"
 # Pager
 export PAGER="less"
 export LESS="-R -F -X"
-
-# XDG Cleanup
 export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
-
-# zoxide
-export _ZO_DOCTOR=0
-
-# asdf
-export ASDF_DATA_DIR="${XDG_DATA_HOME}/asdf"
-export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
-export ASDF_DEFAULTS_ROOT="${XDG_CONFIG_HOME}/asdf"
-
-# OS-specific configuration
-case "$OS_TYPE" in
-    macos)
-        # Homebrew
-        export HOMEBREW_NO_ANALYTICS=1
-        export HOMEBREW_NO_AUTO_UPDATE=1
-        
-        # Initialize Homebrew
-        if [ -x /opt/homebrew/bin/brew ]; then
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-        elif [ -x /usr/local/bin/brew ]; then
-            eval "$(/usr/local/bin/brew shellenv)"
-        fi
-        ;;
-    
-    arch|linux)
-        # Linux-specific environment variables
-        # Add system paths if needed
-        ;;
-esac

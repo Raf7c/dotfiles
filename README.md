@@ -1,170 +1,124 @@
 # 🏠 dotfiles
 
-macOS configuration for modern development environments.
+Configuration macOS pour un environnement de développement. Les fichiers sont centralisés sous `~/.config` (XDG) et reliés par des liens symboliques.
 
-**Supported:** macOS 
+**Supporté :** macOS
 
-[📚 Complete Wiki](https://github.com/Raf7c/dotfiles/wiki)
-
----
+📚 [Wiki complet](https://github.com/Raf7c/dotfiles/wiki)
 
 ---
 
-## 📋 Table of Contents
+## 📋 Table des matières
 
-- [Prerequisites](#-prerequisites)
-- [Quick Installation](#-quick-installation)
+- [Prérequis](#-prérequis)
+- [Installation rapide](#-installation-rapide)
 - [Documentation](#-documentation)
-- [What's Included](#-whats-included)
-- [Updates](#-updates)
+- [Contenu](#-contenu)
+- [Scripts optionnels](#-scripts-optionnels)
+- [Mise à jour](#-mise-à-jour)
+- [Licence](#-licence)
 
-## 🔧 Prerequisites
+---
+
+## 🔧 Prérequis
 
 ### macOS
-- **Version**: macOS 12.0 or higher
-- **Architecture**: Apple Silicon (M1/M2/M3/M4) or Intel
-- **Required tools**: git, curl (Xcode Command Line Tools)
 
-## 🚀 Quick Installation
+- **Version :** macOS 26 Tahoe
+- **Architecture :** Apple Silicon (M1/M2/M3/M4)
+- **Requis :** Xcode Command Line Tools (git, etc.)
+
+---
+
+## 🚀 Installation rapide
 
 ```bash
-# Clone the repository with submodules (includes Neovim config)
-git clone --recurse-submodules https://github.com/Raf7c/dotfiles.git ~/.dotfiles
+git clone git@github.com:Raf7c/dotfiles.git ~/.dotfiles
 
-# Launch installation
 cd ~/.dotfiles
 ./bootstrap.sh
 ```
 
-**What it does (in order):**
-1. 🔗 Creates symbolic links for all configurations
-2. 📦 Installs/configures Homebrew and packages from `Brewfile`
-3. 📚 Migrates shell history to XDG directories
-4. 🔌 Installs Tmux Plugin Manager
-5. 🔧 Installs asdf plugins and versions from `.tool-versions`
-6. ⚙️ Configures macOS system preferences
-7. 🔄 Generates GCC cache
+**Ce que fait `bootstrap.sh` :**
 
-> **⏱️ Duration:** 3-10 min | **🔄 Idempotent:** Safe to re-run anytime
+1. **osx.sh** — Réglages système (Dock, Finder, captures d’écran, heure 24h, etc.)
+2. **brew.sh** — Installe Homebrew si besoin, puis les paquets du `Brewfile`
+3. **asdf.sh** — Installe les plugins et versions définis dans `.tool-versions` (neovim, nodejs, python, golang, pnpm)
+4. **links.sh** — Crée les liens symboliques vers `~/.config` et `~` (.zshrc, .bashrc, .tool-versions)
+5. **tmux.sh** — Installe le Tmux Plugin Manager (TPM) dans `~/.config/tmux/plugins/tpm`
+6. **shell.sh** — Migre les historiques shell vers les répertoires XDG
 
-**Detailed guide:** [📦 Installation Wiki](https://github.com/Raf7c/dotfiles/wiki/Installation)
+Redémarre ton shell pour charger la config.
+
+---
 
 ## 📚 Documentation
 
-**[📖 Complete Wiki →](https://github.com/Raf7c/dotfiles/wiki)**
-
 | 📄 Guide | 📝 Description |
-|---------|---------------|
-| [Installation](https://github.com/Raf7c/dotfiles/wiki/Installation) | Step-by-step setup guide |
-| [Configuration](https://github.com/Raf7c/dotfiles/wiki/Configuration) | Architecture & structure |
-| [Zsh Setup](https://github.com/Raf7c/dotfiles/wiki/Zsh-Configuration) | Shell, plugins, optimizations |
-| [Tmux Setup](https://github.com/Raf7c/dotfiles/wiki/Tmux-Configuration) | Terminal multiplexer config |
-| [Performance](https://github.com/Raf7c/dotfiles/wiki/Performance-Optimizations) | Speed optimizations & benchmarks |
-| [Troubleshooting](https://github.com/Raf7c/dotfiles/wiki/Troubleshooting) | Common issues & solutions |
-| [FAQ](https://github.com/Raf7c/dotfiles/wiki/FAQ) | Frequently asked questions |
-| [Scripts Reference](https://github.com/Raf7c/dotfiles/wiki/Scripts-Reference) | Documentation of all scripts |
+|----------|----------------|
+| [Installation](https://github.com/Raf7c/dotfiles/wiki/Installation) | Installation pas à pas |
+| [Configuration](https://github.com/Raf7c/dotfiles/wiki/Configuration) | Structure du dépôt, XDG, env |
+| [Configuration Zsh](https://github.com/Raf7c/dotfiles/wiki/Zsh-Configuration) | Zinit, plugins, Starship |
+| [Configuration Tmux](https://github.com/Raf7c/dotfiles/wiki/Tmux-Configuration) | Raccourcis, TPM, thèmes |
+| [Configuration Git](https://github.com/Raf7c/dotfiles/wiki/Git-Configuration) | Config globale, ignore |
+| [Guide CLI](https://github.com/Raf7c/dotfiles/wiki/CLI-Tools-Guide) | bat, eza, fzf, zoxide, etc. |
+| [Dépannage](https://github.com/Raf7c/dotfiles/wiki/Troubleshooting) | Problèmes courants et solutions |
+| [FAQ](https://github.com/Raf7c/dotfiles/wiki/FAQ) | Questions fréquentes |
+| [Aide-mémoire](https://github.com/Raf7c/dotfiles/wiki/Cheatsheet) | Raccourcis tmux, aliases |
 
-## 🛠️ What's Included
+README par composant : [Kitty](.config/kitty/README.md) · [Ghostty](.config/ghostty/README.md) · [Tmux](.config/tmux/README.md)
 
-### Core Tools
-- **Terminal:** [Ghostty](https://ghostty.org/) with [Catppuccin](https://github.com/catppuccin/catppuccin) theme
-- **Shell:** [Zsh](https://www.zsh.org/) + [Zinit](https://github.com/zdharma-continuum/zinit) + [Starship](https://starship.rs/)
-- **Multiplexer:** [Tmux](https://github.com/tmux/tmux) with TPM plugins
-- **Editor:** [Neovim](https://neovim.io/) configuration via [Git submodule](https://github.com/Raf7c/neovim)
+---
 
-### CLI Utilities
-`bat` · `eza` · `fzf` · `ripgrep` · `fd` · `btop` · `zoxide` · `tree` · `starship` · `git` · `gcc` · `make`
+## 🛠️ Contenu
 
-### Features
-- ✅ **macOS focused** - Optimized for macOS with automatic OS detection
-- ✅ **XDG compliant** - Clean home directory
-- ✅ **Performance optimized** - Shell startup <200ms
-- ✅ **Modular scripts** - Easy to customize, minimal dependencies
-- ✅ **POSIX sh** - Maximum portability
-- ✅ **Simplified** - No external logging dependencies
-- ✅ **Idempotent** - Safe to re-run anytime
+### Principal
 
-**[📄 Package lists →](Brewfile)** (macOS)
+| Composant | Description |
+|-----------|-------------|
+| **Zsh** | Historique XDG, env/aliases partagés, Zinit (completions, autosuggest, syntax-highlighting, fzf-tab), zoxide, fzf, Starship. |
+| **Bash** | Même env/aliases, zoxide, fzf, Starship (sans Zinit). |
+| **Tmux** | Préfixe `Ctrl+Space`, splits `s`/`v`, resize hjkl, zoom `m`, Catppuccin Mocha/Latte (auto selon l’apparence système), TPM. |
+| **Kitty** | JetBrains Mono, Catppuccin auto (clair/sombre), padding, opacité, copier sur sélection. |
+| **Ghostty** | Catppuccin Latte/Mocha auto, même philosophie que Kitty. |
+| **Git** | User, exclude, diff, fetch — voir `.config/git/config`. |
+| **Starship** | Prompt minimal, formats par langage. |
+| **asdf** | Versions dans `.tool-versions` : neovim, nodejs, python, golang, pnpm. |
 
-## ⚙️ Key Features
+### CLI (Brewfile)
 
-### 🚀 Performance
-- **Shell startup:** <200ms on Apple Silicon
-- **Async plugin loading** - Non-blocking Zsh plugins
-- **Smart caching** - GCC aliases, completions
-- **Optimized Tmux** - Reduced memory & CPU usage
+`git` · `tmux` · `zsh` · `eza` · `bat` · `fzf` · `zoxide` · `starship` · `ripgrep` · `fd` · `asdf` · …
 
-### 🎨 Design
-- **Catppuccin theme** - Mocha (dark) & Latte (light)
-- **Nerd Fonts** - Monaspace, JetBrains Mono
-- **Consistent colors** - Across terminal, Tmux, and editors
+### Caractéristiques
 
-### 🔧 Developer Experience
-- **XDG compliant** - Clean `$HOME` directory
-- **Smart aliases** - `cd` → zoxide (si installé), `ls` → eza
-- **Git shortcuts** - 20+ productivity aliases
-- **Tmux prefix** - `Ctrl+Space` (more ergonomic)
-- **Neovim config** - Managed as Git submodule for easy updates
+- **Orientation macOS** — Détection OS, réglages système, Homebrew
+- **Conforme XDG** — Config sous `~/.config`, état sous `~/.local/state`
+- **Modulaire** — Scripts dans `install/macos/`, config dans `.config/`
+- **Idempotent** — On peut relancer `bootstrap.sh` sans risque
 
-**[📖 Detailed configuration →](https://github.com/Raf7c/dotfiles/wiki/Configuration)**
+---
 
-## 🔄 Updates
+## 📜 Scripts optionnels
 
-Since `bootstrap.sh` is idempotent, you can simply re-run it to update everything:
+- **scritps/tools42.sh** — Installe **norminette** (42 school) et **c_formatter_42** via pip. Utilise le Python asdf si le script est lancé depuis un shell où asdf est chargé.  
+  Usage : `./scritps/tools42.sh`
+
+---
+
+## 🔄 Mise à jour
 
 ```bash
 cd ~/.dotfiles
+git pull
 ./bootstrap.sh
 ```
 
-This will update:
-- ✅ Homebrew packages (from `Brewfile`)
-- ✅ asdf plugins and versions (from `.tool-versions`)
-- ✅ Tmux Plugin Manager (if needed)
-- ✅ macOS system preferences
-- ✅ GCC cache
-
-**Update Neovim config (submodule):**
-```bash
-cd ~/.dotfiles
-git submodule update --remote --merge
-```
-
-**Duration:** 30s - 5min
-
-**[📖 Update guide →](https://github.com/Raf7c/dotfiles/wiki/Installation#updates)**
+Relancer `bootstrap.sh` met à jour les liens, les paquets Homebrew, les versions asdf et TPM si besoin. Les changements de config (zsh, tmux, kitty, etc.) sont pris en compte au prochain lancement du shell ou après rechargement.
 
 ---
 
-## 💻 Tested On
+## 📝 Licence
 
-### macOS
-- **Mac mini M1** (16GB) - macOS Sequoia 15.2
-- **MacBook Pro M1 Max** (64GB) - macOS Sequoia 15.2
-- **Compatibility:** Apple Silicon · Intel · macOS 12.0+
+[Licence MIT](LICENSE).
 
 ---
-
-## 🐛 Need Help?
-
-- **[🔧 Troubleshooting Guide](https://github.com/Raf7c/dotfiles/wiki/Troubleshooting)** - Common issues & solutions
-- **[❓ FAQ](https://github.com/Raf7c/dotfiles/wiki/FAQ)** - Frequently asked questions
-- **[📝 Issues](https://github.com/Raf7c/dotfiles/issues)** - Report bugs or request features
-
-## 📝 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 🙏 Acknowledgments
-
-[Catppuccin](https://github.com/catppuccin/catppuccin) · [Zinit](https://github.com/zdharma-continuum/zinit) · [Starship](https://starship.rs/) · [Ghostty](https://ghostty.org/) · [Homebrew](https://brew.sh/)
-
----
-
-<div align="center">
-
-**[📚 Complete Documentation](https://github.com/Raf7c/dotfiles/wiki)** · **[🚀 Get Started](https://github.com/Raf7c/dotfiles/wiki/Installation)** · **[💬 Issues](https://github.com/Raf7c/dotfiles/issues)**
-
-Built with ❤️ for macOS
-
-</div>

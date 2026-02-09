@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash
+# macOS system preferences (minimal)
 
 set -eu
 
@@ -24,7 +25,7 @@ mkdir -p "$HOME/Pictures/screenshots"
 defaults write com.apple.screencapture location -string "$HOME/Pictures/screenshots"
 defaults write com.apple.screencapture type -string "png"
 
-# Restart services
+# Apply
 killall Dock 2>/dev/null || true
 killall Finder 2>/dev/null || true
 killall SystemUIServer 2>/dev/null || true
