@@ -5,7 +5,7 @@ HISTSIZE=10000
 HISTFILESIZE=10000
 shopt -s histappend
 HISTCONTROL=ignorespace:erasedups
-# Partage de l'historique entre sessions
+# Share history between sessions
 PROMPT_COMMAND="history -a; history -n${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
 
 # 2. Env (PATH, Homebrew, asdf…)
@@ -17,10 +17,10 @@ command -v asdf >/dev/null 2>&1 && . <(asdf completion bash)
 # 3. Aliases
 [ -f "$HOME/.config/shell/aliases" ] && . "$HOME/.config/shell/aliases"
 
-# 4. zoxide (smarter cd) — --cmd cd remplace cd
+# 4. zoxide (smarter cd) — --cmd cd replaces cd
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash --cmd cd)"
 
-# 5. fzf — raccourcis (Ctrl-T fichiers, Ctrl-R historique, Alt-C cd) + complétion floue
+# 5. fzf — shortcuts (Ctrl-T files, Ctrl-R history, Alt-C cd) + fuzzy completion
 command -v fzf >/dev/null 2>&1 && eval "$(fzf --bash)"
 
 # 6. Starship prompt

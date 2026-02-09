@@ -1,5 +1,5 @@
 # Shell env (bash & zsh)
-# Apple Silicon / Homebrew — détection via uname pour Bash et Zsh
+# Apple Silicon / Homebrew — detection via uname for Bash and Zsh
 if [ "$(uname -s)" = "Darwin" ]; then
   if [ -x /opt/homebrew/bin/brew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -15,10 +15,10 @@ fi
 : "${DOTFILES:=${HOME}/.dotfiles}"
 export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME DOTFILES
 
-# Binaire utilisateur en tête du PATH
+# User binaries first in PATH
 PATH="${HOME}/.local/bin:${PATH}"
 
-# asdf — chemin XDG puis shims sur PATH
+# asdf — XDG path then shims on PATH
 # https://asdf-vm.com/guide/getting-started.html
 export ASDF_DATA_DIR="${XDG_DATA_HOME}/asdf"
 export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
@@ -32,7 +32,7 @@ export TERM="xterm-256color"
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 
-# Editor (nvim si présent, sinon vim)
+# Editor (nvim if present, else vim)
 if command -v nvim >/dev/null 2>&1; then
   export EDITOR="nvim"
 else

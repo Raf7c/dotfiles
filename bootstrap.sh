@@ -1,5 +1,5 @@
 #!/bin/bash
-# Bootstrap dotfiles : détection OS et configuration
+# Bootstrap dotfiles : detection OS and configuration
 
 set -eu
 
@@ -14,7 +14,7 @@ run_macos() {
 
 case "$(uname -s)" in
   Darwin)
-    echo "macOS détecté — configuration..."
+    echo "macOS detected — configuring..."
     run_macos osx.sh
     run_macos brew.sh
     run_macos asdf.sh
@@ -23,7 +23,7 @@ case "$(uname -s)" in
     run_macos shell.sh
     ;;
   *)
-    echo "Pas de configuration disponible pour cet OS."
+    echo "No configuration available for this OS."
     exit 0
     ;;
 esac
