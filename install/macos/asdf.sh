@@ -17,6 +17,11 @@ if ! command -v asdf >/dev/null 2>&1; then
   exit 1
 fi
 
+# Ensure GNU Make signature key is available for GPG verification
+if ! gpg --list-keys B2508A90102F8AE3B12A0090DEACCAAEDB78137A >/dev/null 2>&1; then
+  gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys B2508A90102F8AE3B12A0090DEACCAAEDB78137A
+fi
+
 autres_plugins="$(asdf plugin list)"
 
 while IFS=' ' read -r plugin version || [ -n "$plugin" ]; do

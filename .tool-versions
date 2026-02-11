@@ -3,3 +3,4 @@ nodejs 25.2.1
 python 3.14.0
 golang 1.25.6
 pnpm 10.22.0
+make 4.4.1
