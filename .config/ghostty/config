@@ -1,0 +1,23 @@
+# Auto theme based on macOS/Linux appearance
+theme = light:Catppuccin Latte,dark:Catppuccin Mocha
+
+# macOS option (ignored on Linux)
+macos-option-as-alt = true
+
+window-decoration = true
+window-padding-x = 10
+window-padding-y = 10
+
+font-family = "JetBrainsMono Nerd Font"
+font-size = 21
+
+cursor-style = block
+adjust-cell-height = 35%
+
+mouse-hide-while-typing = true
+mouse-scroll-multiplier = 2
+
+background-blur-radius = 20
+background-opacity = 0.96
+
+copy-on-select = clipboard

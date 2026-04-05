@@ -1,0 +1,10 @@
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.tmp
+*~
+*.backup.*
+install.log
+.config/tmux/plugins/
+!.config/tmux/plugins/.gitkeep
