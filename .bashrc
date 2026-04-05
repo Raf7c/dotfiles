@@ -7,6 +7,14 @@ esac
 
 [ -f "$HOME/.config/shell/alaiase" ] && . "$HOME/.config/shell/alaiase"
 
+if command -v asdf >/dev/null 2>&1; then
+  ASDF_COMP="${ASDF_DATA_DIR:-$HOME/.asdf}/completions"
+  if [ ! -f "$ASDF_COMP/asdf.bash" ]; then
+    mkdir -p "$ASDF_COMP" && asdf completion bash > "$ASDF_COMP/asdf.bash"
+  fi
+  [ -f "$ASDF_COMP/asdf.bash" ] && . "$ASDF_COMP/asdf.bash"
+fi
+
 HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/bash/history"
 HISTSIZE=10000
 HISTFILESIZE=10000

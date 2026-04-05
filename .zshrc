@@ -11,6 +11,12 @@ setopt hist_find_no_dups
 [ -f "$HOME/.config/shell/env" ] && . "$HOME/.config/shell/env"
 [ -f "$HOME/.config/shell/alaiase" ] && . "$HOME/.config/shell/alaiase"
 
+if command -v asdf >/dev/null 2>&1; then
+  ASDF_COMP="${ASDF_DATA_DIR:-$HOME/.asdf}/completions"
+  [ ! -f "$ASDF_COMP/_asdf" ] && mkdir -p "$ASDF_COMP" && asdf completion zsh > "$ASDF_COMP/_asdf"
+  [ -d "$ASDF_COMP" ] && fpath=("$ASDF_COMP" $fpath)
+fi
+
 [ -f "$HOME/.config/zsh/zinit.zsh" ] && . "$HOME/.config/zsh/zinit.zsh"
 
 : ${XDG_CACHE_HOME:=$HOME/.cache}
