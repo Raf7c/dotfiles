@@ -13,6 +13,15 @@ if command -v brew >/dev/null 2>&1; then
   export HOMEBREW_NO_ANALYTICS=1
 fi
 
+# asdf — shims for tools in .tool-versions (neovim, node, python, …)
+if command -v brew >/dev/null 2>&1; then
+  _asdf_root="$(brew --prefix asdf 2>/dev/null)"
+  if [ -n "$_asdf_root" ] && [ -f "$_asdf_root/libexec/asdf.sh" ]; then
+    . "$_asdf_root/libexec/asdf.sh"
+  fi
+  unset _asdf_root
+fi
+
 # tools
 export EDITOR="nvim"
 export VISUAL="$EDITOR"
