@@ -21,6 +21,16 @@ cask "github"
 cask "gitkraken"
 cask "jetbrains-toolbox"
 cask "utm"
+brew "ansible"
+tap "hashicorp/tap"
+brew "hashicorp/tap/terraform"
+brew "hashicorp/tap/packer"
+cask "vagrant"
+
+# AI
+tap "anomalyco/tap"
+brew "opencode"
+cask "claude-code"
 
 # terminal
 cask "ghostty"
