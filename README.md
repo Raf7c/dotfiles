@@ -3,9 +3,9 @@ Configuration personnelle pour **macOS** (Apple Silicon).
 ## Prérequis
 
 - Mac **Apple Silicon** (M1, M2, M3, …)
-- **macOS** récent (testé avec Tahoe 26+ ; versions antérieures peuvent fonctionner)
+- **macOS** récent (testé avec Tahoe 26+)
 - **Xcode Command Line Tools** : `xcode-select --install`
-- **Git** (souvent fourni avec les outils Xcode)
+- **Git** (fourni avec les outils Xcode)
 
 ## Installation
 
