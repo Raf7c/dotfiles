@@ -31,6 +31,7 @@ cask "vagrant"
 tap "anomalyco/tap"
 brew "opencode"
 cask "claude-code"
+cask "claude"
 
 # terminal
 cask "ghostty"
