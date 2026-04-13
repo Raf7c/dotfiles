@@ -18,6 +18,7 @@ link_file() {
 }
 mkdir -p "$HOME/.cache/zsh"
 mkdir -p "$HOME/.config"
+link_file "$DOTS_ROOT/.tool-versions" "$HOME/.tool-versions"
 link_file "$DOTS_ROOT/.config/shell" "$HOME/.config/shell"
 link_file "$DOTS_ROOT/.config/zsh" "$HOME/.config/zsh"
 link_file "$DOTS_ROOT/.config/git" "$HOME/.config/git"
