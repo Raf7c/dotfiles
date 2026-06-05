@@ -1,0 +1,8 @@
+# Zsh compiled files
+.zsh_sessions
+
+# macOS
+.DS_Store
+
+# tmux plugins (gérés par TPM, pas versionnés)
+.config/tmux/plugins/
