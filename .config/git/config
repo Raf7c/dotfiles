@@ -1,0 +1,62 @@
+[includeIf "gitdir/i:~/lab/github/"]
+    path = ~/.config/git/github.conf
+
+[includeIf "gitdir/i:~/lab/gitlab/"]
+    path = ~/.config/git/gitlab.conf
+
+[includeIf "gitdir/i:~/.dotfiles/"]
+    path = ~/.config/git/github.conf
+
+[column]
+    ui = auto
+
+[branch]
+    sort = -committerdate
+
+[tag]
+    sort = version:refname
+
+[init]
+    defaultBranch = main
+
+[core]
+    excludesFile = ~/.config/git/ignore
+
+[diff]
+    algorithm = histogram
+    colorMoved = plain
+    mnemonicPrefix = true
+    renames = true
+
+[fetch]
+    prune = true
+    pruneTags = true
+    all = true
+
+[help]
+    autocorrect = prompt
+
+[commit]
+    verbose = true
+
+[push]
+    autoSetupRemote = true
+    followTags = true
+
+[pull]
+    rebase = true
+
+[rebase]
+    autoSquash = true
+    autoStash = true
+    updateRefs = true
+
+[rerere]
+    enabled = true
+    autoupdate = true
+
+[merge]
+    conflictStyle = zdiff3
+
+[transfer]
+    fsckObjects = true
