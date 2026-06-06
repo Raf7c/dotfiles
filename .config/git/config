@@ -1,11 +1,6 @@
-[includeIf "gitdir/i:~/lab/github/"]
-    path = ~/.config/git/github.conf
-
-[includeIf "gitdir/i:~/lab/gitlab/"]
-    path = ~/.config/git/gitlab.conf
-
-[includeIf "gitdir/i:~/.dotfiles/"]
-    path = ~/.config/git/github.conf
+[user]
+    name = Raphaël C
+    email = 122828688+Raf7c@users.noreply.github.com
 
 [column]
     ui = auto
