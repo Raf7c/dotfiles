@@ -1,0 +1,87 @@
+#!/usr/bin/env sh
+# run — single entry point for the dotfiles. Dispatches to a subcommand.
+
+set -eu
+
+DOTFILES_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+export DOTFILES_DIR
+
+# SINGLE source of truth for the order. To insert a step: create
+# setup/steps/<name>.sh then add <name> here, at the right position.
+STEPS="prereqs submodules directories migrate symlinks packages runtimes plugins shell"
+export STEPS
+
+usage() {
+  cat <<EOF
+run — dotfiles installer (macOS · Fedora)
+
+Usage:
+  ./run <command> [options] [modules...]
+
+Commands:
+  install
+  update
+  upgrade
+
+Options:
+  -y, --yes       proceed without confirmation (irreversible steps included)
+  -n, --dry-run   print the actions without running anything
+  -h, --help      show this help
+
+Examples:
+  ./run install                       # install everything
+  ./run install -n                    # preview, run nothing
+  ./run install symlinks packages     # only these modules
+  ./run update -y                     # resync without confirmation
+  ./run upgrade -n                    # preview the updates
+
+Details: docs/INSTALL_DESIGN.md
+EOF
+}
+
+# First arg = command (no dash; help/empty handled here).
+case "${1:-}" in
+  ''|-h|--help|help) usage; exit 0 ;;
+esac
+cmd=$1; shift
+case "$cmd" in
+  install|update|upgrade) ;;
+  *) printf 'unknown command: %s\n' "$cmd" >&2; usage; exit 2 ;;
+esac
+
+# Options + remaining module names.
+DRY_RUN=0
+ASSUME_YES=0
+MODULES=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -y|--yes)     ASSUME_YES=1 ;;
+    -n|--dry-run) DRY_RUN=1 ;;
+    -h|--help)    usage; exit 0 ;;
+    -*)           printf 'unknown option: %s\n' "$1" >&2; usage; exit 2 ;;
+    *)            MODULES="$MODULES $1" ;;
+  esac
+  shift
+done
+
+# Modules only apply to install (update/upgrade have a fixed scope).
+if [ "$cmd" != install ] && [ -n "$MODULES" ]; then
+  printf 'modules not supported for "%s":%s\n' "$cmd" "$MODULES" >&2
+  usage; exit 2
+fi
+
+RUN_TS=$(date +%Y%m%d%H%M%S)          # unique run timestamp (backup directory)
+export DRY_RUN ASSUME_YES MODULES RUN_TS
+
+# Shared libraries
+. "$DOTFILES_DIR/setup/lib/log.sh"
+. "$DOTFILES_DIR/setup/lib/os.sh"
+. "$DOTFILES_DIR/setup/lib/util.sh"
+
+detect_os
+log_step "command: $cmd   |   OS: $OS"
+[ "$OS" = unknown ] && { log_error "unsupported OS"; exit 1; }
+[ "$DRY_RUN" = 1 ] && log_warn "DRY-RUN: no action will be performed"
+
+# shellcheck disable=SC1090
+. "$DOTFILES_DIR/setup/commands/$cmd.sh"

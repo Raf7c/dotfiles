@@ -1,0 +1,32 @@
+# ------------------ CLI core ------------------
+brew "git"
+brew "bash"
+brew "bash-completion@2"
+brew "tmux"
+brew "mise"
+brew "eza"
+brew "starship"
+brew "zoxide"
+brew "zsh"
+brew "fzf"
+
+# ------------------ CLI tools ------------------
+
+brew "bat"
+brew "fd"
+brew "ripgrep"
+brew "lazygit"
+
+# ------------------ Casks ------------------
+cask "raycast"
+cask "keymapp"
+cask "obsidian"
+cask "slack"
+cask "discord"
+cask "figma"
+cask "firefox"
+cask "google-chrome"
+cask "utm"
+cask "jetbrains-toolbox"
+cask "gitkraken"
+cask "visual-studio-code"

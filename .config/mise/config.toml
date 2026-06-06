@@ -1,0 +1,5 @@
+# Versions des outils gérées par mise — config globale (équivaut à un mise.toml
+# appliqué à tous les dossiers). Format recommandé par la doc officielle.
+# https://mise.jdx.dev/configuration.html
+[tools]
+neovim = "0.12.2"
