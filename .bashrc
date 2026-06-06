@@ -43,16 +43,6 @@ path_prepend() {
 path_prepend "$HOME/.local/bin"
 path_prepend "${XDG_CONFIG_HOME}/scripts"
 path_prepend "${XDG_DATA_HOME}/mise/shims"   # shims mise en tête
-
-# Homebrew (macOS): login shell only, then reassert path order.
-if shopt -q login_shell && [[ -x /opt/homebrew/bin/brew ]]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-  export HOMEBREW_NO_AUTO_UPDATE=1
-  export HOMEBREW_NO_ANALYTICS=1
-  path_prepend "$HOME/.local/bin"
-  path_prepend "${XDG_CONFIG_HOME}/scripts"
-  path_prepend "${XDG_DATA_HOME}/mise/shims"
-fi
 export PATH
 
 # ===================== Beyond: interactive only =====================
