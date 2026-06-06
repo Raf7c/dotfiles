@@ -26,7 +26,6 @@ export LESS="-R --quit-if-one-screen"
 export BROWSER="firefox"
 
 # ------------------ Tools / history files (XDG) ------------------
-export ASDF_DATA_DIR="${XDG_DATA_HOME}/asdf"
 export LESSHISTFILE="${XDG_CACHE_HOME}/less/history"
 export PYTHON_HISTORY="${XDG_DATA_HOME}/python/history"
 
@@ -38,7 +37,7 @@ export PYTHON_HISTORY="${XDG_DATA_HOME}/python/history"
 _zsh_build_path() {
   typeset -gU path PATH
   path=(
-    ${ASDF_DATA_DIR}/shims        # versions managed by asdf (highest priority)
+    ${XDG_DATA_HOME}/mise/shims   # mise shims (highest priority)
     ${XDG_CONFIG_HOME}/scripts    # personal scripts
     $HOME/.local/bin              # user binaries (XDG)
     $path                         # existing entries (system…)

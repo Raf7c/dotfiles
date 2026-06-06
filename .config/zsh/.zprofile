@@ -8,7 +8,7 @@ if [[ -x /opt/homebrew/bin/brew ]]; then
   export HOMEBREW_NO_ANALYTICS=1
 fi
 
-# brew just prepended the PATH; reassert our priorities (asdf shims first)
+# brew just prepended the PATH; reassert our priorities (mise shims first)
 # by reusing the function defined in .zshenv — no duplicated list.
 _zsh_build_path
 export PATH

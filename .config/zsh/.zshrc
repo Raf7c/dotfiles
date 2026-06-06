@@ -21,7 +21,6 @@ export GPG_TTY="$(tty)"
 
 
 
-fpath=("${ASDF_DATA_DIR:-$XDG_DATA_HOME/asdf}/completions" $fpath)
 source "${ZDOTDIR}/zinit.zsh"
 
 # ------------------ Completion zstyle ------------------
@@ -59,6 +58,10 @@ source "${XDG_CONFIG_HOME}/shell/aliases.sh"
 source "${ZDOTDIR}/fzf.zsh"                    # fzf variables + widget (zsh)
 
 # ------------------ Tools init ------------------
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate zsh)"
+  source <(mise completion zsh)
+fi
 eval "$(zoxide init zsh)"
 eval "$(starship init zsh)"
 
