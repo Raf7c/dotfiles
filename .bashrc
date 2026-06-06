@@ -22,7 +22,6 @@ export PAGER="less"
 export LESS="-R --quit-if-one-screen"
 export BROWSER="firefox"
 
-export ASDF_DATA_DIR="${XDG_DATA_HOME}/asdf"
 export LESSHISTFILE="${XDG_CACHE_HOME}/less/history"
 export PYTHON_HISTORY="${XDG_DATA_HOME}/python/history"
 
@@ -43,7 +42,7 @@ path_prepend() {
 }
 path_prepend "$HOME/.local/bin"
 path_prepend "${XDG_CONFIG_HOME}/scripts"
-path_prepend "${ASDF_DATA_DIR}/shims"   # asdf versions first
+path_prepend "${XDG_DATA_HOME}/mise/shims"   # shims mise en tête
 
 # Homebrew (macOS): login shell only, then reassert path order.
 if shopt -q login_shell && [[ -x /opt/homebrew/bin/brew ]]; then
@@ -52,7 +51,7 @@ if shopt -q login_shell && [[ -x /opt/homebrew/bin/brew ]]; then
   export HOMEBREW_NO_ANALYTICS=1
   path_prepend "$HOME/.local/bin"
   path_prepend "${XDG_CONFIG_HOME}/scripts"
-  path_prepend "${ASDF_DATA_DIR}/shims"
+  path_prepend "${XDG_DATA_HOME}/mise/shims"
 fi
 export PATH
 
@@ -84,9 +83,10 @@ if [[ -r /opt/homebrew/etc/profile.d/bash_completion.sh ]]; then
 elif [[ -r /usr/share/bash-completion/bash_completion ]]; then
   source /usr/share/bash-completion/bash_completion
 fi
-# asdf — kept to avoid "asdf
-if command -v asdf >/dev/null; then
-  source <(asdf completion bash)
+# mise : Active mise (tools/environment per project) + completion. Keeps first boot.
+if command -v mise >/dev/null; then
+  eval "$(mise activate bash)"
+  source <(mise completion bash)
 fi
 
 # ------------------ Aliases ------------------
