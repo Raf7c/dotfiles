@@ -1,32 +1,39 @@
-# ------------------ CLI core ------------------
+# shell & core
 brew "git"
+brew "tmux"
+brew "zsh"
 brew "bash"
 brew "bash-completion@2"
-brew "tmux"
-brew "mise"
-brew "eza"
 brew "starship"
+brew "tree"
+brew "eza"
 brew "zoxide"
-brew "zsh"
 brew "fzf"
-
-# ------------------ CLI tools ------------------
-
 brew "bat"
+brew "mise"
+
+# CLI tools
+brew "make"
 brew "fd"
 brew "ripgrep"
 brew "lazygit"
+brew "btop"
+brew "jq"
 
-# ------------------ Casks ------------------
+# terminal
+cask "ghostty"
+cask "kitty"
+
+# Tools Dev
+cask "jetbrains-toolbox"
+cask "gitkraken"
+brew "docker"
+
+# productivity
 cask "raycast"
 cask "keymapp"
 cask "obsidian"
-cask "slack"
-cask "discord"
-cask "figma"
+
+# browser
 cask "firefox"
 cask "google-chrome"
-cask "utm"
-cask "jetbrains-toolbox"
-cask "gitkraken"
-cask "visual-studio-code"

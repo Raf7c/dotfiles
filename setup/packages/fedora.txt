@@ -1,17 +1,27 @@
-# Fedora packages (dnf) — one name per line. # = comment, empty lines ignored.
-# Read by install/packages.sh -> pkg_install. CLI mirror of the Brewfile (macOS).
-
+# shell & core
 git
+tmux
 zsh
 bash
 bash-completion
-tmux
-bat
-fd-find          # provides the `fd` command
-ripgrep
-fzf
-zoxide
+tree
 eza
+zoxide
+fzf
+bat
+
+# CLI tools
+make
+fd-find
+ripgrep
+btop
+jq
+
+# terminal
+kitty
+
+# browser
+firefox
 
 # --- not in the base repos: install another way (see packages) ---
 # starship       # COPR atim/starship, or official script
