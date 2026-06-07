@@ -16,12 +16,22 @@
 
 [core]
     excludesFile = ~/.config/git/ignore
+    ignorecase = false
 
 [diff]
     algorithm = histogram
     colorMoved = plain
     mnemonicPrefix = true
     renames = true
+
+[diff]
+  tool = nvimdiff
+[difftool "nvimdiff"]
+	cmd = nvim -d \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "nvimdiff"]
+	cmd = nvim -d \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
 
 [fetch]
     prune = true
@@ -50,8 +60,14 @@
     enabled = true
     autoupdate = true
 
-[merge]
-    conflictStyle = zdiff3
-
 [transfer]
     fsckObjects = true
+
+[alias]
+    d = diff
+    ck = checkout
+    cm = commit
+    cma = commit -a
+    st = status
+    br = branch
+    bra = branch -a
