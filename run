@@ -35,7 +35,7 @@ Examples:
   ./run update -y                     # resync without confirmation
   ./run upgrade -n                    # preview the updates
 
-Details: docs/INSTALL_DESIGN.md
+Details: README.md
 EOF
 }
 
