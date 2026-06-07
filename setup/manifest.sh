@@ -12,9 +12,10 @@ dotfiles_links() {
 .config/tmux           .config/tmux
 .config/git            .config/git
 .config/ghostty        .config/ghostty
+.config/bat            .config/bat
 .config/nvim           .config/nvim
 .config/starship.toml  .config/starship.toml
-.config/mise/config.toml  .config/mise/config.toml
+.config/mise           .config/mise
 
 # --- startup files at the root of $HOME ---
 .bashrc                .bashrc
