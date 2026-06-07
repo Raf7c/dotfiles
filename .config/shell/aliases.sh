@@ -5,7 +5,7 @@
 alias ls='eza --icons'
 alias ll='eza -lh --icons --git'
 alias la='eza -lah --icons --git'
-alias tree='eza --tree --icons'
+alias lt='eza --tree --icons'
 
 # ------------------ Tools ------------------
 alias cat='bat'
