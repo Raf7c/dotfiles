@@ -16,6 +16,7 @@ fd-find
 ripgrep
 btop
 jq
+gnupg2
 
 # terminal
 kitty
