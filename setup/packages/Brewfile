@@ -26,6 +26,8 @@ cask "ghostty"
 cask "kitty"
 
 # Tools Dev
+# (claude code: installed via the official script in packages.sh, NOT brew —
+#  the formula lags behind Anthropic's release pace)
 cask "jetbrains-toolbox"
 cask "gitkraken"
 cask "docker-desktop"   # engine + CLI (the `docker` formula is CLI-only)

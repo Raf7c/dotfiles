@@ -25,6 +25,13 @@ else
   log_warn "mise missing -> runtime update skipped"
 fi
 
+# --- Claude Code (native installer; self-updates, but stay explicit) ---
+if command -v claude >/dev/null 2>&1; then
+  run claude update || log_warn "claude update: failed"
+else
+  log_info "claude code not installed -> skipped"
+fi
+
 # --- zinit (zsh): self-update + plugins ---
 _zinit="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh"
 if [ -r "$_zinit" ] && command -v zsh >/dev/null 2>&1; then

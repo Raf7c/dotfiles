@@ -30,3 +30,4 @@ firefox
 # mise           # via recipe (curl https://mise.run | sh -> ~/.local/bin); NOT in the dnf repos
 # ghostty        # COPR pgdev/ghostty (kitty from the repos is the fallback here)
 # docker         # use podman (dnf install podman) or moby-engine instead
+# claude-code    # official script (curl https://claude.ai/install.sh | bash), see packages.sh

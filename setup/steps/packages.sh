@@ -4,6 +4,8 @@
 # Scope ("repo + safe recipes"):
 #   1. repo packages     (packages/fedora.txt -> pkg_install)   [Fedora]
 #   2. safe recipes WITHOUT sudo/repo: mise + starship (scripts) -> ~/.local/bin
+#      + claude code (official script, BOTH OSes: no brew on purpose —
+#        releases move faster than the formula; not packaged for Fedora)
 #   3. out of scope (lazygit) -> warning, without blocking
 #
 # Contract:
@@ -40,11 +42,29 @@ _install_starship() {
     || log_warn "starship: installation failed"
 }
 
+# _install_claude: official native installer -> ~/.local/bin (no sudo).
+# Deliberately NOT via brew (formula lags behind releases) nor dnf (not
+# packaged). The native install self-updates in the background.
+_install_claude() {
+  command -v claude >/dev/null 2>&1 && { log_ok "claude code already present"; return 0; }
+  [ -x "$HOME/.local/bin/claude" ] && { log_ok "claude code already present (~/.local/bin)"; return 0; }
+  if [ "$DRY_RUN" = 1 ]; then
+    log_info "[dry-run] claude code: curl https://claude.ai/install.sh | bash"
+    return 0
+  fi
+  log_info "installing claude code…"
+  curl -fsSL https://claude.ai/install.sh | bash || log_warn "claude code: installation failed"
+}
+
 # --- logic ---
 
 if is_macos; then
   [ "$DRY_RUN" = 1 ] || require_cmd brew || return 0
   run brew bundle --file "$DOTFILES_DIR/setup/packages/Brewfile"
+
+  # safe recipe (outside brew on purpose)
+  _install_claude
+
   [ "$DRY_RUN" = 1 ] || hash -r
   log_ok "macOS packages (brew bundle) ok"
 else
@@ -62,6 +82,7 @@ else
   # safe recipes (no sudo/repo)
   _install_mise
   _install_starship
+  _install_claude
 
   # out of scope: lazygit (Fedora -> COPR atim/lazygit)
   command -v lazygit >/dev/null 2>&1 || log_warn "lazygit missing -> COPR atim/lazygit (see ${_list##*/})"
