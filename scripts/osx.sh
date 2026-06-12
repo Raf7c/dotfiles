@@ -27,7 +27,11 @@ defaults write com.apple.screencapture type -string "png"
 # iCloud Drive -> ~/icloud (chemin court)
 ln -sfn "$HOME/Library/Mobile Documents/com~apple~CloudDocs" "$HOME/icloud"
 
+# Spotlight — désactiver le raccourci clavier (⌘ Space)
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>65535</integer><integer>49</integer><integer>1048576</integer></array><key>type</key><string>standard</string></dict></dict>"
+
 # Apply
+/System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u  
 killall Dock 2>/dev/null || true
 killall Finder 2>/dev/null || true
 killall SystemUIServer 2>/dev/null || true
