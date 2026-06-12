@@ -9,8 +9,7 @@
 My entire working environment, versioned and reproducible: a single `./run install` takes a fresh machine (**macOS** or **Fedora**) to a ready-to-use workstation. `$HOME` stays clean: everything follows the [XDG Base Directory](https://specifications.freedesktop.org/basedir-spec/latest/) specification.
 
 <!-- Drop a screenshot or GIF of your terminal (starship + tmux) at the repo
-     root as preview.png to display it here. -->
-![Terminal preview](preview.png)
+     root as preview.png, then add: ![Terminal preview](preview.png) -->
 
 > [!WARNING]
 > Don't blindly use my settings unless you know what they do. Use at your own risk!
@@ -42,7 +41,7 @@ cd ~/.dotfiles
 
 ```sh
 ./run install     # install everything -> ready (idempotent)
-./run update      # git pull + resync (links, packages, runtimes, submodules)
+./run update      # git pull + resync (links, packages, runtimes, submodules, tmux plugins)
 ./run upgrade     # bump versions (brew/dnf, mise, zinit, TPM, submodules)
 ```
 

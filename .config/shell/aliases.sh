@@ -1,15 +1,20 @@
 #!/usr/bin/env sh
 # Common bash/zsh aliases (POSIX syntax).
+# Guarded: a missing tool must NOT break ls/cat on a fresh machine.
 
 # ------------------ Navigation ------------------
-alias ls='eza --icons'
-alias ll='eza -lh --icons --git'
-alias la='eza -lah --icons --git'
-alias lt='eza --tree --icons'
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --icons'
+  alias ll='eza -lh --icons --git'
+  alias la='eza -lah --icons --git'
+  alias lt='eza --tree --icons'
+else
+  alias ll='ls -lh'
+  alias la='ls -lah'
+fi
 
 # ------------------ Tools ------------------
-alias cat='bat'
-alias rg='rg --color=auto'
+command -v bat >/dev/null 2>&1 && alias cat='bat'
 alias diff='diff --color=auto'
 alias df='df -h'
 

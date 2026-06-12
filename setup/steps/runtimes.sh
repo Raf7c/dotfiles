@@ -23,6 +23,6 @@ fi
 # In case mise was just placed in ~/.local/bin without being "hashed" yet.
 _mise=$(command -v mise 2>/dev/null || printf '%s' "$HOME/.local/bin/mise")
 
-run "$_mise" trust "$HOME/.config/mise/config.toml"
+run "$_mise" trust "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml"
 run "$_mise" install
 log_ok "runtimes (mise) installed from ~/.config/mise/config.toml"

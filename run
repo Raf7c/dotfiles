@@ -23,6 +23,9 @@ Commands:
   update
   upgrade
 
+Modules (install only, exact names):
+  $STEPS
+
 Options:
   -y, --yes       proceed without confirmation (irreversible steps included)
   -n, --dry-run   print the actions without running anything
@@ -69,6 +72,17 @@ if [ "$cmd" != install ] && [ -n "$MODULES" ]; then
   printf 'modules not supported for "%s":%s\n' "$cmd" "$MODULES" >&2
   usage; exit 2
 fi
+
+# Validate module names (exact match against $STEPS): a typo must fail
+# loudly, not silently "succeed" by running nothing.
+for _m in $MODULES; do
+  _found=0
+  for _s in $STEPS; do [ "$_s" = "$_m" ] && _found=1; done
+  if [ "$_found" != 1 ]; then
+    printf 'unknown module: %s\navailable modules: %s\n' "$_m" "$STEPS" >&2
+    exit 2
+  fi
+done
 
 RUN_TS=$(date +%Y%m%d%H%M%S)          # unique run timestamp (backup directory)
 export DRY_RUN ASSUME_YES MODULES RUN_TS

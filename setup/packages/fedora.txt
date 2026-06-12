@@ -25,6 +25,8 @@ kitty
 firefox
 
 # --- not in the base repos: install another way (see packages) ---
-# starship       # COPR atim/starship, or official script
+# starship       # COPR atim/starship, or official script (used by packages.sh)
 # lazygit        # COPR atim/lazygit
-# mise           # via recipe (curl https://mise.run | sh -> ~/.local/bin); also dnf repo mise
+# mise           # via recipe (curl https://mise.run | sh -> ~/.local/bin); NOT in the dnf repos
+# ghostty        # COPR pgdev/ghostty (kitty from the repos is the fallback here)
+# docker         # use podman (dnf install podman) or moby-engine instead

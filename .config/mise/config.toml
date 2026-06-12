@@ -4,3 +4,4 @@ node = "latest"
 python = "latest"
 rust = "latest"
 tree-sitter = "latest"
+usage = "latest"   # required by `mise completion` (bash/zsh)

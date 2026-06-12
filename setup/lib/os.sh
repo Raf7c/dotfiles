@@ -27,7 +27,7 @@ detect_os() {
 }
 
 is_macos() { [ "${OS:-}" = macos ]; }
-is_linux() { [ "${OS:-}" = fedora ]; }
+is_fedora() { [ "${OS:-}" = fedora ]; }
 
 # System zshenv file where the ZDOTDIR bootstrap is placed.
 # Both macOS and Fedora use /etc/zshenv.

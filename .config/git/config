@@ -15,7 +15,6 @@
     defaultBranch = main
 
 [core]
-    excludesFile = ~/.config/git/ignore
     ignorecase = false
 
 [diff]
@@ -23,15 +22,14 @@
     colorMoved = plain
     mnemonicPrefix = true
     renames = true
+    tool = nvimdiff
 
-[diff]
-  tool = nvimdiff
-[difftool "nvimdiff"]
-	cmd = nvim -d \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "nvimdiff"]
-	cmd = nvim -d \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
+[difftool]
+    prompt = false
+
+[merge]
+    tool = nvimdiff
+    conflictStyle = zdiff3
 
 [fetch]
     prune = true

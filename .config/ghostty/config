@@ -1,4 +1,4 @@
-#uto theme based on macOS/Linux appearance
+# Auto theme based on macOS/Linux appearance
 theme = light:Catppuccin Latte,dark:Catppuccin Mocha
 
 # macOS option (ignored on Linux)

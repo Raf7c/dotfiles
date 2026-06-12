@@ -28,7 +28,7 @@ cask "kitty"
 # Tools Dev
 cask "jetbrains-toolbox"
 cask "gitkraken"
-brew "docker"
+cask "docker-desktop"   # engine + CLI (the `docker` formula is CLI-only)
 
 # productivity
 cask "raycast"

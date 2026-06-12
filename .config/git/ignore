@@ -1,9 +1,7 @@
+# Global excludes: OS / editor junk ONLY.
+# (Repo-specific patterns belong in each repo's .gitignore.)
 .DS_Store
 .idea/
 .vscode/
 *.swp
-*.tmp
 *~
-*.backup.*
-install.log
-.config/tmux/plugins/

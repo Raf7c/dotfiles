@@ -14,7 +14,7 @@
 #   - end: hash -r (so runtimes finds mise)
 
 # _install_mise: official script -> ~/.local/bin (mise: brew on macOS, else here).
-# (mise is also available in the dnf repo; we keep the script, no sudo.)
+# (mise is NOT in the Fedora repos: the official script is the way, no sudo.)
 _install_mise() {
   command -v mise >/dev/null 2>&1 && { log_ok "mise already present"; return 0; }
   [ -x "$HOME/.local/bin/mise" ] && { log_ok "mise already present (~/.local/bin)"; return 0; }

@@ -16,15 +16,20 @@ run() {
   fi
 }
 
+# log_done MSG : success log; prefixed in dry-run (nothing really happened).
+log_done() {
+  if [ "$DRY_RUN" = 1 ]; then log_info "[dry-run] $*"; else log_ok "$*"; fi
+}
+
 # require_cmd NAME : fail if the command is missing.
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || { log_error "missing command: $1"; return 1; }
 }
 
-# run_steps [filters...] : run the steps listed in $STEPS (order = $STEPS).
-# No filter = all. With filters = those whose name contains one of the filters
-# (substring). Each step (setup/steps/<name>.sh) is SOURCED (shares lib + run
-# env). Reused by `install` (all / selection) and `update` (subset).
+# run_steps [names...] : run the steps listed in $STEPS (order = $STEPS).
+# No name = all. With names = EXACT match (validated upstream by run).
+# Each step (setup/steps/<name>.sh) is SOURCED (shares lib + run env).
+# Reused by `install` (all / selection) and `update` (subset).
 run_steps() {
   : "${STEPS:?STEPS must be set (step order, set by run)}"
   for _short in $STEPS; do
@@ -32,7 +37,7 @@ run_steps() {
     [ -e "$_f" ] || { log_warn "step not found: $_short.sh"; continue; }
     if [ "$#" -gt 0 ]; then
       _ok=0
-      for _flt in "$@"; do case "$_short" in *"$_flt"*) _ok=1 ;; esac; done
+      for _flt in "$@"; do [ "$_short" = "$_flt" ] && _ok=1; done
       [ "$_ok" = 1 ] || continue
     fi
     log_step "step: $_short"
@@ -46,6 +51,8 @@ run_steps() {
 #   no TTY      -> no (don't run an irreversible step blindly)
 confirm() {
   [ "$ASSUME_YES" = 1 ] && return 0
+  # Preview must never block on questions: nothing will be executed anyway.
+  [ "$DRY_RUN" = 1 ] && return 0
   # Read/print via /dev/tty (not fd 0): robust if a previous step
   # (brew bundle, curl|sh installers…) consumed or redirected stdin.
   # Accepts STRICTLY y or Y (nothing else): no trailing space or \r tolerated.
@@ -75,7 +82,7 @@ backup_file() {
   esac
   _bdest="$BACKUP_DIR/$_rel"
   run mkdir -p "$(dirname "$_bdest")"
-  log_info "backup: ${_abs#"$HOME"/} -> ${BACKUP_DIR#"$HOME"/}/$_rel"
+  log_done "backup: ${_abs#"$HOME"/} -> ${BACKUP_DIR#"$HOME"/}/$_rel"
   run mv "$_abs" "$_bdest"
 }
 
@@ -93,7 +100,7 @@ migrate_file() {
     return 0
   fi
   run mkdir -p "$(dirname "$_md")"
-  log_ok "migrated: ${_ms#"$HOME"/} -> ${_md#"$HOME"/}"
+  log_done "migrated: ${_ms#"$HOME"/} -> ${_md#"$HOME"/}"
   run mv "$_ms" "$_md"
 }
 
@@ -118,5 +125,5 @@ link_with_backup() {
   fi
   run mkdir -p "$(dirname "$_dst")"
   run ln -sfn "$_src" "$_dst"
-  log_ok "linked: $2 -> $1"
+  log_done "linked: $2 -> $1"
 }

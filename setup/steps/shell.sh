@@ -28,8 +28,9 @@ elif confirm "Write the ZDOTDIR block to $_sysfile (sudo)?"; then
       'if [ -z "${XDG_CONFIG_HOME}" ]; then export XDG_CONFIG_HOME="${HOME}/.config"; fi' \
       'if [ -d "${XDG_CONFIG_HOME}/zsh" ]; then export ZDOTDIR="${XDG_CONFIG_HOME}/zsh"; fi' \
       '# <<< dotfiles ZDOTDIR <<<' \
-      | sudo tee -a "$_sysfile" >/dev/null
-    log_ok "ZDOTDIR set in $_sysfile"
+      | sudo tee -a "$_sysfile" >/dev/null \
+      && log_ok "ZDOTDIR set in $_sysfile" \
+      || log_warn "ZDOTDIR: write to $_sysfile failed (sudo refused?)"
   fi
 else
   log_warn "ZDOTDIR not configured: the zsh config (.config/zsh) will not load"
@@ -45,8 +46,9 @@ elif confirm "Make zsh ($_zsh) the login shell (chsh)?"; then
   if [ "$DRY_RUN" = 1 ]; then
     log_info "[dry-run] add $_zsh to /etc/shells if needed + chsh -s $_zsh"
   else
-    grep -qx "$_zsh" /etc/shells 2>/dev/null \
-      || printf '%s\n' "$_zsh" | sudo tee -a /etc/shells >/dev/null
+    { grep -qx "$_zsh" /etc/shells 2>/dev/null \
+      || printf '%s\n' "$_zsh" | sudo tee -a /etc/shells >/dev/null; } \
+      || log_warn "/etc/shells: write failed (sudo refused?)"
     chsh -s "$_zsh" || log_warn "chsh failed (password?)"
     log_ok "login shell -> zsh (takes effect next session)"
   fi
