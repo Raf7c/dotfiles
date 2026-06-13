@@ -37,6 +37,9 @@ cask "raycast"
 cask "keymapp"
 cask "obsidian"
 
+# Ai
+cask claude
+
 # browser
 cask "firefox"
 cask "google-chrome"
