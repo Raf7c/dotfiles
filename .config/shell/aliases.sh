@@ -18,6 +18,9 @@ command -v bat >/dev/null 2>&1 && alias cat='bat'
 alias diff='diff --color=auto'
 alias df='df -h'
 
+# Print $PATH, one directory per line (portable: works in bash & zsh)
+alias path='echo "$PATH" | tr ":" "\n"'
+
 # ------------------ Editor ------------------
 alias v='nvim'
 
