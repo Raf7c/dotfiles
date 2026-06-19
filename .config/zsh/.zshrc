@@ -18,6 +18,11 @@ setopt AUTOCD
 setopt NOBEEP
 setopt NUMERIC_GLOB_SORT
 
+# Native vi mode (replaces the zsh-vi-mode plugin)
+bindkey -v
+# Shorten the delay when switching to normal mode (default 0.4s)
+export KEYTIMEOUT=1
+
 # ------------------ SSH ------------------
 export GPG_TTY="$(tty)"
 
@@ -68,10 +73,7 @@ fi
 command -v zoxide   >/dev/null 2>&1 && eval "$(zoxide init zsh)"
 command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
 
-# fzf rebinds Ctrl-R/Ctrl-T/Alt-C. zsh-vi-mode resets keymaps in
-# its zvm_after_init hook -> re-register fzf + our bindings AFTER, otherwise
-# they get overwritten.
-zvm_after_init_commands+=(
-  'command -v fzf >/dev/null 2>&1 && eval "$(fzf --zsh)"'
-  'bindkey "^F" _fzf_file_no_hidden'
-)
+# fzf rebinds Ctrl-R/Ctrl-T/Alt-C. Load it AFTER `bindkey -v` so the
+# bindings land in the vi keymaps.
+command -v fzf >/dev/null 2>&1 && eval "$(fzf --zsh)"
+bindkey "^F" _fzf_file_no_hidden

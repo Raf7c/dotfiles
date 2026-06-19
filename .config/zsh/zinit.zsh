@@ -36,19 +36,3 @@ zinit wait lucid for \
   zsh-users/zsh-syntax-highlighting \
   atload"_zsh_autosuggest_start" \
   zsh-users/zsh-autosuggestions
-
-# zsh-vi-mode
-# The ZVM_CURSOR_* constants are defined BY the plugin, so they must be
-# referenced inside zvm_config (called automatically by the plugin),
-# not before it is sourced — see README, "Configuration Function".
-zvm_config() {
-  ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BEAM
-  ZVM_NORMAL_MODE_CURSOR=$ZVM_CURSOR_BLOCK
-  ZVM_VISUAL_MODE_CURSOR=$ZVM_CURSOR_BLOCK
-  ZVM_VI_HIGHLIGHT_BACKGROUND=none
-  ZVM_VI_HIGHLIGHT_FOREGROUND=none
-  ZVM_VI_HIGHLIGHT_EXTRASTYLE=none
-}
-
-zinit ice depth=1
-zinit light jeffreytse/zsh-vi-mode
