@@ -38,7 +38,7 @@ cask "keymapp"
 cask "obsidian"
 
 # Ai
-cask claude
+cask "claude"
 
 # browser
 cask "firefox"
