@@ -18,6 +18,11 @@ btop
 jq
 gnupg2
 
+# system integration
+util-linux-user   # chsh (not installed by default on Fedora)
+wl-clipboard      # tmux copy-pipe (Wayland: wl-copy)
+xclip             # tmux copy-pipe (X11 fallback)
+
 # terminal
 kitty
 

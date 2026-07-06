@@ -25,7 +25,15 @@ _install_mise() {
     return 0
   fi
   log_info "installing mise…"
-  curl -fsSL https://mise.run | sh || log_warn "mise: installation failed"
+  # Download THEN execute (no curl|sh): a failed/truncated download must
+  # never reach the shell. Pin a published checksum here to go further.
+  _tmp=$(mktemp) || { log_warn "mise: mktemp failed"; return 0; }
+  if curl -fsSL -o "$_tmp" -- https://mise.run; then
+    sh "$_tmp" || log_warn "mise: installation failed"
+  else
+    log_warn "mise: download failed"
+  fi
+  rm -f -- "$_tmp"
 }
 
 # _install_starship: official script -> ~/.local/bin (no sudo).
@@ -37,9 +45,14 @@ _install_starship() {
   fi
   log_info "installing starship…"
   mkdir -p "$HOME/.local/bin"
-  curl -fsSL https://starship.rs/install.sh \
-    | sh -s -- --yes --bin-dir "$HOME/.local/bin" \
-    || log_warn "starship: installation failed"
+  _tmp=$(mktemp) || { log_warn "starship: mktemp failed"; return 0; }
+  if curl -fsSL -o "$_tmp" -- https://starship.rs/install.sh; then
+    sh "$_tmp" --yes --bin-dir "$HOME/.local/bin" \
+      || log_warn "starship: installation failed"
+  else
+    log_warn "starship: download failed"
+  fi
+  rm -f -- "$_tmp"
 }
 
 # _install_claude: official native installer -> ~/.local/bin (no sudo).
@@ -53,13 +66,24 @@ _install_claude() {
     return 0
   fi
   log_info "installing claude code…"
-  curl -fsSL https://claude.ai/install.sh | bash || log_warn "claude code: installation failed"
+  _tmp=$(mktemp) || { log_warn "claude code: mktemp failed"; return 0; }
+  if curl -fsSL -o "$_tmp" -- https://claude.ai/install.sh; then
+    bash "$_tmp" || log_warn "claude code: installation failed"
+  else
+    log_warn "claude code: download failed"
+  fi
+  rm -f -- "$_tmp"
 }
 
 # --- logic ---
 
 if is_macos; then
-  [ "$DRY_RUN" = 1 ] || require_cmd brew || return 0
+  # brew missing on macOS = broken install (prereqs failed?): fail loudly,
+  # don't silently skip every package.
+  if [ "$DRY_RUN" != 1 ] && ! require_cmd brew; then
+    log_error "brew required on macOS -> install aborted"
+    exit 1
+  fi
   run brew bundle --file "$DOTFILES_DIR/setup/packages/Brewfile"
 
   # safe recipe (outside brew on purpose)

@@ -16,3 +16,5 @@ dotfiles_history_migrations | while read -r _old _new _rest; do
   case "$_old" in \#*) continue ;; esac
   migrate_file "$_old" "$_new"
 done
+
+log_ok "history migrations ok"

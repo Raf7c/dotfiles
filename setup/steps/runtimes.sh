@@ -16,6 +16,12 @@
 hash -r 2>/dev/null || true
 
 if ! command -v mise >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/mise" ]; then
+  if [ "$DRY_RUN" = 1 ]; then
+    # Faithful preview: in a real run, packages would have installed mise
+    # right before this step, so it would NOT be skipped.
+    log_info "[dry-run] mise trust + mise install (mise installed by packages)"
+    return 0
+  fi
   log_warn "mise missing -> step skipped (install via packages)"
   return 0
 fi

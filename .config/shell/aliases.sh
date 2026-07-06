@@ -15,17 +15,21 @@ fi
 
 # ------------------ Tools ------------------
 command -v bat >/dev/null 2>&1 && alias cat='bat'
-alias diff='diff --color=auto'
+# BSD diff on macOS < 13 has no --color: probe before aliasing, a broken
+# `diff` everywhere is worse than a monochrome one.
+if diff --color=auto /dev/null /dev/null >/dev/null 2>&1; then
+  alias diff='diff --color=auto'
+fi
 alias df='df -h'
 
 # Print $PATH, one directory per line (portable: works in bash & zsh)
-alias path='echo "$PATH" | tr ":" "\n"'
+alias path='printf "%s\n" "$PATH" | tr ":" "\n"'
 
 # ------------------ Editor ------------------
 alias v='nvim'
 
 # ------------------ Git clone helpers ------------------
 # ghc <repo> -> clone git@github.com:$GITUSER/<repo> into $GHREPOS/<repo>
-ghc() { git clone "git@github.com:${GITUSER}/$1.git" "${GHREPOS}/$1" && cd "${GHREPOS}/$1"; }
+ghc() { git clone -- "git@github.com:${GITUSER}/$1.git" "${GHREPOS}/$1" && cd -- "${GHREPOS}/$1" || return 1; }
 # glc <repo> -> same for GitLab
-glc() { git clone "git@gitlab.com:${GITUSER}/$1.git" "${GLREPOS}/$1" && cd "${GLREPOS}/$1"; }
+glc() { git clone -- "git@gitlab.com:${GITUSER}/$1.git" "${GLREPOS}/$1" && cd -- "${GLREPOS}/$1" || return 1; }

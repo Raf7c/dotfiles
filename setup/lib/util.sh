@@ -10,7 +10,10 @@
 # (no pipe or redirection; for those, test $DRY_RUN by hand).
 run() {
   if [ "$DRY_RUN" = 1 ]; then
-    printf '    [dry-run] %s\n' "$*"
+    # Quote each argument: paths with spaces stay unambiguous in the preview.
+    printf '    [dry-run]'
+    for _a in "$@"; do printf " '%s'" "$_a"; done
+    printf '\n'
   else
     "$@"
   fi
@@ -56,7 +59,11 @@ confirm() {
   # Read/print via /dev/tty (not fd 0): robust if a previous step
   # (brew bundle, curl|sh installers…) consumed or redirected stdin.
   # Accepts STRICTLY y or Y (nothing else): no trailing space or \r tolerated.
-  if [ ! -r /dev/tty ]; then
+  # -r only tests permission bits, not the presence of a controlling
+  # terminal: actually try to OPEN /dev/tty (fails in cron/CI/`ssh host cmd`).
+  # Subshell required: a redirection error on a special builtin (:) is FATAL
+  # in non-interactive POSIX sh; the subshell absorbs it.
+  if ! ( : < /dev/tty ) 2>/dev/null; then
     log_warn "non-interactive without --yes: step skipped ($1)"
     return 1
   fi
@@ -82,8 +89,8 @@ backup_file() {
   esac
   _bdest="$BACKUP_DIR/$_rel"
   run mkdir -p "$(dirname "$_bdest")"
-  log_done "backup: ${_abs#"$HOME"/} -> ${BACKUP_DIR#"$HOME"/}/$_rel"
   run mv "$_abs" "$_bdest"
+  log_done "backup: ${_abs#"$HOME"/} -> ${BACKUP_DIR#"$HOME"/}/$_rel"
 }
 
 # migrate_file SRC DST (ABSOLUTE paths) : move a legacy file to its
@@ -100,8 +107,8 @@ migrate_file() {
     return 0
   fi
   run mkdir -p "$(dirname "$_md")"
-  log_done "migrated: ${_ms#"$HOME"/} -> ${_md#"$HOME"/}"
   run mv "$_ms" "$_md"
+  log_done "migrated: ${_ms#"$HOME"/} -> ${_md#"$HOME"/}"
 }
 
 # link_with_backup SRC DST : SRC relative to the repo, DST relative to $HOME.

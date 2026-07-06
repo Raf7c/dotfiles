@@ -12,7 +12,7 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 # ------------------ Editor / locale ------------------
 export EDITOR="nvim"
 export VISUAL="$EDITOR"
-export GIT_EDITOR="$EDITOR"
+# (no GIT_EDITOR: git already falls back to VISUAL then EDITOR)
 export LANG="en_US.UTF-8"
 
 # ------------------ Repos / personal paths ------------------

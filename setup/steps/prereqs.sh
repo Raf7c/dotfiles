@@ -21,7 +21,13 @@ if is_macos; then
     else
       log_info "installing Homebrew…"
       [ "$ASSUME_YES" = 1 ] && export NONINTERACTIVE=1
-      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      # Download THEN execute: a failed curl must fail loudly, not expand
+      # to an empty string silently executed by `bash -c`.
+      _hb=$(curl -fsSL -- https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh) \
+        || { log_error "Homebrew: download failed (network?)"; exit 1; }
+      /bin/bash -c "$_hb" \
+        || { log_error "Homebrew: installer failed"; exit 1; }
+      unset _hb
     fi
   else
     log_warn "Homebrew not installed -> packages will fail on macOS"

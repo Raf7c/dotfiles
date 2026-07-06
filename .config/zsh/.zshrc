@@ -21,7 +21,7 @@ setopt NUMERIC_GLOB_SORT
 # Native vi mode (replaces the zsh-vi-mode plugin)
 bindkey -v
 # Shorten the delay when switching to normal mode (default 0.4s)
-export KEYTIMEOUT=1
+export KEYTIMEOUT=5
 
 # ------------------ SSH ------------------
 export GPG_TTY="$(tty)"

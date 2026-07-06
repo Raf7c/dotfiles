@@ -85,7 +85,12 @@ for _m in $MODULES; do
 done
 
 RUN_TS=$(date +%Y%m%d%H%M%S)          # unique run timestamp (backup directory)
-export DRY_RUN ASSUME_YES MODULES RUN_TS
+
+# SINGLE source of truth for the repos root (also set by shell/env.sh for
+# interactive shells): the manifest uses ${REPOS} without any fallback.
+REPOS="${REPOS:-$HOME/lab}"
+
+export DRY_RUN ASSUME_YES MODULES RUN_TS REPOS
 
 # Shared libraries
 . "$DOTFILES_DIR/setup/lib/log.sh"
@@ -96,6 +101,9 @@ detect_os
 log_step "command: $cmd   |   OS: $OS"
 [ "$OS" = unknown ] && { log_error "unsupported OS"; exit 1; }
 [ "$DRY_RUN" = 1 ] && log_warn "DRY-RUN: no action will be performed"
+
+# Preamble warnings (e.g. the DRY-RUN notice) must not count as failures.
+log_reset_counts
 
 # shellcheck disable=SC1090
 . "$DOTFILES_DIR/setup/commands/$cmd.sh"

@@ -48,6 +48,20 @@ cd ~/.dotfiles
 Options: `-n`/`--dry-run` (preview), `-y`/`--yes` (no confirmation), `-h`/`--help`.
 Target specific modules (install only): `./run install symlinks packages`.
 
+## Uninstall
+
+The symlinks point into this repo: removing the repo just leaves dead links
+(delete them at your convenience). Backups made by the installer live in
+`~/.local/state/dotfiles/backups/<timestamp>/`. Two system files are touched
+by `./run install` and must be reverted by hand:
+
+```sh
+# Remove the ZDOTDIR block (works with BSD and GNU sed)
+sudo sed -i.bak '/# >>> dotfiles ZDOTDIR >>>/,/# <<< dotfiles ZDOTDIR <<</d' /etc/zshenv
+# Optional: restore the previous login shell (zsh stays listed in /etc/shells)
+chsh -s /bin/bash
+```
+
 ## License
 
 See [LICENSE](LICENSE).

@@ -36,8 +36,8 @@ ${XDG_CACHE_HOME:-$HOME/.cache}/less
 ${XDG_DATA_HOME:-$HOME/.local/share}/mise
 ${XDG_DATA_HOME:-$HOME/.local/share}/python
 $HOME/.local/bin
-${REPOS:-$HOME/lab}/github
-${REPOS:-$HOME/lab}/gitlab
+${REPOS:?REPOS must be set (exported by run)}/github
+${REPOS}/gitlab
 EOF
 }
 

@@ -32,7 +32,8 @@ case "${PROMPT_COMMAND:-}" in
 esac
 
 # ------------------ GPG ------------------
-export GPG_TTY="$(tty)"
+GPG_TTY="$(tty 2>/dev/null || true)"
+export GPG_TTY
 
 # ------------------ Completion ------------------
 if [[ -r /opt/homebrew/etc/profile.d/bash_completion.sh ]]; then
@@ -45,7 +46,16 @@ fi
 # without the guard, every shell start would print an error.
 if command -v mise >/dev/null 2>&1; then
   eval "$(mise activate bash --shims)"
-  command -v usage >/dev/null 2>&1 && source <(mise completion bash)
+  # Completion generated ONCE into the cache: regenerating it at every
+  # startup costs a fork + generation for an identical result.
+  # `./run upgrade` deletes the cache -> regenerated at the next shell.
+  _mc="${XDG_CACHE_HOME}/bash/mise-completion.bash"
+  if [[ ! -r "$_mc" ]] && command -v usage >/dev/null 2>&1; then
+    mkdir -p "${_mc%/*}"
+    mise completion bash > "$_mc" 2>/dev/null || rm -f -- "$_mc"
+  fi
+  [[ -r "$_mc" ]] && source "$_mc"
+  unset _mc
 fi
 
 # ------------------ Aliases ------------------

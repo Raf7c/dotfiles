@@ -1,25 +1,28 @@
-#!/usr/bin/env bash
-# Install norminette (42 school) + c_formatter_42
-# Usage: ./install-42-tools.sh
-
-set -e
+#!/usr/bin/env sh
+# tool42.sh — install norminette (42 school) + c_formatter_42.
+# Usage: ./tool42.sh
+set -eu
 
 # Python 3.10+ for norminette, 3.8+ for c_formatter_42
-if ! command -v python3 &>/dev/null; then
-  echo "Error: python3 required (3.10+ for norminette)." >&2
+command -v python3 >/dev/null 2>&1 || {
+  printf 'Error: python3 required (3.10+ for norminette).\n' >&2
   exit 1
-fi
+}
 
-echo "Installing norminette (42school) and c_formatter_42..."
+printf 'Installing norminette (42school) and c_formatter_42...\n'
 
 # Norminette — https://github.com/42school/norminette
-python3 -m pip install --user -U norminette 2>/dev/null || python3 -m pip install -U norminette
+python3 -m pip install --user -U norminette 2>/dev/null \
+  || python3 -m pip install -U norminette
 
 # c_formatter_42 — https://github.com/dawnbeen/c_formatter_42
-python3 -m pip install --user -U c-formatter-42 2>/dev/null || python3 -m pip install -U c-formatter-42
+python3 -m pip install --user -U c-formatter-42 2>/dev/null \
+  || python3 -m pip install -U c-formatter-42
 
-echo "Verifying..."
-command -v norminette && norminette --version 2>/dev/null || true
-command -v c_formatter_42 && echo "c_formatter_42 OK" || true
+printf 'Verifying...\n'
+if command -v norminette >/dev/null 2>&1; then
+  norminette --version 2>/dev/null || true
+fi
+command -v c_formatter_42 >/dev/null 2>&1 && printf 'c_formatter_42 OK\n'
 
-echo "Done. Usage: norminette [file.c], c_formatter_42 < file.c"
+printf 'Done. Usage: norminette [file.c], c_formatter_42 < file.c\n'

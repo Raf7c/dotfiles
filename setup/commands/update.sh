@@ -20,3 +20,4 @@ fi
 run_steps submodules directories symlinks packages runtimes plugins
 
 log_step "update done."
+log_summary update || exit 1

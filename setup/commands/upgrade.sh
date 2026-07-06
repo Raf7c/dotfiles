@@ -21,6 +21,10 @@ if command -v mise >/dev/null 2>&1; then
   # On macOS the mise binary is updated by brew; elsewhere it self-updates.
   is_macos || run mise self-update || log_warn "mise self-update: failed"
   run mise upgrade || log_warn "mise upgrade: failed"
+  # Invalidate the cached shell completions (see .zshrc/.bashrc): they are
+  # regenerated at the next shell start with the fresh mise.
+  run rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/mise-completion.zsh" \
+    "${XDG_CACHE_HOME:-$HOME/.cache}/bash/mise-completion.bash"
 else
   log_warn "mise missing -> runtime update skipped"
 fi
@@ -57,3 +61,4 @@ if [ -f "$DOTFILES_DIR/.gitmodules" ]; then
 fi
 
 log_step "upgrade done."
+log_summary upgrade || exit 1

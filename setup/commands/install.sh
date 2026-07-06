@@ -8,3 +8,4 @@
 run_steps ${MODULES:-}
 
 log_step "install done."
+log_summary install || exit 1

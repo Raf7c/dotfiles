@@ -1,7 +1,10 @@
+# Majors PINNED on purpose: "latest" installs a different version depending
+# on the install date -> two machines diverge, "reproducible" becomes false.
+# Minor/patch updates still flow via `mise upgrade`; bump majors HERE.
 [tools]
 neovim = "0.12.2"
-node = "latest"
-python = "latest"
-rust = "latest"
+node = "22"        # LTS
+python = "3.13"
+rust = "1"
 tree-sitter = "latest"
 usage = "latest"   # required by `mise completion` (bash/zsh)

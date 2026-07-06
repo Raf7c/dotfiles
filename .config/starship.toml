@@ -9,6 +9,7 @@ disabled = false
 format = "[$symbol](blue) "
 
 [os.symbols]
+Fedora  = "󰣛"
 Ubuntu  = "󰕈"
 Artix   = "󰣇"
 Arch    = "󰣇"
