@@ -20,6 +20,13 @@ brew "lazygit"
 brew "btop"
 brew "jq"
 brew "gnupg"
+brew "just"
+
+# Infra / automation
+brew "ansible"
+brew "ansible-lint"
+brew "yamllint"
+brew "cloudflared"   # macOS only (not installed on Fedora)
 
 # terminal
 cask "ghostty"
