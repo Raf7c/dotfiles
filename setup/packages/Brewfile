@@ -28,6 +28,12 @@ brew "ansible-lint"
 brew "yamllint"
 brew "cloudflared"   # macOS only (not installed on Fedora)
 
+# Secrets / security (macOS only)
+brew "age"                  # modern file encryption
+brew "sops"                 # secrets in git (age/KMS backends)
+brew "age-plugin-yubikey"   # age identities backed by a YubiKey
+brew "ykman"                # YubiKey Manager CLI
+
 # terminal
 cask "ghostty"
 cask "kitty"
