@@ -1,6 +1,7 @@
 [user]
-    name = Raphaël C
+    name = Raphaël Congiusti 
     email = 122828688+Raf7c@users.noreply.github.com
+	signingkey = /Users/racongiu/.ssh/id_signing_sk.pub
 
 [column]
     ui = auto
@@ -41,6 +42,7 @@
 
 [commit]
     verbose = true
+	gpgsign = true
 
 [push]
     autoSetupRemote = true
@@ -69,3 +71,8 @@
     st = status
     br = branch
     bra = branch -a
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /opt/homebrew/opt/openssh/bin/ssh-keygen
+	allowedSignersFile = /Users/racongiu/.config/git/allowed_signers
