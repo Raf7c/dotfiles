@@ -33,6 +33,8 @@ brew "age"                  # modern file encryption
 brew "sops"                 # secrets in git (age/KMS backends)
 brew "age-plugin-yubikey"   # age identities backed by a YubiKey
 brew "ykman"                # YubiKey Manager CLI
+brew "openssh"              # newer than Apple's ssh; FIDO2/sk key support
+brew "libfido2"             # FIDO2 lib (YubiKey ssh keys: sk-ed25519/ecdsa)
 
 # terminal
 cask "ghostty"
