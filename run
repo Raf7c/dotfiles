@@ -8,7 +8,7 @@ export DOTFILES_DIR
 
 # SINGLE source of truth for the order. To insert a step: create
 # setup/steps/<name>.sh then add <name> here, at the right position.
-STEPS="prereqs submodules directories migrate symlinks packages runtimes plugins shell"
+STEPS="prereqs submodules directories migrate symlinks packages gitsign runtimes plugins shell"
 export STEPS
 
 usage() {
