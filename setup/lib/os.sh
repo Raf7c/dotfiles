@@ -43,7 +43,9 @@ zdotdir_system_file() {
 pkg_install() {
   [ "$#" -gt 0 ] || return 0
   case "${OS:-}" in
-    fedora) run sudo dnf install -y "$@" ;;
+    # run_soft: an unreachable mirror or one renamed package must be
+    # reported, not abort the run (`set -e`) before the rest of the steps.
+    fedora) run_soft sudo dnf install -y "$@" ;;
     *) log_warn "pkg_install: unsupported OS ($OS)"; return 1 ;;
   esac
 }

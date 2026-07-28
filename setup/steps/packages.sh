@@ -84,7 +84,9 @@ if is_macos; then
     log_error "brew required on macOS -> install aborted"
     exit 1
   fi
-  run brew bundle --file "$DOTFILES_DIR/setup/packages/Brewfile"
+  # run_soft: one formula that fails to build / one dead tap must not take
+  # the whole install with it. The failure is logged and the summary counts it.
+  run_soft brew bundle --file "$DOTFILES_DIR/setup/packages/Brewfile"
 
   # safe recipe (outside brew on purpose)
   _install_claude
@@ -109,7 +111,9 @@ else
   _install_claude
 
   # out of scope: lazygit (Fedora -> COPR atim/lazygit)
-  command -v lazygit >/dev/null 2>&1 || log_warn "lazygit missing -> COPR atim/lazygit (see ${_list##*/})"
+  # Deliberately out of scope (needs a third-party COPR): INFO, not a
+  # warning — nothing is broken and nothing is expected from the user.
+  command -v lazygit >/dev/null 2>&1 || log_info "lazygit missing -> COPR atim/lazygit (see ${_list##*/})"
 
   [ "$DRY_RUN" = 1 ] || hash -r
   log_ok "Linux packages ($OS) ok"

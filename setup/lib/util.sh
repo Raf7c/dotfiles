@@ -19,6 +19,22 @@ run() {
   fi
 }
 
+# run_soft CMD... : like run(), but a FAILURE is logged and swallowed.
+# For the fragile commands (network, package managers): a mirror that is
+# down, one missing formula or a refused sudo must be reported, not abort
+# the whole run through `set -e`. Always returns 0 on purpose.
+run_soft() {
+  if [ "$DRY_RUN" = 1 ]; then
+    run "$@"
+    return 0
+  fi
+  if "$@"; then
+    return 0
+  fi
+  log_error "command failed: $*"
+  return 0
+}
+
 # log_done MSG : success log; prefixed in dry-run (nothing really happened).
 log_done() {
   if [ "$DRY_RUN" = 1 ]; then log_info "[dry-run] $*"; else log_ok "$*"; fi
@@ -44,8 +60,20 @@ run_steps() {
       [ "$_ok" = 1 ] || continue
     fi
     log_step "step: $_short"
+    # A step is SOURCED: under `set -e` any uncaught failure inside it kills
+    # `run` on the spot — no summary, no following step, no exit code that
+    # says WHICH step broke. Neutralize `set -e` around the source, capture
+    # the status, log it, keep going.
+    # Trade-off: this makes a genuinely broken step non-fatal, so it must be
+    # applied WITH 04/05/06, which turn the fragile commands (network,
+    # package managers) into run_soft / `|| log_*`. log_summary still returns
+    # 1 at the end, so the command's exit code stays honest.
+    set +e
     # shellcheck disable=SC1090
     . "$_f"
+    _rc=$?
+    set -e
+    [ "$_rc" -eq 0 ] || log_error "step failed: $_short (exit $_rc)"
   done
 }
 
@@ -88,8 +116,8 @@ backup_file() {
     *)         _rel=$(basename "$_abs") ;;
   esac
   _bdest="$BACKUP_DIR/$_rel"
-  run mkdir -p "$(dirname "$_bdest")"
-  run mv "$_abs" "$_bdest"
+  run mkdir -p -- "$(dirname -- "$_bdest")"
+  run mv -- "$_abs" "$_bdest"
   log_done "backup: ${_abs#"$HOME"/} -> ${BACKUP_DIR#"$HOME"/}/$_rel"
 }
 
@@ -106,8 +134,8 @@ migrate_file() {
     backup_file "$_ms"
     return 0
   fi
-  run mkdir -p "$(dirname "$_md")"
-  run mv "$_ms" "$_md"
+  run mkdir -p -- "$(dirname -- "$_md")"
+  run mv -- "$_ms" "$_md"
   log_done "migrated: ${_ms#"$HOME"/} -> ${_md#"$HOME"/}"
 }
 
@@ -123,14 +151,33 @@ link_with_backup() {
   # Already the right link? Test by INODE (-ef), not the readlink string: robust
   # to path-form differences (macOS firmlinks /Users vs
   # /System/Volumes/Data/Users, trailing slash, etc.).
+  # shellcheck disable=SC3013  # -ef: extension supported by dash/bash/zsh
   if [ -L "$_dst" ] && [ "$_dst" -ef "$_src" ]; then
     log_ok "already linked: $2"
     return 0
   fi
+  # Remember where backup_file moved the target: same rule as backup_file,
+  # and $_dst is ALWAYS under $HOME here (built as "$HOME/$2").
+  _lbak=''
   if [ -e "$_dst" ] || [ -L "$_dst" ]; then
     backup_file "$_dst"
+    _lbak="$BACKUP_DIR/${_dst#"$HOME"/}"
   fi
-  run mkdir -p "$(dirname "$_dst")"
-  run ln -sfn "$_src" "$_dst"
-  log_done "linked: $2 -> $1"
+  run mkdir -p -- "$(dirname -- "$_dst")"
+  # `ln` CAN fail after the backup (read-only parent, ENOSPC, immutable
+  # flag...). Leaving the user with neither the original nor the link is
+  # the worst outcome: put the backup back and report the failure.
+  if run ln -sfn -- "$_src" "$_dst"; then
+    log_done "linked: $2 -> $1"
+    return 0
+  fi
+  log_error "link failed: $2 -> $1"
+  if [ -n "$_lbak" ] && [ -e "$_lbak" ]; then
+    if run mv -- "$_lbak" "$_dst"; then
+      log_info "original restored: $2"
+    else
+      log_error "restore failed, the original stays in ${_lbak#"$HOME"/}"
+    fi
+  fi
+  return 1
 }

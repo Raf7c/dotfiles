@@ -29,6 +29,8 @@ fi
 # In case mise was just placed in ~/.local/bin without being "hashed" yet.
 _mise=$(command -v mise 2>/dev/null || printf '%s' "$HOME/.local/bin/mise")
 
-run "$_mise" trust "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml"
-run "$_mise" install
+# run_soft: mise downloads/builds each runtime from the network. One
+# version that fails to build must be logged, not abort the install.
+run_soft "$_mise" trust -- "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml"
+run_soft "$_mise" install
 log_ok "runtimes (mise) installed from ~/.config/mise/config.toml"

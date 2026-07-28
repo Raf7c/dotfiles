@@ -12,8 +12,16 @@
 #   - dry-run: via run() for the sync; handled by hand for the branch attach
 
 if [ -f "$DOTFILES_DIR/.gitmodules" ]; then
-  run git -C "$DOTFILES_DIR" submodule update --init --recursive
-  log_ok "submodules synced (pinned commit)"
+  # Needs the submodule remote (network + SSH keys). A failure here must be
+  # REPORTED, not abort the whole install through `set -e`: the rest of the
+  # dotfiles installs fine without the nvim config, and `./run update`
+  # replays this step.
+  if run git -C "$DOTFILES_DIR" submodule update --init --recursive; then
+    log_ok "submodules synced (pinned commit)"
+  else
+    log_error "submodule update failed (network / SSH access?) — step stopped"
+    return 0
+  fi
 
   # `submodule update` leaves a DETACHED HEAD: committing from inside the
   # submodule (editing the nvim config) is then easy to get wrong. Re-attach
