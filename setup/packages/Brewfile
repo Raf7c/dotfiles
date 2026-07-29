@@ -26,6 +26,8 @@ brew "just"
 brew "ansible"
 brew "ansible-lint"
 brew "yamllint"
+brew "shellcheck"           # POSIX sh linting: the shell conventions of this repo
+brew "shfmt"                # sh formatter (probed by scripts/verify-zsh.sh)
 brew "cloudflared"   # macOS only (not installed on Fedora)
 
 # Secrets / security (macOS only)
@@ -39,6 +41,10 @@ brew "libfido2"             # FIDO2 lib (YubiKey ssh keys: sk-ed25519/ecdsa)
 # terminal
 cask "ghostty"
 cask "kitty"
+# Nerd Font: the starship prompt, eza --icons and the tmux status bar all
+# print glyphs from the Nerd Font private range. Without it the prompt is
+# a row of tofu. Family name: "JetBrainsMono Nerd Font Mono" (ghostty/config).
+cask "font-jetbrains-mono-nerd-font"
 
 # Tools Dev
 # (claude code: installed via the official script in packages.sh, NOT brew —

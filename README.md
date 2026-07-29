@@ -19,6 +19,15 @@ My entire working environment, versioned and reproducible: a single `./run insta
 - **macOS (Apple Silicon)** or **Fedora**
 - Git
 - An SSH key configured on GitHub — the clone and the submodule use SSH
+- `sudo` is **not** needed for the shell configuration: `~/.zshenv` bootstraps
+  `ZDOTDIR` from `$HOME`. It is only asked for to install packages with `dnf`
+  on Fedora, and to append zsh to `/etc/shells` if you accept the `chsh` prompt.
+
+> [!IMPORTANT]
+> `./run install` **moves** four existing files out of `$HOME` into their XDG
+> locations: `.bash_history`, `.zsh_history`, `.lesshst` and `.python_history`
+> (see `dotfiles_history_migrations` in `setup/manifest.sh`). Nothing is
+> deleted, but the paths change.
 
 ## Quick start
 
@@ -47,6 +56,30 @@ cd ~/.dotfiles
 
 Options: `-n`/`--dry-run` (preview), `-y`/`--yes` (no confirmation), `-h`/`--help`.
 Target specific modules (install only): `./run install symlinks packages`.
+
+## Scripts
+
+`scripts/` is symlinked to `~/.config/scripts`, which is on the `PATH`: every
+file in it is callable by name. **None of them is run by `./run`** — they are
+manual tools, and two of them have side effects worth knowing about.
+
+| Script | What it does |
+|---|---|
+| `verify-zsh.sh` | Read-only checks: `zsh -n`, empty stderr at startup, startup timing, `zprof`, shellcheck, and the `~/.zshenv` bootstrap. Run it after touching any zsh file. |
+| `osx.sh` | **Rewrites about fifteen macOS `defaults`** (Dock, Finder, screenshots, keyboard) and disables the Spotlight shortcut. Read it before running it. |
+| `tool42.sh` | Installs `norminette` and `c_formatter_42` (42 school toolchain). Needs python3. |
+| `bootstrap-aidd.sh` | **Clones two private repositories** into `~/.config/aiddconf` and deploys the symlinks. Requires access to those repos. |
+
+## Environment
+
+Two variables reach beyond this repo:
+
+- **`BASH_ENV`** is exported by `.bashrc` to `~/.config/shell/env.sh`, so *every
+  non-interactive bash* on the machine sources it. That is how scripts inherit
+  the same `PATH` and XDG variables — at the cost of one extra file read per
+  bash subprocess.
+- **`NO_COLOR`**, if set, disables every colour in the installer output
+  (`setup/lib/log.sh`).
 
 ## Uninstall
 

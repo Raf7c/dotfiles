@@ -11,6 +11,7 @@ fzf
 bat
 
 # CLI tools
+neovim            # the repo ships a full nvim config (submodule .config/nvim)
 make
 fd-find
 ripgrep
@@ -28,9 +29,25 @@ just
 ansible           # dnf version may lag behind brew: acceptable for personal use
 ansible-lint
 yamllint
+ShellCheck        # capitals matter: that is the Fedora package name
+shfmt
 
 # terminal
 kitty
+
+# fonts
+# A Nerd Font is REQUIRED (starship prompt, eza --icons, tmux status bar:
+# all use glyphs from the Nerd Font private range).
+# Fedora packages some of them:
+#     sudo dnf install jetbrains-mono-fonts   # NO Nerd Font glyphs
+# The patched build is not in the base repos. WITHOUT root, install it in
+# the user font directory — no sudo, no COPR:
+#     mkdir -p ~/.local/share/fonts
+#     # download JetBrainsMono.zip from the nerd-fonts releases, then:
+#     unzip -o JetBrainsMono.zip -d ~/.local/share/fonts/JetBrainsMonoNerd
+#     fc-cache -f ~/.local/share/fonts
+# (fontconfig picks up ~/.local/share/fonts by default; the terminal must
+#  then be pointed at "JetBrainsMono Nerd Font".)
 
 # browser
 firefox
