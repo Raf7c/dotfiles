@@ -11,9 +11,27 @@ fi
 
 # Failure accounting. Counter FILES (not variables): log_warn/log_error are
 # often called inside `… | while` pipelines, i.e. subshells, where a variable
-# increment would be lost. $$ is the pid of `run` (unchanged in subshells).
-_log_warns="${TMPDIR:-/tmp}/dotfiles-run-$$.warns"
-_log_errors="${TMPDIR:-/tmp}/dotfiles-run-$$.errors"
+# increment would be lost.
+#
+# The files live in a PRIVATE directory created by mktemp -d (mode 0700,
+# unpredictable name) instead of a $$-derived name in a world-writable /tmp:
+# a predictable name can be pre-created as a symlink by another user, and it
+# survives the run when it crashes. A trap removes the directory on every
+# exit path.
+_log_dir=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-run.XXXXXX") || {
+  printf 'log.sh: cannot create the temporary directory\n' >&2
+  exit 1
+}
+_log_warns="$_log_dir/warns"
+_log_errors="$_log_dir/errors"
+
+# log_cleanup : remove the counter directory. Idempotent (rm -rf).
+log_cleanup() { rm -rf -- "$_log_dir"; }
+# INT/TERM: clean up THEN exit with the conventional 128+signal code
+# (the EXIT trap would otherwise be the only one to fire, on some shells).
+trap 'log_cleanup' EXIT
+trap 'log_cleanup; exit 130' INT
+trap 'log_cleanup; exit 143' TERM
 
 log_step()  { printf '%b==>%b %s\n' "${_c_blue}${_c_bold}" "$_c_reset" "$*"; }
 log_info()  { printf '    %s\n' "$*"; }

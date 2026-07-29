@@ -3,7 +3,31 @@
 
 set -eu
 
-DOTFILES_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+# Resolve $0 THROUGH the symlinks before deriving the repo root: `run` is
+# meant to be reachable from ~/.dotfiles/run or from a link in the PATH, and
+# dirname of a link points at the link, not at the repo.
+# `readlink -f` is GNU-only (missing on macOS < 12), so walk the chain by
+# hand — POSIX, and CDPATH='' (not `CDPATH=`, SC1007) keeps `cd` silent.
+_self=$0
+case "$_self" in
+  */*) ;;
+  *)   _self=$(command -v -- "$_self") || { printf 'run: cannot locate %s\n' "$0" >&2; exit 1 ;} ;;
+esac
+_hops=0
+while [ -L "$_self" ]; do
+  _hops=$((_hops + 1))
+  if [ "$_hops" -gt 40 ]; then
+    printf 'run: too many symlink levels for %s\n' "$0" >&2
+    exit 1
+  fi
+  _dir=$(CDPATH='' cd -- "$(dirname -- "$_self")" && pwd)
+  _target=$(readlink -- "$_self")
+  case "$_target" in
+    /*) _self=$_target ;;
+    *)  _self="$_dir/$_target" ;;
+  esac
+done
+DOTFILES_DIR=$(CDPATH='' cd -- "$(dirname -- "$_self")" && pwd)
 export DOTFILES_DIR
 
 # SINGLE source of truth for the order. To insert a step: create
@@ -49,7 +73,7 @@ esac
 cmd=$1; shift
 case "$cmd" in
   install|update|upgrade) ;;
-  *) printf 'unknown command: %s\n' "$cmd" >&2; usage; exit 2 ;;
+  *) printf 'unknown command: %s\n' "$cmd" >&2; usage >&2; exit 2 ;;
 esac
 
 # Options + remaining module names.
@@ -61,16 +85,21 @@ while [ $# -gt 0 ]; do
     -y|--yes)     ASSUME_YES=1 ;;
     -n|--dry-run) DRY_RUN=1 ;;
     -h|--help)    usage; exit 0 ;;
-    -*)           printf 'unknown option: %s\n' "$1" >&2; usage; exit 2 ;;
+    -*)           printf 'unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
     *)            MODULES="$MODULES $1" ;;
   esac
   shift
 done
 
+# Options are parsed: from here on, module names are only ever expanded
+# unquoted ($MODULES). Disable globbing so `./run install '*'` (or a stray
+# file named like a step) can never turn into a list of filenames.
+set -f
+
 # Modules only apply to install (update/upgrade have a fixed scope).
 if [ "$cmd" != install ] && [ -n "$MODULES" ]; then
   printf 'modules not supported for "%s":%s\n' "$cmd" "$MODULES" >&2
-  usage; exit 2
+  usage >&2; exit 2
 fi
 
 # Validate module names (exact match against $STEPS): a typo must fail
