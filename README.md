@@ -52,14 +52,23 @@ Target specific modules (install only): `./run install symlinks packages`.
 
 The symlinks point into this repo: removing the repo just leaves dead links
 (delete them at your convenience). Backups made by the installer live in
-`~/.local/state/dotfiles/backups/<timestamp>/`. Two system files are touched
-by `./run install` and must be reverted by hand:
+`~/.local/state/dotfiles/backups/<timestamp>/`.
+
+The zsh config is bootstrapped by `~/.zshenv`, a symlink into this repo:
+deleting it is enough, no root involved. The only system file `./run install`
+can touch is `/etc/shells`, and only if you accept the `chsh` prompt:
 
 ```sh
-# Remove the ZDOTDIR block (works with BSD and GNU sed)
-sudo sed -i.bak '/# >>> dotfiles ZDOTDIR >>>/,/# <<< dotfiles ZDOTDIR <<</d' /etc/zshenv
 # Optional: restore the previous login shell (zsh stays listed in /etc/shells)
 chsh -s /bin/bash
+```
+
+Migrating from a version that wrote the bootstrap into `/etc/zshenv`? Remove
+the old block once — `~/.zshenv` already does the job:
+
+```sh
+# works with BSD and GNU sed
+sudo sed -i.bak '/# >>> dotfiles ZDOTDIR >>>/,/# <<< dotfiles ZDOTDIR <<</d' /etc/zshenv
 ```
 
 ## License

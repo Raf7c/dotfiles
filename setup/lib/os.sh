@@ -29,15 +29,6 @@ detect_os() {
 is_macos() { [ "${OS:-}" = macos ]; }
 is_fedora() { [ "${OS:-}" = fedora ]; }
 
-# System zshenv file where the ZDOTDIR bootstrap is placed.
-# Both macOS and Fedora use /etc/zshenv.
-zdotdir_system_file() {
-  case "${OS:-}" in
-    macos|fedora) printf '%s\n' /etc/zshenv ;;
-    *) return 1 ;;
-  esac
-}
-
 # pkg_install PKG... : install packages via dnf (Fedora).
 # (macOS goes through `brew bundle`, not this function.)
 pkg_install() {

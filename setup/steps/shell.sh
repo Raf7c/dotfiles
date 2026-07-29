@@ -1,40 +1,25 @@
 #!/usr/bin/env sh
-# Module: shell — ZDOTDIR bootstrap (/etc) + switch the login shell to zsh.
+# Module: shell — switch the login shell to zsh.
+#
+# ZDOTDIR is NOT bootstrapped here any more. It used to be written into
+# /etc/zshenv with sudo, which had three defects:
+#   - it made the whole zsh config depend on root: no sudo, no config;
+#   - /etc/zshenv is read by EVERY zsh of EVERY user, so the block leaked
+#     ZDOTDIR (and XDG_CONFIG_HOME) into other accounts;
+#   - /etc/zshenv is read even by `zsh -f`, so a shell meant to be pristine
+#     was not.
+# The bootstrap now lives in ~/.zshenv, linked from this repo by the
+# symlinks step (see setup/manifest.sh). Single source of truth, no root.
+# Existing machines: remove the old block, see the Uninstall section of the
+# README.
 #
 # Contract:
-#   - idempotent: ZDOTDIR block added only if missing (marker);
-#     chsh only if the current shell is not already zsh
-#   - OS: system file via zdotdir_system_file
-#         (macOS and Fedora = /etc/zshenv)
-#   - sudo: YES (writing /etc and /etc/shells)
+#   - idempotent: chsh only if the current shell is not already zsh
+#   - OS: all
+#   - sudo: only to append to /etc/shells, and only if chsh is accepted
 #   - order: placed AFTER packages (chsh requires zsh installed) and at the end
 #     of install ("system changes last"); if zsh is missing, we skip cleanly.
 #   - dry-run: handled by hand for the `sudo tee` (redirections, outside run()).
-
-# ---------- Bootstrap ZDOTDIR in the system zshenv ----------
-_sysfile=$(zdotdir_system_file 2>/dev/null || true)
-if [ -z "$_sysfile" ]; then
-  log_warn "OS with no known zshenv path -> ZDOTDIR skipped"
-elif [ -r "$_sysfile" ] && grep -q 'dotfiles ZDOTDIR' "$_sysfile" 2>/dev/null; then
-  log_ok "ZDOTDIR already configured ($_sysfile)"
-elif confirm "Write the ZDOTDIR block to $_sysfile (sudo)?"; then
-  if [ "$DRY_RUN" = 1 ]; then
-    log_info "[dry-run] add the ZDOTDIR block to $_sysfile (sudo)"
-  else
-    sudo mkdir -p "$(dirname "$_sysfile")"
-    printf '%s\n' \
-      '' \
-      '# >>> dotfiles ZDOTDIR >>>' \
-      'if [ -z "${XDG_CONFIG_HOME}" ]; then export XDG_CONFIG_HOME="${HOME}/.config"; fi' \
-      'if [ -d "${XDG_CONFIG_HOME}/zsh" ]; then export ZDOTDIR="${XDG_CONFIG_HOME}/zsh"; fi' \
-      '# <<< dotfiles ZDOTDIR <<<' \
-      | sudo tee -a "$_sysfile" >/dev/null \
-      && log_ok "ZDOTDIR set in $_sysfile" \
-      || log_warn "ZDOTDIR: write to $_sysfile failed (sudo refused?)"
-  fi
-else
-  log_warn "ZDOTDIR not configured: the zsh config (.config/zsh) will not load"
-fi
 
 # ---------- Login shell = zsh ----------
 _zsh=$(command -v zsh 2>/dev/null || true)
