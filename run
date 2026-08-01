@@ -11,7 +11,10 @@ set -eu
 _self=$0
 case "$_self" in
   */*) ;;
-  *)   _self=$(command -v -- "$_self") || { printf 'run: cannot locate %s\n' "$0" >&2; exit 1 ;} ;;
+  *) _self=$(command -v -- "$_self") || {
+    printf 'run: cannot locate %s\n' "$0" >&2
+    exit 1
+  } ;;
 esac
 _hops=0
 while [ -L "$_self" ]; do
@@ -24,7 +27,7 @@ while [ -L "$_self" ]; do
   _target=$(readlink -- "$_self")
   case "$_target" in
     /*) _self=$_target ;;
-    *)  _self="$_dir/$_target" ;;
+    *) _self="$_dir/$_target" ;;
   esac
 done
 DOTFILES_DIR=$(CDPATH='' cd -- "$(dirname -- "$_self")" && pwd)
@@ -68,12 +71,20 @@ EOF
 
 # First arg = command (no dash; help/empty handled here).
 case "${1:-}" in
-  ''|-h|--help|help) usage; exit 0 ;;
+  '' | -h | --help | help)
+    usage
+    exit 0
+    ;;
 esac
-cmd=$1; shift
+cmd=$1
+shift
 case "$cmd" in
-  install|update|upgrade) ;;
-  *) printf 'unknown command: %s\n' "$cmd" >&2; usage >&2; exit 2 ;;
+  install | update | upgrade) ;;
+  *)
+    printf 'unknown command: %s\n' "$cmd" >&2
+    usage >&2
+    exit 2
+    ;;
 esac
 
 # Options + remaining module names.
@@ -82,11 +93,18 @@ ASSUME_YES=0
 MODULES=""
 while [ $# -gt 0 ]; do
   case "$1" in
-    -y|--yes)     ASSUME_YES=1 ;;
-    -n|--dry-run) DRY_RUN=1 ;;
-    -h|--help)    usage; exit 0 ;;
-    -*)           printf 'unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
-    *)            MODULES="$MODULES $1" ;;
+    -y | --yes) ASSUME_YES=1 ;;
+    -n | --dry-run) DRY_RUN=1 ;;
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    -*)
+      printf 'unknown option: %s\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+    *) MODULES="$MODULES $1" ;;
   esac
   shift
 done
@@ -99,7 +117,8 @@ set -f
 # Modules only apply to install (update/upgrade have a fixed scope).
 if [ "$cmd" != install ] && [ -n "$MODULES" ]; then
   printf 'modules not supported for "%s":%s\n' "$cmd" "$MODULES" >&2
-  usage >&2; exit 2
+  usage >&2
+  exit 2
 fi
 
 # Validate module names (exact match against $STEPS): a typo must fail
@@ -113,7 +132,7 @@ for _m in $MODULES; do
   fi
 done
 
-RUN_TS=$(date +%Y%m%d%H%M%S)          # unique run timestamp (backup directory)
+RUN_TS=$(date +%Y%m%d%H%M%S) # unique run timestamp (backup directory)
 
 # SINGLE source of truth for the repos root (also set by shell/env.sh for
 # interactive shells): the manifest uses ${REPOS} without any fallback.
@@ -128,7 +147,10 @@ export DRY_RUN ASSUME_YES MODULES RUN_TS REPOS
 
 detect_os
 log_step "command: $cmd   |   OS: $OS"
-[ "$OS" = unknown ] && { log_error "unsupported OS"; exit 1; }
+[ "$OS" = unknown ] && {
+  log_error "unsupported OS"
+  exit 1
+}
 [ "$DRY_RUN" = 1 ] && log_warn "DRY-RUN: no action will be performed"
 
 # Preamble warnings (e.g. the DRY-RUN notice) must not count as failures.

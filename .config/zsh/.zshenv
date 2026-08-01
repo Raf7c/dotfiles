@@ -2,10 +2,8 @@
 
 # Common environment (XDG, EDITOR, history files…) shared with bash:
 # one single source of truth, POSIX syntax.
-# Guarded ([[ -r ]], same idiom as the school repo): .zshenv is read by
-# EVERY zsh — including scripts and `ssh host cmd`. A partial install (the
-# .config/shell link not created yet) would otherwise print an error on
-# every single zsh invocation, and pollute the stdout of every script.
+# Guarded: .zshenv is read by every zsh, scripts included. A partial install
+# would otherwise error on every invocation and pollute every script's stdout.
 _env="${XDG_CONFIG_HOME:-$HOME/.config}/shell/env.sh"
 [[ -r "$_env" ]] && source "$_env"
 unset _env

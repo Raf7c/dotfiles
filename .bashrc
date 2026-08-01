@@ -27,17 +27,16 @@ HISTCONTROL=ignoreboth:erasedups
 HISTTIMEFORMAT='%F %T '
 shopt -s histappend
 shopt -s cmdhist
-shopt -s checkwinsize          # keep LINES/COLUMNS up to date on resize
+shopt -s checkwinsize # keep LINES/COLUMNS up to date on resize
 # Share history across sessions (equiv. to SHARE_HISTORY in zsh). Idempotent.
 case "${PROMPT_COMMAND:-}" in
-  *"history -a"*) ;;
-  *) PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}" ;;
+*"history -a"*) ;;
+*) PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}" ;;
 esac
 
 # ------------------ GPG ------------------
-# `tty 2>/dev/null || true` protected nothing: without a terminal, tty
-# prints "not a tty" on STDOUT (not stderr) and returns 1, so GPG_TTY got
-# that literal string and every pinentry failed. Test the terminal instead.
+# Only when stdin is a terminal: otherwise `tty` prints "not a tty" on
+# stdout, which would poison GPG_TTY and break every pinentry.
 if [ -t 0 ]; then
   GPG_TTY=$(tty)
   export GPG_TTY
@@ -60,7 +59,7 @@ if command -v mise >/dev/null 2>&1; then
   _mc="${XDG_CACHE_HOME:-$HOME/.cache}/bash/mise-completion.bash"
   if [[ ! -r "$_mc" ]] && command -v usage >/dev/null 2>&1; then
     mkdir -p -- "${_mc%/*}"
-    mise completion bash > "$_mc" 2>/dev/null || rm -f -- "$_mc"
+    mise completion bash >"$_mc" 2>/dev/null || rm -f -- "$_mc"
   fi
   [[ -r "$_mc" ]] && source "$_mc"
   unset _mc
@@ -74,6 +73,6 @@ unset _al
 
 # ------------------ Tools init ------------------
 # Guarded: a missing tool must never break the shell.
-command -v zoxide   >/dev/null 2>&1 && eval "$(zoxide init bash)"
-command -v fzf      >/dev/null 2>&1 && eval "$(fzf --bash)"
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)"
+command -v fzf >/dev/null 2>&1 && eval "$(fzf --bash)"
 command -v starship >/dev/null 2>&1 && eval "$(starship init bash)"

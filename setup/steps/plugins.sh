@@ -23,14 +23,14 @@ else
   log_info "cloning TPM -> ${_tpm_dir#"$HOME"/}"
   # No network / GitHub unreachable is NOT a reason to abort the install:
   # tmux works without its plugins, the user replays `./run install plugins`.
-  run git clone --depth 1 -- https://github.com/tmux-plugins/tpm "$_tpm_dir" \
-    || log_warn "TPM: clone failed (network?) — tmux plugins not installed"
+  run git clone --depth 1 -- https://github.com/tmux-plugins/tpm "$_tpm_dir" ||
+    log_warn "TPM: clone failed (network?) — tmux plugins not installed"
 fi
 
 # Install the plugins listed in tmux.conf without opening tmux (if tmux is there).
 if command -v tmux >/dev/null 2>&1 && [ -x "$_tpm_dir/bin/install_plugins" ]; then
-  run "$_tpm_dir/bin/install_plugins" \
-    || log_warn "TPM: plugin install failed (network?) — retry with: prefix + I"
+  run "$_tpm_dir/bin/install_plugins" ||
+    log_warn "TPM: plugin install failed (network?) — retry with: prefix + I"
 fi
 
 log_info "zinit: no action (self-installs on first zsh)"

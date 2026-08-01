@@ -29,31 +29,34 @@ if [ -f "$DOTFILES_DIR/.gitmodules" ]; then
   #   - branch behind the pinned commit -> fast-forward to it
   #   - branch ahead (local work)       -> left untouched, informative log
   git -C "$DOTFILES_DIR" config -f "$DOTFILES_DIR/.gitmodules" \
-    --get-regexp '^submodule\..*\.path$' 2>/dev/null \
-  | while read -r _key _path; do
-    _name=${_key#submodule.}
-    _name=${_name%.path}
-    _branch=$(git -C "$DOTFILES_DIR" config -f "$DOTFILES_DIR/.gitmodules" \
-      "submodule.$_name.branch" 2>/dev/null) || continue
-    _dir="$DOTFILES_DIR/$_path"
-    [ -e "$_dir/.git" ] || continue
-    if [ "$DRY_RUN" = 1 ]; then
-      log_info "[dry-run] attach $_path to branch $_branch (ff to pinned commit if behind)"
-      continue
-    fi
-    _cur=$(git -C "$_dir" symbolic-ref -q --short HEAD 2>/dev/null || true)
-    if [ "$_cur" = "$_branch" ]; then
-      log_ok "submodule $_path already on $_branch"
-      continue
-    fi
-    _pin=$(git -C "$_dir" rev-parse HEAD 2>/dev/null) || continue
-    git -C "$_dir" checkout -q "$_branch" 2>/dev/null \
-      || git -C "$_dir" checkout -q -b "$_branch" "origin/$_branch" 2>/dev/null \
-      || { log_warn "submodule $_path: cannot attach branch $_branch"; continue; }
-    git -C "$_dir" merge --ff-only -q "$_pin" 2>/dev/null \
-      || log_info "submodule $_path: $_branch ahead of pinned commit -> kept as is"
-    log_ok "submodule $_path -> branch $_branch"
-  done
+    --get-regexp '^submodule\..*\.path$' 2>/dev/null |
+    while read -r _key _path; do
+      _name=${_key#submodule.}
+      _name=${_name%.path}
+      _branch=$(git -C "$DOTFILES_DIR" config -f "$DOTFILES_DIR/.gitmodules" \
+        "submodule.$_name.branch" 2>/dev/null) || continue
+      _dir="$DOTFILES_DIR/$_path"
+      [ -e "$_dir/.git" ] || continue
+      if [ "$DRY_RUN" = 1 ]; then
+        log_info "[dry-run] attach $_path to branch $_branch (ff to pinned commit if behind)"
+        continue
+      fi
+      _cur=$(git -C "$_dir" symbolic-ref -q --short HEAD 2>/dev/null || true)
+      if [ "$_cur" = "$_branch" ]; then
+        log_ok "submodule $_path already on $_branch"
+        continue
+      fi
+      _pin=$(git -C "$_dir" rev-parse HEAD 2>/dev/null) || continue
+      git -C "$_dir" checkout -q "$_branch" 2>/dev/null ||
+        git -C "$_dir" checkout -q -b "$_branch" "origin/$_branch" 2>/dev/null ||
+        {
+          log_warn "submodule $_path: cannot attach branch $_branch"
+          continue
+        }
+      git -C "$_dir" merge --ff-only -q "$_pin" 2>/dev/null ||
+        log_info "submodule $_path: $_branch ahead of pinned commit -> kept as is"
+      log_ok "submodule $_path -> branch $_branch"
+    done
 else
   log_info "no submodule (.gitmodules missing) — nothing to do"
 fi

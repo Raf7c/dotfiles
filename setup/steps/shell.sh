@@ -1,17 +1,8 @@
 #!/usr/bin/env sh
 # Module: shell — switch the login shell to zsh.
 #
-# ZDOTDIR is NOT bootstrapped here any more. It used to be written into
-# /etc/zshenv with sudo, which had three defects:
-#   - it made the whole zsh config depend on root: no sudo, no config;
-#   - /etc/zshenv is read by EVERY zsh of EVERY user, so the block leaked
-#     ZDOTDIR (and XDG_CONFIG_HOME) into other accounts;
-#   - /etc/zshenv is read even by `zsh -f`, so a shell meant to be pristine
-#     was not.
-# The bootstrap now lives in ~/.zshenv, linked from this repo by the
-# symlinks step (see setup/manifest.sh). Single source of truth, no root.
-# Existing machines: remove the old block, see the Uninstall section of the
-# README.
+# ZDOTDIR is bootstrapped from ~/.zshenv (linked by the symlinks step), not
+# from /etc/zshenv: no root, no leak into other users, `zsh -f` stays pristine.
 #
 # Contract:
 #   - idempotent: chsh only if the current shell is not already zsh
@@ -31,9 +22,9 @@ elif confirm "Make zsh ($_zsh) the login shell (chsh)?"; then
   if [ "$DRY_RUN" = 1 ]; then
     log_info "[dry-run] add $_zsh to /etc/shells if needed + chsh -s $_zsh"
   else
-    { grep -qx "$_zsh" /etc/shells 2>/dev/null \
-      || printf '%s\n' "$_zsh" | sudo tee -a /etc/shells >/dev/null; } \
-      || log_warn "/etc/shells: write failed (sudo refused?)"
+    { grep -qx "$_zsh" /etc/shells 2>/dev/null ||
+      printf '%s\n' "$_zsh" | sudo tee -a /etc/shells >/dev/null; } ||
+      log_warn "/etc/shells: write failed (sudo refused?)"
     chsh -s "$_zsh" || log_warn "chsh failed (password?)"
     log_ok "login shell -> zsh (takes effect next session)"
   fi

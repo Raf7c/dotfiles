@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # Module: migrate — move legacy history files (~/.bash_history, ~/.zsh_history…)
-# to their XDG location. *** COMPLETE MODULE (like symlinks) ***
+# to their XDG location.
 #
 # Contract:
 #   - idempotent: migrate_file does nothing if the source is missing / already linked;

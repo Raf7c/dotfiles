@@ -81,6 +81,46 @@ Two variables reach beyond this repo:
 - **`NO_COLOR`**, if set, disables every colour in the installer output
   (`setup/lib/log.sh`).
 
+## Third-party plugins
+
+zinit, TPM and their plugins are cloned from GitHub and sourced by every
+interactive shell and every tmux server. They are **not pinned**, and that is a
+decision rather than an oversight:
+
+- a tag only *delays* an upstream compromise. At bump time you take whatever the
+  new tag holds, with no more review than before;
+- the clone is guarded, so exposure is not continuous: it happens on a fresh
+  install or on `./run upgrade`, both of which you trigger yourself;
+- eight hand-written versions are eight things that go stale.
+
+Automatic updates are worth more here than a frozen version. The repository and
+the installed state can drift, though -- a plugin removed from the config stays
+on disk. This lists what a machine actually runs, and flags what is no longer
+declared:
+
+```sh
+_zc="${ZDOTDIR:-${XDG_CONFIG_HOME:-$HOME/.config}/zsh}/zinit.zsh"
+_tc="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/tmux.conf"
+git -C "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git" rev-parse --short HEAD
+find "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/plugins" \
+     "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins" \
+     -mindepth 1 -maxdepth 1 -type d 2>/dev/null | while IFS= read -r _d; do
+  [ -d "$_d/.git" ] || continue
+  _n=${_d##*/}
+  # zinit stores plugins as "user---repo"; tmux as plain "repo".
+  case "$_n" in *---*) _r="${_n%%---*}/${_n#*---}" ;; *) _r=$_n ;; esac
+  if grep -qF -- "$_r" "$_zc" "$_tc" 2>/dev/null; then
+    printf '%-45s %s\n' "$_n" "$(git -C "$_d" rev-parse --short HEAD)"
+  else
+    printf '%-45s %s  <- ORPHAN, no longer declared\n' "$_n" \
+      "$(git -C "$_d" rev-parse --short HEAD)"
+  fi
+done
+```
+
+`find` and not a glob: zsh aborts on a pattern that matches nothing, so a
+missing plugin directory would kill the whole listing.
+
 ## Uninstall
 
 The symlinks point into this repo: removing the repo just leaves dead links

@@ -1,10 +1,8 @@
 #!/usr/bin/env zsh
 
 # ------------------ History ------------------
-# :- default everywhere: .zshrc must survive a zsh started WITHOUT the
-# shared environment (su -, a display manager that drops it, a broken
-# .zshenv). Without it HISTFILE becomes "/zsh/history" and zsh silently
-# stops saving history.
+# :- defaults: .zshrc must survive without env.sh loaded — an empty
+# XDG_STATE_HOME would silently lose the history to /zsh/history.
 HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
 HISTSIZE=100000
 SAVEHIST=100000
@@ -26,13 +24,8 @@ setopt AUTOCD
 setopt NOBEEP
 setopt NUMERIC_GLOB_SORT
 
-# Native vi mode (replaces the zsh-vi-mode plugin)
 bindkey -v
-# Shorten the delay when switching to normal mode (default 0.4s).
-# NOT exported: KEYTIMEOUT only means something to the ZLE of THIS shell,
-# and leaking it into the environment of every child process is noise.
-# 10 (=100 ms) rather than 5: below that, multi-byte key sequences sent by
-# the terminal (arrows, Home/End over ssh) get split and land as garbage.
+# Not exported: ZLE-local. 100 ms — lower splits escape sequences over ssh.
 KEYTIMEOUT=10
 
 # ------------------ GPG ------------------
@@ -49,9 +42,8 @@ source "${ZDOTDIR}/zinit.zsh"
 # ------------------ Completion zstyle ------------------
 zstyle ':completion::complete:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompcache"
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-# list-colors below reads LS_COLORS, which NOTHING was setting: the value
-# was empty and the completion menu monochrome. dircolors produces it.
-# Guarded: no dircolors (macOS without coreutils) just means no colors.
+# dircolors feeds LS_COLORS; guarded — macOS without coreutils just gets
+# no completion colors.
 if (( ${+commands[dircolors]} )); then
   eval "$(dircolors -b)"
 elif (( ${+commands[gdircolors]} )); then
@@ -60,10 +52,8 @@ fi
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' menu no
 
-# Reuse ls completion for eza
 compdef eza=ls
 
-# fzf-tab preview
 if command -v eza >/dev/null 2>&1; then
   zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null'
   if command -v zoxide >/dev/null 2>&1; then
@@ -75,7 +65,6 @@ fi
 
 zstyle ':fzf-tab:complete:*:*' fzf-preview 'less ${(Q)realpath} 2>/dev/null'
 
-# fzf-tab behaviour
 zstyle ':fzf-tab:*' fzf-min-height 20
 zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':fzf-tab:*' fzf-bindings 'tab:down'
@@ -104,10 +93,8 @@ source "${ZDOTDIR}/fzf.zsh"                    # fzf variables + widget (zsh)
 # ~/.config/mise/config.toml); without the guard it errors at startup.
 if command -v mise >/dev/null 2>&1; then
   eval "$(mise activate zsh --shims)"
-  # Completion generated ONCE into the cache, like .bashrc does: `source
-  # <(mise completion zsh)` costs a fork + a full generation at EVERY shell
-  # start for a byte-identical result.
-  # `./run upgrade` deletes this file -> regenerated at the next shell.
+  # Cached once, like .bashrc: regenerating at every startup costs a fork
+  # for an identical result. `./run upgrade` invalidates it.
   _mc="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/mise-completion.zsh"
   if [[ ! -r "$_mc" ]] && command -v usage >/dev/null 2>&1; then
     mkdir -p -- "${_mc:h}"
@@ -122,6 +109,3 @@ command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
 # fzf rebinds Ctrl-R/Ctrl-T/Alt-C. Load it AFTER `bindkey -v` so the
 # bindings land in the vi keymaps.
 command -v fzf >/dev/null 2>&1 && eval "$(fzf --zsh)"
-# `bindkey "^F" _fzf_file_no_hidden` moved to fzf.zsh, next to the widget
-# it binds: here it stayed behind whenever fzf.zsh was removed or skipped,
-# leaving ^F bound to a widget that does not exist.

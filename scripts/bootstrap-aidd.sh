@@ -16,21 +16,22 @@ check_prereqs() {
   }
   _out=$(ssh -o BatchMode=yes -o ConnectTimeout=5 -T git@github.com 2>&1 || true)
   case "$_out" in
-  *"successfully authenticated"*) ;;
-  *)
-    printf 'Error: GitHub SSH access unavailable (key missing or not loaded).\n' >&2
-    printf 'Check with: ssh -T git@github.com\n' >&2
-    exit 1
-    ;;
+    *"successfully authenticated"*) ;;
+    *)
+      printf 'Error: GitHub SSH access unavailable (key missing or not loaded).\n' >&2
+      printf 'Check with: ssh -T git@github.com\n' >&2
+      exit 1
+      ;;
   esac
 }
 
-clone_or_pull() {  # <url> <dest>
-  _url="$1"; _dest="$2"
+clone_or_pull() { # <url> <dest>
+  _url="$1"
+  _dest="$2"
   if [ -d "$_dest/.git" ]; then
     printf '[pull]  %s\n' "$_dest"
-    git -C "$_dest" pull --ff-only \
-      || printf '[warn] pull failed (%s), keeping current state\n' "$_dest" >&2
+    git -C "$_dest" pull --ff-only ||
+      printf '[warn] pull failed (%s), keeping current state\n' "$_dest" >&2
   else
     printf '[clone] %s -> %s\n' "$_url" "$_dest"
     git clone -- "$_url" "$_dest"

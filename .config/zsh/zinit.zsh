@@ -5,18 +5,13 @@
 # `find -mtime +0` prints the dump only if it is older than 24 h.
 _zsh_compinit() {
   autoload -Uz compinit
-  # Default on XDG_CACHE_HOME: this file must survive a zsh started without
-  # the shared env (su -, `zsh -f`, a login manager that drops it) — an
-  # empty value would put the dump in /zsh/ and silently disable caching.
-  # Dump keyed by HOST and ZSH_VERSION: a shared $HOME (NFS, school) or a
-  # zsh upgrade must not reuse an incompatible dump.
+  # Keyed by host and zsh version: a shared (NFS) $HOME or a zsh upgrade
+  # must never reuse an incompatible dump. :- default: survive without env.sh.
   _zdump="${XDG_CACHE_HOME:-${HOME}/.cache}/zsh/zcompdump-${HOST}-${ZSH_VERSION}"
   # compinit silently fails to write its dump if the directory is missing
   # (-> slow startup every time).
   [[ -d "${_zdump:h}" ]] || mkdir -p -- "${_zdump:h}"
-  # -i: never PROMPT about "insecure directories" (a group-writable
-  # /usr/local/share/zsh is common); the offending files are just ignored.
-  # An interactive question at shell startup is a broken shell.
+  # -i: never block startup on the "insecure directories" prompt.
   if [[ -f "${_zdump}" ]] && [[ -z "$(find "${_zdump}" -mtime +0 2>/dev/null)" ]]; then
     compinit -C -i -d "${_zdump}"
   else
@@ -65,7 +60,6 @@ if [[ -r "${ZINIT_HOME}/zinit.zsh" ]]; then
   # ------------------ Plugins ------------------
   zinit light Aloxaf/fzf-tab
 
-  # Syntax highlighting + autosuggestions
   zinit wait lucid for \
     zsh-users/zsh-syntax-highlighting \
     atload"_zsh_autosuggest_start" \

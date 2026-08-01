@@ -6,9 +6,9 @@
 # --- Package manager ---
 if is_macos; then
   if command -v brew >/dev/null 2>&1; then
-    run brew update          || log_warn "brew update: failed"
-    run brew upgrade         || log_warn "brew upgrade: partial failure"
-    run brew cleanup         || true
+    run brew update || log_warn "brew update: failed"
+    run brew upgrade || log_warn "brew upgrade: partial failure"
+    run brew cleanup || true
   else
     log_warn "brew missing -> macOS package update skipped"
   fi
@@ -56,8 +56,8 @@ fi
 # (unlike `update` which resyncs to the pinned commit). The submodule pointer
 # changes in the repo -> commit afterwards if you want to freeze it.
 if [ -f "$DOTFILES_DIR/.gitmodules" ]; then
-  run git -C "$DOTFILES_DIR" submodule update --remote --recursive --merge \
-    || log_warn "submodule --remote: failed"
+  run git -C "$DOTFILES_DIR" submodule update --remote --recursive --merge ||
+    log_warn "submodule --remote: failed"
 fi
 
 log_step "upgrade done."

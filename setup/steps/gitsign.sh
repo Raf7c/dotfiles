@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Module: gitsign — generate the machine-local git signing config. *** COMPLETE MODULE ***
+# Module: gitsign — generate the machine-local git signing config.
 # Contract:
 #
 #   - idempotent: the file is rewritten only when its content changes
@@ -14,13 +14,8 @@
 #   .config/git/config includes config.local, which is gitignored and
 #   regenerated here from what this machine actually has.
 #
-# Why a Homebrew ssh-keygen is required on macOS:
-#   Apple's build ships without FIDO2 support, so it cannot sign with a
-#   security-key (sk-*) key:
-#     $ /usr/bin/ssh-keygen -Y sign -n git -f ~/.ssh/id_signing_sk.pub
-#     No FIDO SecurityKeyProvider specified
-#     Signing (stdin) failed: invalid format
-#   Fedora's openssh is built against libfido2: nothing to override there.
+# Why a Homebrew ssh-keygen on macOS: Apple's build lacks FIDO2 support and
+# cannot sign with sk-* keys; Fedora's openssh (libfido2) can.
 
 # Public part of the signing key: single source of truth for this step.
 _gs_key="$HOME/.ssh/id_signing_sk.pub"

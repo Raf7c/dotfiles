@@ -10,7 +10,6 @@
 . "$DOTFILES_DIR/setup/manifest.sh"
 
 dotfiles_links | while read -r _src _dst _rest; do
-  # ignore empty lines and comments
   [ -z "${_src:-}" ] && continue
   case "$_src" in \#*) continue ;; esac
   # A manifest line is EXACTLY "<source> <target>". A missing target would

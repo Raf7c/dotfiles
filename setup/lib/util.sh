@@ -42,7 +42,10 @@ log_done() {
 
 # require_cmd NAME : fail if the command is missing.
 require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || { log_error "missing command: $1"; return 1; }
+  command -v "$1" >/dev/null 2>&1 || {
+    log_error "missing command: $1"
+    return 1
+  }
 }
 
 # run_steps [names...] : run the steps listed in $STEPS (order = $STEPS).
@@ -53,21 +56,18 @@ run_steps() {
   : "${STEPS:?STEPS must be set (step order, set by run)}"
   for _short in $STEPS; do
     _f="$DOTFILES_DIR/setup/steps/$_short.sh"
-    [ -e "$_f" ] || { log_warn "step not found: $_short.sh"; continue; }
+    [ -e "$_f" ] || {
+      log_warn "step not found: $_short.sh"
+      continue
+    }
     if [ "$#" -gt 0 ]; then
       _ok=0
       for _flt in "$@"; do [ "$_short" = "$_flt" ] && _ok=1; done
       [ "$_ok" = 1 ] || continue
     fi
     log_step "step: $_short"
-    # A step is SOURCED: under `set -e` any uncaught failure inside it kills
-    # `run` on the spot — no summary, no following step, no exit code that
-    # says WHICH step broke. Neutralize `set -e` around the source, capture
-    # the status, log it, keep going.
-    # Trade-off: this makes a genuinely broken step non-fatal, so it must be
-    # applied WITH 04/05/06, which turn the fragile commands (network,
-    # package managers) into run_soft / `|| log_*`. log_summary still returns
-    # 1 at the end, so the command's exit code stays honest.
+    # set -e would kill run on any uncaught failure inside a sourced step.
+    # Capture the status instead; log_summary owns the final exit code.
     set +e
     # shellcheck disable=SC1090
     . "$_f"
@@ -91,13 +91,13 @@ confirm() {
   # terminal: actually try to OPEN /dev/tty (fails in cron/CI/`ssh host cmd`).
   # Subshell required: a redirection error on a special builtin (:) is FATAL
   # in non-interactive POSIX sh; the subshell absorbs it.
-  if ! ( : < /dev/tty ) 2>/dev/null; then
+  if ! (: </dev/tty) 2>/dev/null; then
     log_warn "non-interactive without --yes: step skipped ($1)"
     return 1
   fi
-  printf '%s [y/N] ' "$1" > /dev/tty
-  read -r _ans < /dev/tty || return 1
-  case "$_ans" in y|Y) return 0 ;; *) return 1 ;; esac
+  printf '%s [y/N] ' "$1" >/dev/tty
+  read -r _ans </dev/tty || return 1
+  case "$_ans" in y | Y) return 0 ;; *) return 1 ;; esac
 }
 
 # --- Centralized backups -----------------------------------------------------
@@ -113,7 +113,7 @@ backup_file() {
   _abs=$1
   case "$_abs" in
     "$HOME"/*) _rel=${_abs#"$HOME"/} ;;
-    *)         _rel=$(basename "$_abs") ;;
+    *) _rel=$(basename "$_abs") ;;
   esac
   _bdest="$BACKUP_DIR/$_rel"
   run mkdir -p -- "$(dirname -- "$_bdest")"
@@ -127,7 +127,8 @@ backup_file() {
 #   - target already present           -> don't overwrite; old one goes to backup
 # (Logs show paths relative to $HOME when possible.)
 migrate_file() {
-  _ms=$1; _md=$2
+  _ms=$1
+  _md=$2
   { [ -e "$_ms" ] && [ ! -L "$_ms" ]; } || return 0
   if [ -e "$_md" ]; then
     log_info "migration: ${_md#"$HOME"/} already exists -> backing up old ${_ms#"$HOME"/}"

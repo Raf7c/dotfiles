@@ -14,13 +14,15 @@ detect_os() {
           fedora) OS=fedora ;;
           *)
             case " ${ID_LIKE:-} " in
-              *fedora*|*rhel*) OS=fedora ;;
-              *)               OS=unknown ;;
-            esac ;;
+              *fedora* | *rhel*) OS=fedora ;;
+              *) OS=unknown ;;
+            esac
+            ;;
         esac
       else
         OS=unknown
-      fi ;;
+      fi
+      ;;
     *) OS=unknown ;;
   esac
   export OS
@@ -37,6 +39,9 @@ pkg_install() {
     # run_soft: an unreachable mirror or one renamed package must be
     # reported, not abort the run (`set -e`) before the rest of the steps.
     fedora) run_soft sudo dnf install -y "$@" ;;
-    *) log_warn "pkg_install: unsupported OS ($OS)"; return 1 ;;
+    *)
+      log_warn "pkg_install: unsupported OS ($OS)"
+      return 1
+      ;;
   esac
 }

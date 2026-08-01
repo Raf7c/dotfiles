@@ -6,10 +6,8 @@
 (( ${+commands[fzf]} )) || return 0
 
 # ------------------ Source command ------------------
-# fd when it is there; otherwise a REAL find fallback. The previous
-# `${cmd:-find …}` fallback was dead code: FZF_DEFAULT_COMMAND was always
-# set, so the default never applied and fzf ran `fd: command not found`.
-# -path … -prune: portable on GNU and BSD find (macOS), unlike -printf.
+# fd when available, otherwise a real find fallback. -path … -prune is
+# portable on GNU and BSD find (macOS), unlike -printf.
 if (( ${+commands[fd]} )); then
   export FZF_DEFAULT_COMMAND='fd --type f --hidden --strip-cwd-prefix'
   # Same source, without the hidden files (Ctrl+F widget below).
@@ -45,6 +43,6 @@ _fzf_file_no_hidden() {
   zle reset-prompt
 }
 zle -N _fzf_file_no_hidden
-# Binding declared HERE, next to the widget it uses: in .zshrc it survived
-# the removal of this file and left ^F bound to a missing widget.
+# Binding declared here, next to the widget it uses, so it can never
+# outlive the widget.
 bindkey '^F' _fzf_file_no_hidden

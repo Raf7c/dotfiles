@@ -44,5 +44,5 @@ env_path_prepend() {
 }
 env_path_prepend "$HOME/.local/bin"
 env_path_prepend "${XDG_CONFIG_HOME}/scripts"
-env_path_prepend "${XDG_DATA_HOME}/mise/shims"   # mise shims first
+env_path_prepend "${XDG_DATA_HOME}/mise/shims" # mise shims first
 export PATH

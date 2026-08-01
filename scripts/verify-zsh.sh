@@ -13,7 +13,9 @@ for _f in "$ZDIR/.zshenv" "$ZDIR/.zprofile" "$ZDIR/.zshrc" \
   if zsh -n -- "$_f" 2>/tmp/zsyn.$$; then
     printf 'OK   %s\n' "$_f"
   else
-    printf 'FAIL %s\n' "$_f"; cat /tmp/zsyn.$$; _fail=1
+    printf 'FAIL %s\n' "$_f"
+    cat /tmp/zsyn.$$
+    _fail=1
   fi
 done
 rm -f -- /tmp/zsyn.$$
@@ -23,7 +25,9 @@ for _mode in "-i" "-l -i"; do
   # shellcheck disable=SC2086
   zsh $_mode -c exit 2>/tmp/zerr.$$ || true
   if [ -s /tmp/zerr.$$ ]; then
-    printf 'FAIL zsh %s -c exit — stderr:\n' "$_mode"; cat /tmp/zerr.$$; _fail=1
+    printf 'FAIL zsh %s -c exit — stderr:\n' "$_mode"
+    cat /tmp/zerr.$$
+    _fail=1
   else
     printf 'OK   zsh %s -c exit (empty stderr)\n' "$_mode"
   fi
@@ -52,6 +56,15 @@ if command -v shellcheck >/dev/null 2>&1; then
 else
   printf '  shellcheck missing (brew install shellcheck / dnf install ShellCheck)\n'
 fi
+if command -v shfmt >/dev/null 2>&1; then
+  # shfmt is the formatting authority here (see .editorconfig): a divergence
+  # is a failure, not a note.
+  shfmt -d -- "$DOT/run" "$DOT"/setup/lib/*.sh "$DOT"/setup/steps/*.sh \
+    "$DOT"/setup/commands/*.sh "$DOT/setup/manifest.sh" \
+    "$DOT"/.config/shell/*.sh "$DOT"/scripts/*.sh || _fail=1
+else
+  printf '  shfmt missing (brew install shfmt / dnf install shfmt)\n'
+fi
 if command -v checkbashisms >/dev/null 2>&1; then
   checkbashisms -- "$DOT/run" "$DOT"/setup/lib/*.sh "$DOT"/setup/steps/*.sh \
     "$DOT"/setup/commands/*.sh "$DOT"/.config/shell/*.sh || _fail=1
@@ -60,8 +73,8 @@ else
 fi
 
 printf '\n== 6. ZDOTDIR bootstrap ==\n'
-# Since the /etc route was dropped, ~/.zshenv IS the bootstrap: it must exist
-# and point at this repo.
+# ~/.zshenv IS the bootstrap (no /etc route): it must exist and point at
+# this repo.
 if [ -r "$HOME/.zshenv" ]; then
   printf '  OK   ~/.zshenv present\n'
   # shellcheck disable=SC3013  # -ef: extension supported by dash/bash/zsh
