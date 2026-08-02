@@ -76,3 +76,13 @@ unset _al
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)"
 command -v fzf >/dev/null 2>&1 && eval "$(fzf --bash)"
 command -v starship >/dev/null 2>&1 && eval "$(starship init bash)"
+
+# ------------------ PATH re-assertion ------------------
+# bash has no `typeset -U`: `mise activate --shims` above re-prepends a
+# directory the parent shell already provided. Same final re-assertion
+# zsh does in _zsh_build_path, expressed the bash way: first wins.
+if command -v awk >/dev/null 2>&1; then
+  PATH=$(printf '%s' "$PATH" | awk -v RS=: -v ORS=: '!s[$0]++')
+  PATH=${PATH%:}
+  export PATH
+fi
