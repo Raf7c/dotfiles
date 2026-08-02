@@ -68,3 +68,13 @@ firefox
 # cloudflared    # deliberately NOT installed on Fedora (macOS only, via brew)
 # sops           # not in the base repos: binary from the getsops GitHub releases
 # age-plugin-yubikey  # not packaged: cargo install age-plugin-yubikey (needs rust via mise)
+
+# --- GUI apps (Brewfile casks): Fedora routes, not automated ---
+# obsidian           # flatpak install flathub md.obsidian.Obsidian
+# gitkraken          # flatpak install flathub com.axosoft.GitKraken
+# jetbrains-toolbox  # official tarball (jetbrains.com/toolbox-app); no dnf/flatpak
+# keymapp            # official tarball (zsa.io/flash); needs libwebkit2gtk 4.1
+# google-chrome      # dnf install fedora-workstation-repositories, enable the
+#                    # google-chrome repo, then dnf install google-chrome-stable
+# claude (desktop)   # no official Linux build: claude.ai in the browser
+# docker-desktop     # use podman instead (see docker above)
