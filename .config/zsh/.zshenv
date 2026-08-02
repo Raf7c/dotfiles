@@ -17,8 +17,8 @@ unset _env
 _zsh_build_path() {
   typeset -gU path PATH
   path=(
-    ${XDG_DATA_HOME}/mise/shims   # mise shims (highest priority)
-    ${XDG_CONFIG_HOME}/scripts    # personal scripts
+    ${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims   # mise shims (highest priority)
+    ${XDG_CONFIG_HOME:-$HOME/.config}/scripts         # personal scripts
     $HOME/.local/bin              # user binaries (XDG)
     $path                         # existing entries (system…)
   )
