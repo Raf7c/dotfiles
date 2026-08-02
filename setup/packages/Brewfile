@@ -27,7 +27,7 @@ brew "ansible"
 brew "ansible-lint"
 brew "yamllint"
 brew "shellcheck"           # POSIX sh linting: the shell conventions of this repo
-brew "shfmt"                # sh formatter (probed by scripts/verify-zsh.sh)
+brew "shfmt"                # sh formatter (probed by scripts/doctor.sh)
 brew "cloudflared"   # macOS only (not installed on Fedora)
 
 # Secrets / security (Fedora equivalents in fedora.txt)
