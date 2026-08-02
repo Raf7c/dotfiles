@@ -30,13 +30,13 @@ brew "shellcheck"           # POSIX sh linting: the shell conventions of this re
 brew "shfmt"                # sh formatter (probed by scripts/verify-zsh.sh)
 brew "cloudflared"   # macOS only (not installed on Fedora)
 
-# Secrets / security (macOS only)
+# Secrets / security (Fedora equivalents in fedora.txt)
 brew "age"                  # modern file encryption
 brew "sops"                 # secrets in git (age/KMS backends)
 brew "age-plugin-yubikey"   # age identities backed by a YubiKey
 brew "ykman"                # YubiKey Manager CLI
-brew "openssh"              # newer than Apple's ssh; FIDO2/sk key support
-brew "libfido2"             # FIDO2 lib (YubiKey ssh keys: sk-ed25519/ecdsa)
+brew "openssh"              # macOS only: Apple's ssh-keygen lacks FIDO2/sk support
+brew "libfido2"             # macOS only: FIDO2 lib for the sk-* keys above
 
 # terminal
 cask "ghostty"
