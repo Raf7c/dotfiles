@@ -12,6 +12,7 @@ dotfiles_links() {
 .config/tmux           .config/tmux
 .config/git            .config/git
 .config/ghostty        .config/ghostty
+.config/kitty          .config/kitty
 .config/bat            .config/bat
 .config/nvim           .config/nvim
 .config/starship.toml  .config/starship.toml
