@@ -6,144 +6,80 @@
 ![Install](https://img.shields.io/badge/install-POSIX%20sh%20%C2%B7%20idempotent-2ea44f)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-My entire working environment, versioned and reproducible: a single `./run install` takes a fresh machine (**macOS** or **Fedora**) to a ready-to-use workstation. `$HOME` stays clean: everything follows the [XDG Base Directory](https://specifications.freedesktop.org/basedir-spec/latest/) specification.
+My entire working environment, versioned and reproducible: one `./run install`
+takes a fresh machine (**macOS** or **Fedora**) to a ready workstation.
 
-<!-- Drop a screenshot or GIF of your terminal (starship + tmux) at the repo
-     root as preview.png, then add: ![Terminal preview](preview.png) -->
+<!-- TODO: screenshot — starship prompt + tmux status bar + `ll` output.
+     Save as assets/preview.png, then: ![Terminal preview](assets/preview.png) -->
 
 > [!WARNING]
-> Don't blindly use my settings unless you know what they do. Use at your own risk!
+> These are my settings. Read before you run.
 
-## Requirements
+## Highlights
 
-- **macOS (Apple Silicon)** or **Fedora**
-- Git
-- An SSH key configured on GitHub — the clone and the submodule use SSH
-- `sudo` is **not** needed for the shell configuration: `~/.zshenv` bootstraps
-  `ZDOTDIR` from `$HOME`. It is only asked for to install packages with `dnf`
-  on Fedora, and to append zsh to `/etc/shells` if you accept the `chsh` prompt.
+- **POSIX sh installer** — idempotent (re-run = no-op), faithful `--dry-run`,
+  timestamped restorable backups, honest exit codes. No framework.
+- **Clean `$HOME`** — everything follows the [XDG Base Directory spec](https://specifications.freedesktop.org/basedir-spec/latest/);
+  even legacy history files are migrated out on install.
+- **No root required for the shell** — `~/.zshenv` bootstraps `ZDOTDIR`
+  entirely from `$HOME`. `sudo` is only needed by the package layer: the
+  initial Homebrew install on macOS, `dnf` on Fedora, and `/etc/shells`.
+- **Degrades cleanly** — no network, no git, a missing tool: the shell still
+  starts. Scripts stay silent; an interactive shell gets a single stderr
+  line, never a blocked startup. On-demand diagnosis: `scripts/doctor.sh`.
+- **Tooling as authority** — shellcheck and shfmt are installed by the repo
+  and enforced by it (`.editorconfig`, `scripts/doctor.sh`).
 
-> [!IMPORTANT]
-> `./run install` **moves** four existing files out of `$HOME` into their XDG
-> locations: `.bash_history`, `.zsh_history`, `.lesshst` and `.python_history`
-> (see `dotfiles_history_migrations` in `setup/manifest.sh`). Nothing is
-> deleted, but the paths change.
+## How it works
+
+```mermaid
+flowchart LR
+    A["~/.zshenv"] --> B["ZDOTDIR<br/>~/.config/zsh"] --> C[".zshenv → env.sh<br/>XDG · EDITOR · PATH"] --> D[".zshrc<br/>interactive"] --> E["zinit → plugins"]
+    F["bash: .bash_profile → .bashrc"] --> C
+```
+
+Details, load order and design decisions: [docs/architecture.md](docs/architecture.md).
 
 ## Quick start
 
 ```sh
 git clone --recurse-submodules git@github.com:Raf7c/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
-./run install
+./run install          # idempotent; preview first with: ./run install -n
 ```
-
-`install` is **idempotent**: you can re-run it safely, it only does what's missing. To preview without changing anything:
-
-```sh
-./run install --dry-run
-```
-
-> [!NOTE]
-> The Neovim configuration is a Git submodule (`.config/nvim`).
 
 ## Commands
 
 ```sh
-./run install     # install everything -> ready (idempotent)
-./run update      # git pull + resync (links, packages, runtimes, submodules, tmux plugins)
+./run install     # everything -> ready (idempotent)
+./run update      # git pull + resync links, packages, runtimes, submodules
 ./run upgrade     # bump versions (brew/dnf, mise, zinit, TPM, submodules)
 ```
 
-Options: `-n`/`--dry-run` (preview), `-y`/`--yes` (no confirmation), `-h`/`--help`.
-Target specific modules (install only): `./run install symlinks packages`.
+Options: `-n`/`--dry-run`, `-y`/`--yes`, `-h`/`--help`.
+Single modules: `./run install symlinks packages`.
 
-## Scripts
+## Documentation
 
-`scripts/` is symlinked to `~/.config/scripts`, which is on the `PATH`: every
-file in it is callable by name. **None of them is run by `./run`** — they are
-manual tools, and two of them have side effects worth knowing about.
-
-| Script | What it does |
+| Page | Contents |
 |---|---|
-| `verify-zsh.sh` | Read-only checks: `zsh -n`, empty stderr at startup, startup timing, `zprof`, shellcheck, and the `~/.zshenv` bootstrap. Run it after touching any zsh file. |
-| `osx.sh` | **Rewrites about fifteen macOS `defaults`** (Dock, Finder, screenshots, keyboard) and disables the Spotlight shortcut. Read it before running it. |
-| `tool42.sh` | Installs `norminette` and `c_formatter_42` (42 school toolchain). Needs python3. |
-| `bootstrap-aidd.sh` | **Clones two private repositories** into `~/.config/aiddconf` and deploys the symlinks. Requires access to those repos. |
+| [architecture.md](docs/architecture.md) | startup chains, XDG layout, bootstrap without root, plugin policy |
+| [installer.md](docs/installer.md) | how `run` works, step contract, backups, the doctor |
+| [keymaps.md](docs/keymaps.md) | every binding: zsh vi-mode, fzf, aliases |
+| [tools.md](docs/tools.md) | each CLI tool and why it is there |
+| [terminals.md](docs/terminals.md) | ghostty and kitty, fonts, themes |
+| [tmux](.config/tmux/README.md) | everything tmux: bindings, theme, plugins — lives with its config |
+| [git](.config/git/README.md) | config.local mechanics, FIDO2 signing, aliases, notable defaults |
 
-## Environment
-
-Two variables reach beyond this repo:
-
-- **`BASH_ENV`** is exported by `.bashrc` to `~/.config/shell/env.sh`, so *every
-  non-interactive bash* on the machine sources it. That is how scripts inherit
-  the same `PATH` and XDG variables — at the cost of one extra file read per
-  bash subprocess.
-- **`NO_COLOR`**, if set, disables every colour in the installer output
-  (`setup/lib/log.sh`).
-
-## Third-party plugins
-
-zinit, TPM and their plugins are cloned from GitHub and sourced by every
-interactive shell and every tmux server. They are **not pinned**, and that is a
-decision rather than an oversight:
-
-- a tag only *delays* an upstream compromise. At bump time you take whatever the
-  new tag holds, with no more review than before;
-- the clone is guarded, so exposure is not continuous: it happens on a fresh
-  install or on `./run upgrade`, both of which you trigger yourself;
-- eight hand-written versions are eight things that go stale.
-
-Automatic updates are worth more here than a frozen version. The repository and
-the installed state can drift, though -- a plugin removed from the config stays
-on disk. This lists what a machine actually runs, and flags what is no longer
-declared:
-
-```sh
-_zc="${ZDOTDIR:-${XDG_CONFIG_HOME:-$HOME/.config}/zsh}/zinit.zsh"
-_tc="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/tmux.conf"
-git -C "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git" rev-parse --short HEAD
-find "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/plugins" \
-     "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins" \
-     -mindepth 1 -maxdepth 1 -type d 2>/dev/null | while IFS= read -r _d; do
-  [ -d "$_d/.git" ] || continue
-  _n=${_d##*/}
-  # zinit stores plugins as "user---repo"; tmux as plain "repo".
-  case "$_n" in *---*) _r="${_n%%---*}/${_n#*---}" ;; *) _r=$_n ;; esac
-  if grep -qF -- "$_r" "$_zc" "$_tc" 2>/dev/null; then
-    printf '%-45s %s\n' "$_n" "$(git -C "$_d" rev-parse --short HEAD)"
-  else
-    printf '%-45s %s  <- ORPHAN, no longer declared\n' "$_n" \
-      "$(git -C "$_d" rev-parse --short HEAD)"
-  fi
-done
-```
-
-`find` and not a glob: zsh aborts on a pattern that matches nothing, so a
-missing plugin directory would kill the whole listing.
+Maintenance convention: documentation is fixed in the same commit as the
+code it describes.
 
 ## Uninstall
 
-The symlinks point into this repo: removing the repo just leaves dead links
-(delete them at your convenience). Backups made by the installer live in
-`~/.local/state/dotfiles/backups/<timestamp>/`.
-
-The zsh config is bootstrapped by `~/.zshenv`, a symlink into this repo:
-deleting it is enough, no root involved. The only system file `./run install`
-can touch is `/etc/shells`, and only if you accept the `chsh` prompt:
-
-```sh
-# Optional: restore the previous login shell (zsh stays listed in /etc/shells)
-chsh -s /bin/bash
-```
-
-Migrating from a version that wrote the bootstrap into `/etc/zshenv`? Remove
-the old block once — `~/.zshenv` already does the job:
-
-```sh
-# works with BSD and GNU sed
-sudo sed -i.bak '/# >>> dotfiles ZDOTDIR >>>/,/# <<< dotfiles ZDOTDIR <<</d' /etc/zshenv
-```
+Symlinks point into this repo — removing the repo leaves dead links to delete
+at your convenience. Backups live in `~/.local/state/dotfiles/backups/<ts>/`.
+The only system change is the login shell: `chsh -s /bin/bash` reverts it.
 
 ## License
 
-See [LICENSE](LICENSE).
+[MIT](LICENSE).
