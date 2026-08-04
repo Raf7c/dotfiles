@@ -26,19 +26,25 @@ brew "just"
 brew "ansible"
 brew "ansible-lint"
 brew "yamllint"
+brew "shellcheck"           # POSIX sh linting: the shell conventions of this repo
+brew "shfmt"                # sh formatter (probed by scripts/doctor.sh)
 brew "cloudflared"   # macOS only (not installed on Fedora)
 
-# Secrets / security (macOS only)
+# Secrets / security (Fedora equivalents in fedora.txt)
 brew "age"                  # modern file encryption
 brew "sops"                 # secrets in git (age/KMS backends)
 brew "age-plugin-yubikey"   # age identities backed by a YubiKey
 brew "ykman"                # YubiKey Manager CLI
-brew "openssh"              # newer than Apple's ssh; FIDO2/sk key support
-brew "libfido2"             # FIDO2 lib (YubiKey ssh keys: sk-ed25519/ecdsa)
+brew "openssh"              # macOS only: Apple's ssh-keygen lacks FIDO2/sk support
+brew "libfido2"             # macOS only: FIDO2 lib for the sk-* keys above
 
 # terminal
 cask "ghostty"
 cask "kitty"
+# Nerd Font: the starship prompt, eza --icons and the tmux status bar all
+# print glyphs from the Nerd Font private range. Without it the prompt is
+# a row of tofu. Family name: "JetBrainsMono Nerd Font Mono" (ghostty/config).
+cask "font-jetbrains-mono-nerd-font"
 
 # Tools Dev
 # (claude code: installed via the official script in packages.sh, NOT brew —

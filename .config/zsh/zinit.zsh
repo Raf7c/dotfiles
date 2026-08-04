@@ -5,14 +5,17 @@
 # `find -mtime +0` prints the dump only if it is older than 24 h.
 _zsh_compinit() {
   autoload -Uz compinit
-  _zdump="${XDG_CACHE_HOME}/zsh/zcompdump"
+  # Keyed by host and zsh version: a shared (NFS) $HOME or a zsh upgrade
+  # must never reuse an incompatible dump. :- default: survive without env.sh.
+  _zdump="${XDG_CACHE_HOME:-${HOME}/.cache}/zsh/zcompdump-${HOST}-${ZSH_VERSION}"
   # compinit silently fails to write its dump if the directory is missing
   # (-> slow startup every time).
-  [[ -d "${_zdump:h}" ]] || mkdir -p "${_zdump:h}"
+  [[ -d "${_zdump:h}" ]] || mkdir -p -- "${_zdump:h}"
+  # -i: never block startup on the "insecure directories" prompt.
   if [[ -f "${_zdump}" ]] && [[ -z "$(find "${_zdump}" -mtime +0 2>/dev/null)" ]]; then
-    compinit -C -d "${_zdump}"
+    compinit -C -i -d "${_zdump}"
   else
-    compinit -d "${_zdump}"
+    compinit -i -d "${_zdump}"
   fi
   unset _zdump
 }
@@ -22,10 +25,15 @@ ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
 # Guarded: a fresh machine without git or network must still get a working
 # shell (degraded: no plugins), never startup errors.
-if [[ ! -d "${ZINIT_HOME}" ]]; then
+# Test the FILE we are going to source, not just the directory: an
+# interrupted clone (Ctrl-C, network drop) leaves a directory that passes
+# `-d` but has no zinit.zsh — the bootstrap would then never retry, and
+# `git clone` into a non-empty directory refuses to run anyway. Purge it.
+if [[ ! -r "${ZINIT_HOME}/zinit.zsh" ]]; then
+  [[ -d "${ZINIT_HOME}" ]] && rm -rf -- "${ZINIT_HOME}"
   if (( ${+commands[git]} )); then
-    mkdir -p "${ZINIT_HOME:h}"
-    git clone -- https://github.com/zdharma-continuum/zinit.git "${ZINIT_HOME}" \
+    mkdir -p -- "${ZINIT_HOME:h}"
+    git clone --depth 1 -- https://github.com/zdharma-continuum/zinit.git "${ZINIT_HOME}" \
       || print -u2 "zinit: clone failed (network?) — plugins skipped this session"
   else
     print -u2 "zinit: git missing — plugins skipped this session"
@@ -52,7 +60,6 @@ if [[ -r "${ZINIT_HOME}/zinit.zsh" ]]; then
   # ------------------ Plugins ------------------
   zinit light Aloxaf/fzf-tab
 
-  # Syntax highlighting + autosuggestions
   zinit wait lucid for \
     zsh-users/zsh-syntax-highlighting \
     atload"_zsh_autosuggest_start" \

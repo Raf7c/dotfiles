@@ -1,0 +1,27 @@
+# EditorConfig -- read by most editors AND by shfmt.
+# https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Shell scripts: shfmt is the authority. `shfmt -d .` must stay silent.
+# switch_case_indent keeps `case` branches one level in, which is what the
+# scripts already do and what most shell style guides recommend.
+[{*.sh,run}]
+indent_style = space
+indent_size = 2
+switch_case_indent = true
+
+# Written by git itself, in its canonical tab-indented format: leave it alone.
+[.gitmodules]
+indent_style = tab
+trim_trailing_whitespace = false
+
+[*.md]
+trim_trailing_whitespace = false

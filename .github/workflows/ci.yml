@@ -1,0 +1,35 @@
+# Same bar as scripts/doctor.sh lint + shells sections, on a neutral runner.
+name: ci
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install toolchain
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q shellcheck shfmt dash zsh
+
+      - name: syntax (dash / bash / zsh -n)
+        run: |
+          find run setup scripts .config/shell \( -name '*.sh' -o -name run \) -not -path '*/plugins/*' \
+            -exec dash -n {} +
+          for f in $(find .config/zsh -name '.z*' -o -name '*.zsh' 2>/dev/null); do
+            zsh -n "$f"
+          done
+          bash -n .bashrc && bash -n .bash_profile
+
+      - name: shellcheck (warning and above)
+        run: |
+          find run setup scripts .config/shell \( -name '*.sh' -o -name run \) -not -path '*/plugins/*' \
+            -exec shellcheck -S warning {} +
+
+      - name: shfmt (.editorconfig is the authority, -d must stay silent)
+        run: shfmt -d run setup scripts .config/shell .bashrc .bash_profile

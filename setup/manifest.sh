@@ -12,6 +12,7 @@ dotfiles_links() {
 .config/tmux           .config/tmux
 .config/git            .config/git
 .config/ghostty        .config/ghostty
+.config/kitty          .config/kitty
 .config/bat            .config/bat
 .config/nvim           .config/nvim
 .config/starship.toml  .config/starship.toml
@@ -19,6 +20,9 @@ dotfiles_links() {
 scripts                .config/scripts
 
 # --- startup files at the root of $HOME ---
+# .zshenv is the ZDOTDIR bootstrap: it is what lets zsh find .config/zsh
+# WITHOUT sudo (the /etc/zshenv route needs root — see steps/shell.sh).
+.zshenv                .zshenv
 .bashrc                .bashrc
 .bash_profile          .bash_profile
 EOF

@@ -23,10 +23,16 @@ if is_macos; then
       [ "$ASSUME_YES" = 1 ] && export NONINTERACTIVE=1
       # Download THEN execute: a failed curl must fail loudly, not expand
       # to an empty string silently executed by `bash -c`.
-      _hb=$(curl -fsSL -- https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh) \
-        || { log_error "Homebrew: download failed (network?)"; exit 1; }
-      /bin/bash -c "$_hb" \
-        || { log_error "Homebrew: installer failed"; exit 1; }
+      _hb=$(curl -fsSL -- https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh) ||
+        {
+          log_error "Homebrew: download failed (network?)"
+          exit 1
+        }
+      /bin/bash -c "$_hb" ||
+        {
+          log_error "Homebrew: installer failed"
+          exit 1
+        }
       unset _hb
     fi
   else
@@ -46,7 +52,7 @@ fi
 
 # Final check (non-blocking: install may have been declined / partial).
 if [ "$DRY_RUN" != 1 ]; then
-  command -v git  >/dev/null 2>&1 || log_warn "git not found after prereqs"
+  command -v git >/dev/null 2>&1 || log_warn "git not found after prereqs"
   command -v curl >/dev/null 2>&1 || log_warn "curl not found after prereqs"
 fi
 

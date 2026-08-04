@@ -2,7 +2,10 @@
 
 add_newline = false
 
-format = "$directory$os$git_branch$git_status$nodejs$rust$golang$php $character"
+# Only the runtimes actually installed (see .config/mise/config.toml):
+# a module for a missing runtime costs a probe on every prompt and
+# never prints anything.
+format = "$directory$os$git_branch$git_status$nodejs$rust $character"
 
 [os]
 disabled = false
@@ -43,14 +46,6 @@ format = "[$symbol $version](green) "
 [rust]
 symbol = ""
 format = "[$symbol $version](red) "
-
-[golang]
-symbol = ""
-format = "[$symbol $version](cyan) "
-
-[php]
-symbol = ""
-format = "[$symbol $version](purple) "
 
 [character]
 success_symbol = "[❯](green)"

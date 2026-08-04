@@ -11,6 +11,7 @@ fzf
 bat
 
 # CLI tools
+neovim            # the repo ships a full nvim config (submodule .config/nvim)
 make
 fd-find
 ripgrep
@@ -28,9 +29,31 @@ just
 ansible           # dnf version may lag behind brew: acceptable for personal use
 ansible-lint
 yamllint
+ShellCheck        # capitals matter: that is the Fedora package name
+shfmt
+
+# secrets / security
+# (openssh + libfido2 are NOT needed here: Fedora's stock openssh already
+#  signs with FIDO2 sk-* keys — the Brewfile ships them only to fix Apple's)
+age               # modern file encryption
+yubikey-manager   # ykman: Fedora package name differs from the CLI
 
 # terminal
 kitty
+
+# fonts
+# A Nerd Font is REQUIRED (starship prompt, eza --icons, tmux status bar:
+# all use glyphs from the Nerd Font private range).
+# Fedora packages some of them:
+#     sudo dnf install jetbrains-mono-fonts   # NO Nerd Font glyphs
+# The patched build is not in the base repos. WITHOUT root, install it in
+# the user font directory — no sudo, no COPR:
+#     mkdir -p ~/.local/share/fonts
+#     # download JetBrainsMono.zip from the nerd-fonts releases, then:
+#     unzip -o JetBrainsMono.zip -d ~/.local/share/fonts/JetBrainsMonoNerd
+#     fc-cache -f ~/.local/share/fonts
+# (fontconfig picks up ~/.local/share/fonts by default; the terminal must
+#  then be pointed at "JetBrainsMono Nerd Font".)
 
 # browser
 firefox
@@ -43,3 +66,15 @@ firefox
 # docker         # use podman (dnf install podman) or moby-engine instead
 # claude-code    # official script (curl https://claude.ai/install.sh | bash), see packages.sh
 # cloudflared    # deliberately NOT installed on Fedora (macOS only, via brew)
+# sops           # not in the base repos: binary from the getsops GitHub releases
+# age-plugin-yubikey  # not packaged: cargo install age-plugin-yubikey (needs rust via mise)
+
+# --- GUI apps (Brewfile casks): Fedora routes, not automated ---
+# obsidian           # flatpak install flathub md.obsidian.Obsidian
+# gitkraken          # flatpak install flathub com.axosoft.GitKraken
+# jetbrains-toolbox  # official tarball (jetbrains.com/toolbox-app); no dnf/flatpak
+# keymapp            # official tarball (zsa.io/flash); needs libwebkit2gtk 4.1
+# google-chrome      # dnf install fedora-workstation-repositories, enable the
+#                    # google-chrome repo, then dnf install google-chrome-stable
+# claude (desktop)   # no official Linux build: claude.ai in the browser
+# docker-desktop     # use podman instead (see docker above)

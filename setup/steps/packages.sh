@@ -18,8 +18,14 @@
 # _install_mise: official script -> ~/.local/bin (mise: brew on macOS, else here).
 # (mise is NOT in the Fedora repos: the official script is the way, no sudo.)
 _install_mise() {
-  command -v mise >/dev/null 2>&1 && { log_ok "mise already present"; return 0; }
-  [ -x "$HOME/.local/bin/mise" ] && { log_ok "mise already present (~/.local/bin)"; return 0; }
+  command -v mise >/dev/null 2>&1 && {
+    log_ok "mise already present"
+    return 0
+  }
+  [ -x "$HOME/.local/bin/mise" ] && {
+    log_ok "mise already present (~/.local/bin)"
+    return 0
+  }
   if [ "$DRY_RUN" = 1 ]; then
     log_info "[dry-run] mise: curl https://mise.run | sh -> ~/.local/bin"
     return 0
@@ -27,7 +33,10 @@ _install_mise() {
   log_info "installing mise…"
   # Download THEN execute (no curl|sh): a failed/truncated download must
   # never reach the shell. Pin a published checksum here to go further.
-  _tmp=$(mktemp) || { log_warn "mise: mktemp failed"; return 0; }
+  _tmp=$(mktemp) || {
+    log_warn "mise: mktemp failed"
+    return 0
+  }
   if curl -fsSL -o "$_tmp" -- https://mise.run; then
     sh "$_tmp" || log_warn "mise: installation failed"
   else
@@ -38,17 +47,23 @@ _install_mise() {
 
 # _install_starship: official script -> ~/.local/bin (no sudo).
 _install_starship() {
-  command -v starship >/dev/null 2>&1 && { log_ok "starship already present"; return 0; }
+  command -v starship >/dev/null 2>&1 && {
+    log_ok "starship already present"
+    return 0
+  }
   if [ "$DRY_RUN" = 1 ]; then
     log_info "[dry-run] starship: official script -> ~/.local/bin"
     return 0
   fi
   log_info "installing starship…"
   mkdir -p "$HOME/.local/bin"
-  _tmp=$(mktemp) || { log_warn "starship: mktemp failed"; return 0; }
+  _tmp=$(mktemp) || {
+    log_warn "starship: mktemp failed"
+    return 0
+  }
   if curl -fsSL -o "$_tmp" -- https://starship.rs/install.sh; then
-    sh "$_tmp" --yes --bin-dir "$HOME/.local/bin" \
-      || log_warn "starship: installation failed"
+    sh "$_tmp" --yes --bin-dir "$HOME/.local/bin" ||
+      log_warn "starship: installation failed"
   else
     log_warn "starship: download failed"
   fi
@@ -59,14 +74,23 @@ _install_starship() {
 # Deliberately NOT via brew (formula lags behind releases) nor dnf (not
 # packaged). The native install self-updates in the background.
 _install_claude() {
-  command -v claude >/dev/null 2>&1 && { log_ok "claude code already present"; return 0; }
-  [ -x "$HOME/.local/bin/claude" ] && { log_ok "claude code already present (~/.local/bin)"; return 0; }
+  command -v claude >/dev/null 2>&1 && {
+    log_ok "claude code already present"
+    return 0
+  }
+  [ -x "$HOME/.local/bin/claude" ] && {
+    log_ok "claude code already present (~/.local/bin)"
+    return 0
+  }
   if [ "$DRY_RUN" = 1 ]; then
     log_info "[dry-run] claude code: curl https://claude.ai/install.sh | bash"
     return 0
   fi
   log_info "installing claude code…"
-  _tmp=$(mktemp) || { log_warn "claude code: mktemp failed"; return 0; }
+  _tmp=$(mktemp) || {
+    log_warn "claude code: mktemp failed"
+    return 0
+  }
   if curl -fsSL -o "$_tmp" -- https://claude.ai/install.sh; then
     bash "$_tmp" || log_warn "claude code: installation failed"
   else
@@ -84,7 +108,9 @@ if is_macos; then
     log_error "brew required on macOS -> install aborted"
     exit 1
   fi
-  run brew bundle --file "$DOTFILES_DIR/setup/packages/Brewfile"
+  # run_soft: one formula that fails to build / one dead tap must not take
+  # the whole install with it. The failure is logged and the summary counts it.
+  run_soft brew bundle --file "$DOTFILES_DIR/setup/packages/Brewfile"
 
   # safe recipe (outside brew on purpose)
   _install_claude
@@ -109,7 +135,9 @@ else
   _install_claude
 
   # out of scope: lazygit (Fedora -> COPR atim/lazygit)
-  command -v lazygit >/dev/null 2>&1 || log_warn "lazygit missing -> COPR atim/lazygit (see ${_list##*/})"
+  # Deliberately out of scope (needs a third-party COPR): INFO, not a
+  # warning — nothing is broken and nothing is expected from the user.
+  command -v lazygit >/dev/null 2>&1 || log_info "lazygit missing -> COPR atim/lazygit (see ${_list##*/})"
 
   [ "$DRY_RUN" = 1 ] || hash -r
   log_ok "Linux packages ($OS) ok"

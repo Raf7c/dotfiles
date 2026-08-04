@@ -1,13 +1,19 @@
 #!/usr/bin/env zsh
 
 # ------------------ History ------------------
-HISTFILE="${XDG_STATE_HOME}/zsh/history"
+# :- defaults: .zshrc must survive without env.sh loaded — an empty
+# XDG_STATE_HOME would silently lose the history to /zsh/history.
+HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
 HISTSIZE=100000
 SAVEHIST=100000
 # Without the directory, zsh silently stops saving history.
-[[ -d "${HISTFILE:h}" ]] || mkdir -p "${HISTFILE:h}"
+[[ -d "${HISTFILE:h}" ]] || mkdir -p -- "${HISTFILE:h}"
 
 setopt SHARE_HISTORY
+# Timestamp + duration per entry. Required for HIST_EXPIRE_DUPS_FIRST and
+# `history -E` to mean anything; must be set BEFORE the file is written,
+# switching it on later leaves a mixed-format history.
+setopt EXTENDED_HISTORY
 setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_SPACE
 setopt HIST_EXPIRE_DUPS_FIRST
@@ -18,26 +24,36 @@ setopt AUTOCD
 setopt NOBEEP
 setopt NUMERIC_GLOB_SORT
 
-# Native vi mode (replaces the zsh-vi-mode plugin)
 bindkey -v
-# Shorten the delay when switching to normal mode (default 0.4s)
-export KEYTIMEOUT=5
+# Not exported: ZLE-local. 100 ms — lower splits escape sequences over ssh.
+KEYTIMEOUT=10
 
-# ------------------ SSH ------------------
-export GPG_TTY="$(tty)"
+# ------------------ GPG ------------------
+# Only when stdin really is a terminal: in a non-interactive zsh (`zsh -c`,
+# a hook, `ssh host cmd`) `tty` prints "not a tty" on STDOUT and returns 1,
+# so GPG_TTY ends up holding that string and every pinentry then fails.
+if [[ -t 0 ]]; then
+  GPG_TTY=$(tty)
+  export GPG_TTY
+fi
 
 source "${ZDOTDIR}/zinit.zsh"
 
 # ------------------ Completion zstyle ------------------
-zstyle ':completion::complete:*' cache-path "${XDG_CACHE_HOME}/zsh/zcompcache"
+zstyle ':completion::complete:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompcache"
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+# dircolors feeds LS_COLORS; guarded — macOS without coreutils just gets
+# no completion colors.
+if (( ${+commands[dircolors]} )); then
+  eval "$(dircolors -b)"
+elif (( ${+commands[gdircolors]} )); then
+  eval "$(gdircolors -b)"
+fi
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' menu no
 
-# Reuse ls completion for eza
 compdef eza=ls
 
-# fzf-tab preview
 if command -v eza >/dev/null 2>&1; then
   zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null'
   if command -v zoxide >/dev/null 2>&1; then
@@ -49,17 +65,25 @@ fi
 
 zstyle ':fzf-tab:complete:*:*' fzf-preview 'less ${(Q)realpath} 2>/dev/null'
 
-# fzf-tab behaviour
 zstyle ':fzf-tab:*' fzf-min-height 20
 zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':fzf-tab:*' fzf-bindings 'tab:down'
 
-# Register zinit completion
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
+# Register zinit completion — ONLY if zinit really loaded (see zinit.zsh:
+# without git or without network it does not). Otherwise every TAB on
+# `zinit` autoloads a completion for a command that does not exist.
+if (( ${+functions[zinit]} )); then
+  autoload -Uz _zinit
+  (( ${+_comps} )) && _comps[zinit]=_zinit
+fi
 
 # ------------------ Modular Config ------------------
-source "${XDG_CONFIG_HOME}/shell/aliases.sh"
+# Guarded: aliases.sh lives in .config/shell, a SEPARATE link from this
+# directory. A partial install (or a symlinks step that failed) must not
+# make every zsh start with a "no such file or directory".
+_al="${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliases.sh"
+[[ -r "$_al" ]] && source "$_al"
+unset _al
 
 source "${ZDOTDIR}/fzf.zsh"                    # fzf variables + widget (zsh)
 
@@ -69,7 +93,15 @@ source "${ZDOTDIR}/fzf.zsh"                    # fzf variables + widget (zsh)
 # ~/.config/mise/config.toml); without the guard it errors at startup.
 if command -v mise >/dev/null 2>&1; then
   eval "$(mise activate zsh --shims)"
-  command -v usage >/dev/null 2>&1 && source <(mise completion zsh)
+  # Cached once, like .bashrc: regenerating at every startup costs a fork
+  # for an identical result. `./run upgrade` invalidates it.
+  _mc="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/mise-completion.zsh"
+  if [[ ! -r "$_mc" ]] && command -v usage >/dev/null 2>&1; then
+    mkdir -p -- "${_mc:h}"
+    mise completion zsh > "$_mc" 2>/dev/null || rm -f -- "$_mc"
+  fi
+  [[ -r "$_mc" ]] && source "$_mc"
+  unset _mc
 fi
 command -v zoxide   >/dev/null 2>&1 && eval "$(zoxide init zsh)"
 command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
@@ -77,4 +109,3 @@ command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
 # fzf rebinds Ctrl-R/Ctrl-T/Alt-C. Load it AFTER `bindkey -v` so the
 # bindings land in the vi keymaps.
 command -v fzf >/dev/null 2>&1 && eval "$(fzf --zsh)"
-bindkey "^F" _fzf_file_no_hidden

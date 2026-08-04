@@ -2,7 +2,11 @@
 
 # Common environment (XDG, EDITOR, history files…) shared with bash:
 # one single source of truth, POSIX syntax.
-source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/env.sh"
+# Guarded: .zshenv is read by every zsh, scripts included. A partial install
+# would otherwise error on every invocation and pollute every script's stdout.
+_env="${XDG_CONFIG_HOME:-$HOME/.config}/shell/env.sh"
+[[ -r "$_env" ]] && source "$_env"
+unset _env
 
 # ------------------ PATH ------------------
 # env.sh already prepended what's needed; this function RE-ASSERTS our
@@ -13,8 +17,8 @@ source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/env.sh"
 _zsh_build_path() {
   typeset -gU path PATH
   path=(
-    ${XDG_DATA_HOME}/mise/shims   # mise shims (highest priority)
-    ${XDG_CONFIG_HOME}/scripts    # personal scripts
+    ${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims   # mise shims (highest priority)
+    ${XDG_CONFIG_HOME:-$HOME/.config}/scripts         # personal scripts
     $HOME/.local/bin              # user binaries (XDG)
     $path                         # existing entries (system…)
   )

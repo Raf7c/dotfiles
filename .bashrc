@@ -6,7 +6,10 @@ source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/env.sh"
 # Non-interactive bash shells (scripts, `ssh host cmd`) load the MINIMAL
 # env file, not this whole .bashrc: env + PATH available everywhere
 # without leaking interactive behaviour into scripts.
-export BASH_ENV="${XDG_CONFIG_HOME}/shell/env.sh"
+# :- default everywhere below: if env.sh could not be sourced (partial
+# install), an empty XDG_* silently turns "${XDG_STATE_HOME}/bash/history"
+# into "/bash/history" — an unwritable path, and no history at all.
+export BASH_ENV="${XDG_CONFIG_HOME:-$HOME/.config}/shell/env.sh"
 
 # ===================== Beyond: interactive only =====================
 case $- in *i*) ;; *) return ;; esac
@@ -16,24 +19,28 @@ case $- in *i*) ;; *) return ;; esac
 [[ -r /etc/bashrc ]] && source /etc/bashrc
 
 # ------------------ History ------------------
-export HISTFILE="${XDG_STATE_HOME}/bash/history"
-mkdir -p "${HISTFILE%/*}"
+export HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/bash/history"
+mkdir -p -- "${HISTFILE%/*}"
 HISTSIZE=100000
 HISTFILESIZE=100000
 HISTCONTROL=ignoreboth:erasedups
 HISTTIMEFORMAT='%F %T '
 shopt -s histappend
 shopt -s cmdhist
-shopt -s checkwinsize          # keep LINES/COLUMNS up to date on resize
+shopt -s checkwinsize # keep LINES/COLUMNS up to date on resize
 # Share history across sessions (equiv. to SHARE_HISTORY in zsh). Idempotent.
 case "${PROMPT_COMMAND:-}" in
-  *"history -a"*) ;;
-  *) PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}" ;;
+*"history -a"*) ;;
+*) PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}" ;;
 esac
 
 # ------------------ GPG ------------------
-GPG_TTY="$(tty 2>/dev/null || true)"
-export GPG_TTY
+# Only when stdin is a terminal: otherwise `tty` prints "not a tty" on
+# stdout, which would poison GPG_TTY and break every pinentry.
+if [ -t 0 ]; then
+  GPG_TTY=$(tty)
+  export GPG_TTY
+fi
 
 # ------------------ Completion ------------------
 if [[ -r /opt/homebrew/etc/profile.d/bash_completion.sh ]]; then
@@ -49,20 +56,33 @@ if command -v mise >/dev/null 2>&1; then
   # Completion generated ONCE into the cache: regenerating it at every
   # startup costs a fork + generation for an identical result.
   # `./run upgrade` deletes the cache -> regenerated at the next shell.
-  _mc="${XDG_CACHE_HOME}/bash/mise-completion.bash"
+  _mc="${XDG_CACHE_HOME:-$HOME/.cache}/bash/mise-completion.bash"
   if [[ ! -r "$_mc" ]] && command -v usage >/dev/null 2>&1; then
-    mkdir -p "${_mc%/*}"
-    mise completion bash > "$_mc" 2>/dev/null || rm -f -- "$_mc"
+    mkdir -p -- "${_mc%/*}"
+    mise completion bash >"$_mc" 2>/dev/null || rm -f -- "$_mc"
   fi
   [[ -r "$_mc" ]] && source "$_mc"
   unset _mc
 fi
 
 # ------------------ Aliases ------------------
-[[ -r "${XDG_CONFIG_HOME}/shell/aliases.sh" ]] && source "${XDG_CONFIG_HOME}/shell/aliases.sh"
+_al="${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliases.sh"
+# shellcheck source=/dev/null  # path known only at runtime; guarded by -r
+[[ -r "$_al" ]] && source "$_al"
+unset _al
 
 # ------------------ Tools init ------------------
 # Guarded: a missing tool must never break the shell.
-command -v zoxide   >/dev/null 2>&1 && eval "$(zoxide init bash)"
-command -v fzf      >/dev/null 2>&1 && eval "$(fzf --bash)"
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)"
+command -v fzf >/dev/null 2>&1 && eval "$(fzf --bash)"
 command -v starship >/dev/null 2>&1 && eval "$(starship init bash)"
+
+# ------------------ PATH re-assertion ------------------
+# bash has no `typeset -U`: `mise activate --shims` above re-prepends a
+# directory the parent shell already provided. Same final re-assertion
+# zsh does in _zsh_build_path, expressed the bash way: first wins.
+if command -v awk >/dev/null 2>&1; then
+  PATH=$(printf '%s' "$PATH" | awk -v RS=: -v ORS=: '!s[$0]++')
+  PATH=${PATH%:}
+  export PATH
+fi
