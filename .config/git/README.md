@@ -24,6 +24,47 @@ OS — Homebrew's on macOS (Apple's build cannot), the system one on Fedora
 (native FIDO2) — which is why `gpg.ssh.program` lives in `config.local`,
 written by the gitsign step from what the machine actually has.
 
+### Creating the keys (YubiKey)
+
+Two distinct FIDO2 credentials live on the one YubiKey, one per job —
+revoking or rotating one never touches the other:
+
+```sh
+# 1. Commit signing — no touch required: signing happens at every commit,
+#    and a tap each time only teaches reflex-tapping.
+/opt/homebrew/opt/openssh/bin/ssh-keygen -t ed25519-sk -O resident \
+  -O no-touch-required -O application=ssh:signing \
+  -C "signing-yubikey" -f ~/.ssh/id_signing_sk
+
+# 2. GitHub authentication — PIN required: pushing is a more powerful
+#    right than signing, it costs a PIN.
+/opt/homebrew/opt/openssh/bin/ssh-keygen -t ed25519-sk -O resident \
+  -O verify-required -O application=ssh:github \
+  -C "github-yubikey" -f ~/.ssh/github_sk
+```
+
+Flag by flag: the full Homebrew path because Apple's `ssh-keygen` cannot
+create `sk-*` keys; `-O resident` stores the credential on the YubiKey
+itself — on a new machine, `ssh-keygen -K` regenerates the key handles
+with no file to transfer; `-O application=ssh:…` namespaces each
+credential so both coexist on one key.
+
+Wiring: upload `id_signing_sk.pub` to GitHub as a **signing key** and
+`github_sk.pub` as an **authentication key** (two separate dropdowns),
+then point ssh at the auth key:
+
+```
+# ~/.ssh/config
+Host github.com
+  IdentityFile ~/.ssh/github_sk
+  IdentitiesOnly yes
+```
+
+The signing side needs no manual wiring: `~/.ssh/id_signing_sk.pub` is
+exactly the file the gitsign step looks for — `./run install gitsign`
+writes `user.signingkey` and `commit.gpgsign` into `config.local` on its
+own.
+
 ## Aliases
 
 | Alias | Becomes |
