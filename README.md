@@ -26,9 +26,9 @@ takes a fresh machine (**macOS** or **Fedora**) to a ready workstation.
   initial Homebrew install on macOS, `dnf` on Fedora, and `/etc/shells`.
 - **Degrades cleanly** — no network, no git, a missing tool: the shell still
   starts. Scripts stay silent; an interactive shell gets a single stderr
-  line, never a blocked startup. On-demand diagnosis: `scripts/doctor.sh`.
+  line, never a blocked startup.
 - **Tooling as authority** — shellcheck and shfmt are installed by the repo
-  and enforced by it (`.editorconfig`, `scripts/doctor.sh`).
+  and enforced by it (`.editorconfig`, CI).
 
 ## How it works
 
@@ -64,7 +64,7 @@ Single modules: `./run install symlinks packages`.
 | Page | Contents |
 |---|---|
 | [architecture.md](docs/architecture.md) | startup chains, XDG layout, bootstrap without root, plugin policy |
-| [installer.md](docs/installer.md) | how `run` works, step contract, backups, the doctor |
+| [installer.md](docs/installer.md) | how `run` works, step contract, backups |
 | [keymaps.md](docs/keymaps.md) | every binding: zsh vi-mode, fzf, aliases |
 | [tools.md](docs/tools.md) | each CLI tool and why it is there |
 | [terminals.md](docs/terminals.md) | ghostty and kitty, fonts, themes |

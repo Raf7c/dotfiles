@@ -1,5 +1,12 @@
-# Same bar as scripts/doctor.sh lint + shells sections, on a neutral runner.
+# The repo's quality bar on a neutral runner: three-shell syntax,
+# shellcheck (warning and above), shfmt against .editorconfig.
+# Actions are pinned to full commit SHAs: a tag is mutable — the
+# tj-actions attack (CVE-2025-30066) repointed existing tags; a SHA
+# cannot be repointed. Dependabot proposes the bumps.
 name: ci
+
+permissions:
+  contents: read
 
 on:
   push:
@@ -10,7 +17,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: install shells
         run: |
@@ -19,7 +26,7 @@ jobs:
 
       # Same shellcheck/shfmt versions as every machine: mise reads the
       # repo's own config.toml — one version source for local and CI.
-      - uses: jdx/mise-action@v2
+      - uses: jdx/mise-action@e6a8b3978addb5a52f2b4cd9d91eafa7f0ab959d # v4.2.0
         env:
           MISE_GLOBAL_CONFIG_FILE: ${{ github.workspace }}/.config/mise/config.toml
         with:
@@ -29,7 +36,7 @@ jobs:
         run: |
           find run setup scripts .config/shell \( -name '*.sh' -o -name run \) -not -path '*/plugins/*' \
             -exec dash -n {} +
-          for f in $(find .config/zsh -name '.z*' -o -name '*.zsh' 2>/dev/null); do
+          for f in .zshenv $(find .config/zsh -name '.z*' -o -name '*.zsh' 2>/dev/null); do
             zsh -n "$f"
           done
           bash -n .bashrc && bash -n .bash_profile

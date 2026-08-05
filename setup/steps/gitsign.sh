@@ -52,7 +52,10 @@ if is_macos; then
 fi
 
 # --- build the wanted content ----------------------------------------------
-_gs_tmp="${TMPDIR:-/tmp}/dotfiles-gitsign.$$"
+# Inside log.sh's PRIVATE mktemp -d directory (0700, unpredictable name,
+# removed by its EXIT trap): a $$-derived name in world-writable /tmp can
+# be pre-created as a symlink by another local user — arbitrary file write.
+_gs_tmp="${_log_dir:?log.sh not sourced}/gitsign"
 {
   printf '%s\n' "$_gs_mark"
   printf '%s\n' '# Machine-local git settings. Regenerate with: ./run install gitsign'

@@ -60,8 +60,8 @@ Brewfile: one installer per tool, no shadowed copies.
 (`.config/mise/config.toml`), not taken from brew or dnf — their output
 defines conformance, so every machine and the CI must lint with the same
 version (shfmt can change its formatting on a minor bump). Enforced by
-`scripts/doctor.sh` and `.editorconfig`: the repo's own scripts must pass
-both — the formatter is an authority, not a suggestion.
+`.editorconfig` and the CI: the repo's own scripts must pass both —
+the formatter is an authority, not a suggestion.
 
 ## Security
 
