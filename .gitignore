@@ -4,6 +4,11 @@
 # macOS
 .DS_Store
 
+# IDE junk. Also in .config/git/ignore for every repo, but a clone of THIS
+# repo must be clean before that global config is linked.
+.idea/
+.vscode/
+
 # tmux plugins (managed by TPM, not versioned)
 .config/tmux/plugins/
 

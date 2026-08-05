@@ -29,7 +29,8 @@ EOF
 }
 
 # Directories to create (absolute paths, computed from XDG — unquoted heredoc).
-# One directory per line. This is what fixes C2 (missing zsh state/cache).
+# One directory per line. Without them zsh silently drops history and
+# compinit caching (the state/cache dirs are never auto-created).
 dotfiles_dirs() {
   cat <<EOF
 ${XDG_CONFIG_HOME:-$HOME/.config}

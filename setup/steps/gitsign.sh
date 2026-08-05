@@ -60,12 +60,15 @@ _gs_tmp="${_log_dir:?log.sh not sourced}/gitsign"
   printf '%s\n' "$_gs_mark"
   printf '%s\n' '# Machine-local git settings. Regenerate with: ./run install gitsign'
   printf '\n'
+  printf '%s\n' '[gpg "ssh"]'
+  printf '%s\n' '    # Machine data: git expands NO variable in pathname values (only ~),'
+  printf '%s\n' '    # so the XDG-aware path is expanded here, at generation time.'
+  printf '%s\n' "    allowedSignersFile = ${XDG_CONFIG_HOME:-$HOME/.config}/git/allowed_signers"
   if [ -n "$_gs_program" ]; then
-    printf '%s\n' '[gpg "ssh"]'
     printf '%s\n' "    # Apple's ssh-keygen has no FIDO2 support: sk-* keys need this build."
     printf '%s\n' "    program = $_gs_program"
-    printf '\n'
   fi
+  printf '\n'
   if [ -r "$_gs_key" ]; then
     printf '%s\n' '[user]'
     printf '%s\n' "    signingkey = ~/${_gs_key#"$HOME"/}"

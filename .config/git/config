@@ -72,11 +72,9 @@
 [gpg]
     format = ssh
 
-[gpg "ssh"]
-    # No `program` here on purpose: the right ssh-keygen differs per OS
-    # (macOS needs the Homebrew build for FIDO2 / sk-* keys, Fedora does
-    # not). The gitsign step writes it into config.local.
-    allowedSignersFile = ~/.config/git/allowed_signers
+# gpg.ssh.* lives entirely in config.local (gitsign step): `program`
+# differs per OS, and allowedSignersFile must follow XDG — git expands no
+# variable in pathname values, so the shell expands it at generation time.
 
 # Machine-local settings (signing key, commit.gpgsign, gpg.ssh.program):
 # kept OUT of the repo so the same config works on every machine.

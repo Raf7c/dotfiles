@@ -21,7 +21,13 @@ defaults write com.apple.screencapture location -string "$HOME/Pictures/screensh
 defaults write com.apple.screencapture type -string "png"
 
 # iCloud Drive -> ~/icloud (short path)
-ln -sfn "$HOME/Library/Mobile Documents/com~apple~CloudDocs" "$HOME/icloud"
+# -n handles an existing SYMLINK; a real directory would silently get the
+# link created INSIDE it.
+if [ -e "$HOME/icloud" ] && [ ! -L "$HOME/icloud" ]; then
+  printf 'icloud: real file/directory at ~/icloud — skipped\n' >&2
+else
+  ln -sfn "$HOME/Library/Mobile Documents/com~apple~CloudDocs" "$HOME/icloud"
+fi
 
 # Spotlight — disable the keyboard shortcut (⌘ Space)
 defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>65535</integer><integer>49</integer><integer>1048576</integer></array><key>type</key><string>standard</string></dict></dict>"

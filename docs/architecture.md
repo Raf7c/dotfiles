@@ -73,10 +73,13 @@ The zsh plugins loaded (tmux plugins: see
 | [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) | command-line colouring (loaded `wait lucid`: after the prompt) |
 | [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions) | greyed-out suggestion from history (`wait lucid` too) |
 
-They are **unpinned on purpose**: a tag only delays an upstream compromise
-(at bump time you take the new tag without review), exposure is limited to
-a fresh install or `./run upgrade` — both user-triggered — and hand-written
-versions go stale.
+They are **unpinned on purpose**, with the argument stated precisely: a
+full-SHA pin protects against tag mutation (the real-world vector —
+existing tags repointed at a malicious commit), but the zsh ecosystem has
+no bump tooling, so hand-written pins go stale and then get bumped without
+review anyway. Exposure stays limited to a fresh install or
+`./run upgrade`, both user-triggered. GitHub Actions are the opposite
+case — bump tooling exists (Dependabot) — so the CI pins full commit SHAs.
 
 To see what a machine actually runs, and spot clones still on disk but no
 longer declared:

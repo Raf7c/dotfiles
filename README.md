@@ -76,9 +76,16 @@ code it describes.
 
 ## Uninstall
 
-Symlinks point into this repo — removing the repo leaves dead links to delete
-at your convenience. Backups live in `~/.local/state/dotfiles/backups/<ts>/`.
-The only system change is the login shell: `chsh -s /bin/bash` reverts it.
+Symlinks point into this repo — removing the repo leaves dead links to
+delete at your convenience. Backups live in
+`~/.local/state/dotfiles/backups/<ts>/`.
+
+What an install leaves beyond `$HOME`, honestly: the login shell (`chsh -s
+/bin/bash` reverts it, `/etc/shells` keeps one line), Homebrew and its
+packages on macOS, the dnf packages on Fedora, and three binaries in
+`~/.local/bin` (mise, starship, claude). `packages` is the only module
+that needs sudo — a root-free install is
+`./run install symlinks directories gitsign plugins`.
 
 ## License
 

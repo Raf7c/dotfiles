@@ -30,7 +30,7 @@ jobs:
         env:
           MISE_GLOBAL_CONFIG_FILE: ${{ github.workspace }}/.config/mise/config.toml
         with:
-          install_args: shellcheck shfmt
+          install_args: shellcheck shfmt yamllint
 
       - name: syntax (dash / bash / zsh -n)
         run: |
@@ -48,3 +48,7 @@ jobs:
 
       - name: shfmt (.editorconfig is the authority, -d must stay silent)
         run: shfmt -d run setup scripts .config/shell .bashrc .bash_profile
+
+      # yamllint is a pinned authority tool: unused, the pin is a lie.
+      - name: yamllint (workflows, dependabot)
+        run: yamllint .github

@@ -27,7 +27,7 @@ _install_mise() {
     return 0
   }
   if [ "$DRY_RUN" = 1 ]; then
-    log_info "[dry-run] mise: curl https://mise.run | sh -> ~/.local/bin"
+    log_info "[dry-run] mise: download https://mise.run, then run it -> ~/.local/bin"
     return 0
   fi
   log_info "installing mise…"
@@ -83,7 +83,7 @@ _install_claude() {
     return 0
   }
   if [ "$DRY_RUN" = 1 ]; then
-    log_info "[dry-run] claude code: curl https://claude.ai/install.sh | bash"
+    log_info "[dry-run] claude code: download https://claude.ai/install.sh, then run it"
     return 0
   fi
   log_info "installing claude code…"
@@ -106,7 +106,7 @@ if is_macos; then
   # don't silently skip every package.
   if [ "$DRY_RUN" != 1 ] && ! require_cmd brew; then
     log_error "brew required on macOS -> install aborted"
-    exit 1
+    return 1
   fi
   # run_soft: one formula that fails to build / one dead tap must not take
   # the whole install with it. The failure is logged and the summary counts it.

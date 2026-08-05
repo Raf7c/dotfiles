@@ -11,13 +11,18 @@ command -v python3 >/dev/null 2>&1 || {
 
 printf 'Installing norminette (42school) and c_formatter_42...\n'
 
+# pipx, not pip: PEP 668 (externally-managed-environment) blocks
+# `pip install --user` on current Fedora and mise-managed pythons — and
+# the old fallback dropped --user, which is worse. pipx is installed by
+# mise (config.toml).
+command -v pipx >/dev/null 2>&1 || {
+  printf 'Error: pipx required -> mise install pipx\n' >&2
+  exit 1
+}
 # Norminette — https://github.com/42school/norminette
-python3 -m pip install --user -U norminette 2>/dev/null ||
-  python3 -m pip install -U norminette
-
+pipx install --force norminette
 # c_formatter_42 — https://github.com/dawnbeen/c_formatter_42
-python3 -m pip install --user -U c-formatter-42 2>/dev/null ||
-  python3 -m pip install -U c-formatter-42
+pipx install --force c-formatter-42
 
 printf 'Verifying...\n'
 if command -v norminette >/dev/null 2>&1; then

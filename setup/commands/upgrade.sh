@@ -13,7 +13,11 @@ if is_macos; then
     log_warn "brew missing -> macOS package update skipped"
   fi
 else
-  run sudo dnf upgrade --refresh -y || log_warn "dnf upgrade: failed"
+  # The heaviest action of the repo (full system upgrade, kernel included)
+  # asks first — chsh does, this must too. -y/--dry-run answer yes already.
+  if confirm "Upgrade every system package (sudo dnf upgrade)?"; then
+    run sudo dnf upgrade --refresh -y || log_warn "dnf upgrade: failed"
+  fi
 fi
 
 # --- mise (runtimes, within the limits of ~/.config/mise/config.toml) ---
@@ -39,7 +43,11 @@ fi
 # --- zinit (zsh): self-update + plugins ---
 _zinit="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh"
 if [ -r "$_zinit" ] && command -v zsh >/dev/null 2>&1; then
-  run zsh -ic 'zinit self-update; zinit update --all' || log_warn "zinit: update failed"
+  # -f: skip every startup file. -i would source the whole interactive
+  # config (compinit, plugins, tools) with no terminal attached — slow,
+  # side effects, and upgrade would then depend on .zshrc being healthy.
+  run zsh -fc "source '$_zinit'; zinit self-update; zinit update --all" ||
+    log_warn "zinit: update failed"
 else
   log_info "zinit not installed -> skipped (installs on first zsh)"
 fi

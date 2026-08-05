@@ -26,12 +26,12 @@ if is_macos; then
       _hb=$(curl -fsSL -- https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh) ||
         {
           log_error "Homebrew: download failed (network?)"
-          exit 1
+          return 1
         }
       /bin/bash -c "$_hb" ||
         {
           log_error "Homebrew: installer failed"
-          exit 1
+          return 1
         }
       unset _hb
     fi

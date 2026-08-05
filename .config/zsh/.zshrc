@@ -50,6 +50,8 @@ elif (( ${+commands[gdircolors]} )); then
   eval "$(gdircolors -b)"
 fi
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+# menu no: required by fzf-tab — it must capture the unambiguous prefix
+# instead of zsh opening its own selection menu.
 zstyle ':completion:*' menu no
 
 compdef eza=ls
