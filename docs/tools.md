@@ -35,7 +35,7 @@ tool that needs more probably deserves its own page.
 | [btop](https://github.com/aristocratos/btop) | top | readable resource view |
 | [lazygit](https://github.com/jesseduffield/lazygit) | — | staging hunks beats `git add -p` |
 | [jq](https://github.com/jqlang/jq) | — | JSON on the command line |
-| [just](https://github.com/casey/just) | make (tasks) | task runner without the .PHONY ceremony |
+| [just](https://github.com/casey/just) | — | named-command runner. NOT a make replacement: make builds (C, incremental targets), just runs repo tasks without the .PHONY ceremony |
 
 ## Prompt — starship
 
@@ -56,8 +56,11 @@ Brewfile: one installer per tool, no shadowed copies.
 ## Shell quality
 
 [shellcheck](https://www.shellcheck.net) +
-[shfmt](https://github.com/mvdan/sh): installed by the repo, enforced by
-`scripts/doctor.sh` and `.editorconfig`. The repo's own scripts must pass
+[shfmt](https://github.com/mvdan/sh): **version-pinned by mise**
+(`.config/mise/config.toml`), not taken from brew or dnf — their output
+defines conformance, so every machine and the CI must lint with the same
+version (shfmt can change its formatting on a minor bump). Enforced by
+`scripts/doctor.sh` and `.editorconfig`: the repo's own scripts must pass
 both — the formatter is an authority, not a suggestion.
 
 ## Security

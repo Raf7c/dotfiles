@@ -2,10 +2,15 @@
 # on the install date -> two machines diverge, "reproducible" becomes false.
 # Minor/patch updates still flow via `mise upgrade`; bump majors HERE.
 [tools]
-neovim = "0.12"     # major.minor pin, like the others (a patch pin would
-                    # drift from the comment above at the next release)
-node = "22"        # LTS
+neovim = "0.12" # major.minor pin, like the others (a patch pin would
+# drift from the comment above at the next release)
+node = "22"            # LTS
 python = "3.13"
+pipx = "latest"
 rust = "1"
 tree-sitter = "latest"
-usage = "latest"   # required by `mise completion` (bash/zsh)
+usage = "latest"       # required by `mise completion` (bash/zsh)
+
+shellcheck = "0.11"
+shfmt = "3.12"
+yamllint = "1"

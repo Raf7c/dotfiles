@@ -13,6 +13,7 @@ bat
 # CLI tools
 neovim            # the repo ships a full nvim config (submodule .config/nvim)
 make
+cmake
 fd-find
 ripgrep
 btop
@@ -28,9 +29,6 @@ xclip             # tmux copy-pipe (X11 fallback)
 just
 ansible           # dnf version may lag behind brew: acceptable for personal use
 ansible-lint
-yamllint
-ShellCheck        # capitals matter: that is the Fedora package name
-shfmt
 
 # secrets / security
 # (openssh + libfido2 are NOT needed here: Fedora's stock openssh already

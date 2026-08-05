@@ -41,6 +41,11 @@ if [[ ! -r "${ZINIT_HOME}/zinit.zsh" ]]; then
 fi
 
 if [[ -r "${ZINIT_HOME}/zinit.zsh" ]]; then
+  # zinit reruns compinit itself during `zinit update`; without this it
+  # writes the dump at the DEFAULT location — $ZDOTDIR/.zcompdump, i.e.
+  # inside this repo. Point it at the same XDG path _zsh_compinit uses.
+  typeset -gA ZINIT
+  ZINIT[ZCOMPDUMP_PATH]="${XDG_CACHE_HOME:-${HOME}/.cache}/zsh/zcompdump-${HOST}-${ZSH_VERSION}"
   source "${ZINIT_HOME}/zinit.zsh"
 
   # ------------------ Completions (BEFORE compinit) ------------------

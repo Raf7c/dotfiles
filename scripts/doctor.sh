@@ -362,6 +362,12 @@ sec_plugins() {
   else
     warn "no compinit dump yet (first interactive zsh will create it)"
   fi
+  # A dump at the DEFAULT location means something ran compinit without
+  # -d (zinit update used to, before ZINIT[ZCOMPDUMP_PATH]).
+  for _stray in "$ZDIR"/.zcompdump*; do
+    [ -e "$_stray" ] &&
+      warn "stray compinit dump in ZDOTDIR: ${_stray##*/} -> delete it; find the caller if it returns"
+  done
   if [ -d "$DOT/.config/tmux/plugins/tpm" ]; then
     ok "TPM present"
   else
@@ -383,7 +389,7 @@ sec_lint() {
       fail "shellcheck findings above"
     fi
   else
-    info "shellcheck missing (brew install shellcheck / dnf install ShellCheck)"
+    info "shellcheck missing (mise install shellcheck)"
   fi
   if has shfmt; then
     if shfmt -d -- "$DOT/run" "$DOT"/setup "$DOT"/.config/shell "$DOT"/scripts; then
@@ -392,7 +398,7 @@ sec_lint() {
       fail "shfmt divergence above (.editorconfig is the authority)"
     fi
   else
-    info "shfmt missing (brew install shfmt / dnf install shfmt)"
+    info "shfmt missing (mise install shfmt)"
   fi
   if has checkbashisms; then
     if checkbashisms -- "$DOT/run" "$DOT"/setup/lib/*.sh "$DOT"/setup/steps/*.sh \
