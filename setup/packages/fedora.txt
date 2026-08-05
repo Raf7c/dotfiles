@@ -1,45 +1,64 @@
-# shell & core
+# Parsed by packages.sh: every uncommented FIRST word is a dnf package —
+# one per line. A commented tool is a decision, not an absence: its
+# install route lives right here, in its own section.
+# Sections mirror the Brewfile so the two files read side by side.
+
+# core — shell, multiplexer, vcs
 git
 tmux
 zsh
 bash
 bash-completion
+
+# modern CLI — each tool's "replaces + why": docs/tools.md
 tree
 eza
 zoxide
 fzf
 bat
-
-# CLI tools
-neovim            # the repo ships a full nvim config (submodule .config/nvim)
-make
-cmake
 fd-find
 ripgrep
 btop
 jq
+# lazygit         # COPR atim/lazygit — third-party repo, install by hand
+
+# build & tasks
+make
+cmake
+just
+
+# prompt & runtimes
+# starship        # not in the dnf repos: official script -> ~/.local/bin (packages.sh)
+# mise            # not in the dnf repos: https://mise.run -> ~/.local/bin (packages.sh);
+#                 # then installs the runtimes AND the pinned authority tools
+#                 # (shellcheck, shfmt, yamllint) — .config/mise/config.toml
+# neovim          # via mise (config.toml), NOT dnf: one installer per tool,
+#                 # no shadowed copy
+
+# infra / automation
+ansible           # dnf version may lag behind brew: acceptable for personal use
+ansible-lint
+# docker          # use podman (dnf install podman) or moby-engine instead
+# cloudflared     # deliberately NOT installed on Fedora (macOS only, via brew)
+# claude-code     # official script (curl https://claude.ai/install.sh | bash), see packages.sh
+
+# secrets / security
+# (openssh + libfido2 are NOT needed here: Fedora's stock openssh already
+#  signs with FIDO2 sk-* keys — the Brewfile ships them only to fix Apple's)
 gnupg2
+age               # modern file encryption
+yubikey-manager   # ykman: Fedora package name differs from the CLI
+# sops            # not in the base repos: binary from the getsops GitHub releases
+# age-plugin-yubikey  # not packaged: cargo install age-plugin-yubikey (rust via mise)
 
 # system integration
 util-linux-user   # chsh (not installed by default on Fedora)
 wl-clipboard      # tmux copy-pipe (Wayland: wl-copy)
 xclip             # tmux copy-pipe (X11 fallback)
 
-# infra / automation
-just
-ansible           # dnf version may lag behind brew: acceptable for personal use
-ansible-lint
-
-# secrets / security
-# (openssh + libfido2 are NOT needed here: Fedora's stock openssh already
-#  signs with FIDO2 sk-* keys — the Brewfile ships them only to fix Apple's)
-age               # modern file encryption
-yubikey-manager   # ykman: Fedora package name differs from the CLI
-
-# terminal
+# terminal & font
 kitty
-
-# fonts
+# ghostty         # COPR pgdev/ghostty (kitty from the repos is the fallback)
 # A Nerd Font is REQUIRED (starship prompt, eza --icons, tmux status bar:
 # all use glyphs from the Nerd Font private range).
 # Fedora packages some of them:
@@ -53,21 +72,10 @@ kitty
 # (fontconfig picks up ~/.local/share/fonts by default; the terminal must
 #  then be pointed at "JetBrainsMono Nerd Font".)
 
-# browser
+# browsers
 firefox
 
-# --- not in the base repos: install another way (see packages) ---
-# starship       # COPR atim/starship, or official script (used by packages.sh)
-# lazygit        # COPR atim/lazygit
-# mise           # via recipe (curl https://mise.run | sh -> ~/.local/bin); NOT in the dnf repos
-# ghostty        # COPR pgdev/ghostty (kitty from the repos is the fallback here)
-# docker         # use podman (dnf install podman) or moby-engine instead
-# claude-code    # official script (curl https://claude.ai/install.sh | bash), see packages.sh
-# cloudflared    # deliberately NOT installed on Fedora (macOS only, via brew)
-# sops           # not in the base repos: binary from the getsops GitHub releases
-# age-plugin-yubikey  # not packaged: cargo install age-plugin-yubikey (needs rust via mise)
-
-# --- GUI apps (Brewfile casks): Fedora routes, not automated ---
+# GUI apps (Brewfile casks): Fedora routes, not automated
 # obsidian           # flatpak install flathub md.obsidian.Obsidian
 # gitkraken          # flatpak install flathub com.axosoft.GitKraken
 # jetbrains-toolbox  # official tarball (jetbrains.com/toolbox-app); no dnf/flatpak
