@@ -4,7 +4,8 @@ Every binding this configuration adds or changes. Defaults are not listed.
 
 ## zsh — line editing (vi mode)
 
-`bindkey -v`, `KEYTIMEOUT=10` (100 ms to leave insert mode).
+`bindkey -v`, `KEYTIMEOUT=10` (100 ms to leave insert mode). bash mirrors
+it (`set -o vi` in `.bashrc`) — same reflexes in the fallback shell.
 
 | Key | Action | Source |
 |---|---|---|

@@ -34,6 +34,10 @@ case "${PROMPT_COMMAND:-}" in
 *) PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}" ;;
 esac
 
+# ------------------ Line editing ------------------
+# Same reflexes as zsh (bindkey -v): vi mode in the fallback shell too.
+set -o vi
+
 # ------------------ GPG ------------------
 # Only when stdin is a terminal: otherwise `tty` prints "not a tty" on
 # stdout, which would poison GPG_TTY and break every pinentry.
