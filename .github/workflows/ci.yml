@@ -3,6 +3,7 @@
 # Actions are pinned to full commit SHAs: a tag is mutable — the
 # tj-actions attack (CVE-2025-30066) repointed existing tags; a SHA
 # cannot be repointed. Dependabot proposes the bumps.
+---
 name: ci
 
 permissions:
@@ -17,7 +18,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
 
       - name: install shells
         run: |
@@ -26,7 +27,7 @@ jobs:
 
       # Same shellcheck/shfmt versions as every machine: mise reads the
       # repo's own config.toml — one version source for local and CI.
-      - uses: jdx/mise-action@e6a8b3978addb5a52f2b4cd9d91eafa7f0ab959d # v4.2.0
+      - uses: jdx/mise-action@e6a8b3978addb5a52f2b4cd9d91eafa7f0ab959d  # v4.2.0
         env:
           MISE_GLOBAL_CONFIG_FILE: ${{ github.workspace }}/.config/mise/config.toml
         with:

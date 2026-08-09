@@ -1,5 +1,6 @@
 # Keeps the SHA-pinned actions fresh: Dependabot proposes the bump PRs,
 # the pin stays immutable between them.
+---
 version: 2
 updates:
   - package-ecosystem: github-actions
