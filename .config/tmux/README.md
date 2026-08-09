@@ -4,8 +4,9 @@ Everything tmux lives here, next to its config — bindings, theme,
 clipboard, plugins.
 
 Prefix: **`Ctrl-Space`** (`C-b` unbound). vi keys everywhere, windows and
-panes numbered from 1 (renumbered on close), 1M lines of history,
-`escape-time 0` (no Esc latency in nvim), `focus-events` (nvim autoread),
+panes numbered from 1 (renumbered on close), 100k lines of history per
+pane (scrollback is RAM), `escape-time 10` (the upstream default — 0 can
+split escape sequences over slow ssh), `focus-events` (nvim autoread),
 `allow-passthrough` (OSC/images through tmux), `detach-on-destroy off`
 (destroying the last session switches to another instead of detaching).
 
@@ -67,7 +68,7 @@ SSH + tmux session lands in the local clipboard, zero remote-side binary.
 | [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) | `Ctrl-h/j/k/l` across tmux panes *and* nvim splits |
 | [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect) | save/restore sessions (nvim strategy: `session`) |
 | [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum) | auto-save every 15 min, restore at server start |
-| [tmux-cpu-mem-monitor](https://github.com/hendrikmi/tmux-cpu-mem-monitor) | cpu / mem / disk in the bar (needs python3) |
+| [tmux-cpu-mem-monitor](https://github.com/hendrikmi/tmux-cpu-mem-monitor) | cpu / mem / disk in the bar (needs python3). Individual-maintainer upstream, knowingly accepted: it publishes no tag to pin, and exposure stays bounded to `prefix I`/`U` |
 
 Unpinned — same policy as zinit:
 [docs/architecture.md](../../docs/architecture.md).

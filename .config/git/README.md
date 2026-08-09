@@ -30,8 +30,12 @@ Two distinct FIDO2 credentials live on the one YubiKey, one per job —
 revoking or rotating one never touches the other:
 
 ```sh
-# 1. Commit signing — no touch required: signing happens at every commit,
-#    and a tap each time only teaches reflex-tapping.
+# 1. Commit signing — no touch required: a deliberate, accepted trade.
+#    Given up: physical presence per signature. Accepted risk: malware on
+#    an unlocked machine with the key plugged in can sign silently, and
+#    verification can never tell (allowed_signers has no touch field).
+#    Kept because signing fires on every commit and the AUTH key below
+#    still demands a PIN — the stronger right keeps the stronger guard.
 /opt/homebrew/opt/openssh/bin/ssh-keygen -t ed25519-sk -O resident \
   -O no-touch-required -O application=ssh:signing \
   -C "signing-yubikey" -f ~/.ssh/id_signing_sk
@@ -92,4 +96,4 @@ own.
 | `help.autocorrect = prompt` | suggests the fix, never runs it on its own |
 | `branch.sort` / `tag.sort` | recent branches first, version-sorted tags |
 | `core.ignorecase = false` | case collisions become visible (the macOS FS itself does not see them) |
-| `merge/diff.tool = nvimdiff` | conflicts get resolved in nvim |
+| `merge/diff.tool = editor` | follows `$EDITOR` — change the editor once, diff and merge follow; `trustExitCode = false`: an editor exit code says nothing about a merge |

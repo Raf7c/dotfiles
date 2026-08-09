@@ -44,9 +44,9 @@ zstyle ':completion::complete:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 # dircolors feeds LS_COLORS; guarded — macOS without coreutils just gets
 # no completion colors.
-if (( ${+commands[dircolors]} )); then
+if ((${+commands[dircolors]})); then
   eval "$(dircolors -b)"
-elif (( ${+commands[gdircolors]} )); then
+elif ((${+commands[gdircolors]})); then
   eval "$(gdircolors -b)"
 fi
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
@@ -74,9 +74,9 @@ zstyle ':fzf-tab:*' fzf-bindings 'tab:down'
 # Register zinit completion — ONLY if zinit really loaded (see zinit.zsh:
 # without git or without network it does not). Otherwise every TAB on
 # `zinit` autoloads a completion for a command that does not exist.
-if (( ${+functions[zinit]} )); then
+if ((${+functions[zinit]})); then
   autoload -Uz _zinit
-  (( ${+_comps} )) && _comps[zinit]=_zinit
+  ((${+_comps})) && _comps[zinit]=_zinit
 fi
 
 # ------------------ Modular Config ------------------
@@ -87,7 +87,7 @@ _al="${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliases.sh"
 [[ -r "$_al" ]] && source "$_al"
 unset _al
 
-source "${ZDOTDIR}/fzf.zsh"                    # fzf variables + widget (zsh)
+source "${ZDOTDIR}/fzf.zsh" # fzf variables + widget (zsh)
 
 # ------------------ Tools init ------------------
 # Guarded: a missing tool must never break the shell.
@@ -100,12 +100,12 @@ if command -v mise >/dev/null 2>&1; then
   _mc="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/mise-completion.zsh"
   if [[ ! -r "$_mc" ]] && command -v usage >/dev/null 2>&1; then
     mkdir -p -- "${_mc:h}"
-    mise completion zsh > "$_mc" 2>/dev/null || rm -f -- "$_mc"
+    mise completion zsh >"$_mc" 2>/dev/null || rm -f -- "$_mc"
   fi
   [[ -r "$_mc" ]] && source "$_mc"
   unset _mc
 fi
-command -v zoxide   >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
 command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
 
 # fzf rebinds Ctrl-R/Ctrl-T/Alt-C. Load it AFTER `bindkey -v` so the

@@ -22,14 +22,27 @@
     colorMoved = plain
     mnemonicPrefix = true
     renames = true
-    tool = nvimdiff
+    # "editor" instead of the built-in "nvimdiff": the tool follows $EDITOR
+    # (nvim, exported by shell/env.sh) — change the editor once, diff and
+    # merge follow. Same design as the school repo.
+    tool = editor
 
 [difftool]
     prompt = false
 
+[difftool "editor"]
+    cmd = \"$EDITOR\" -d \"$LOCAL\" \"$REMOTE\"
+
 [merge]
-    tool = nvimdiff
+    tool = editor
     conflictStyle = zdiff3
+
+[mergetool "editor"]
+    # 4 windows: LOCAL / BASE / REMOTE on top, MERGED (the one to save) at
+    # the bottom — same layout as git's built-in vimdiff3.
+    cmd = \"$EDITOR\" -d \"$LOCAL\" \"$BASE\" \"$REMOTE\" \"$MERGED\" -c '4wincmd w' -c 'wincmd J'
+    # The exit code of an editor says nothing about the merge: git must ask.
+    trustExitCode = false
 
 [fetch]
     prune = true

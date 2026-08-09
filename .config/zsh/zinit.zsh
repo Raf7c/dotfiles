@@ -31,10 +31,10 @@ ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 # `git clone` into a non-empty directory refuses to run anyway. Purge it.
 if [[ ! -r "${ZINIT_HOME}/zinit.zsh" ]]; then
   [[ -d "${ZINIT_HOME}" ]] && rm -rf -- "${ZINIT_HOME}"
-  if (( ${+commands[git]} )); then
+  if ((${+commands[git]})); then
     mkdir -p -- "${ZINIT_HOME:h}"
-    git clone --depth 1 -- https://github.com/zdharma-continuum/zinit.git "${ZINIT_HOME}" \
-      || print -u2 "zinit: clone failed (network?) — plugins skipped this session"
+    git clone --depth 1 -- https://github.com/zdharma-continuum/zinit.git "${ZINIT_HOME}" ||
+      print -u2 "zinit: clone failed (network?) — plugins skipped this session"
   else
     print -u2 "zinit: git missing — plugins skipped this session"
   fi
@@ -54,8 +54,8 @@ if [[ -r "${ZINIT_HOME}/zinit.zsh" ]]; then
 
   # Homebrew completions (eza, fzf, mise…): `brew shellenv` does NOT touch
   # FPATH, and the system /bin/zsh doesn't know /opt/homebrew.
-  [[ -d /opt/homebrew/share/zsh/site-functions ]] \
-    && fpath+=(/opt/homebrew/share/zsh/site-functions)
+  [[ -d /opt/homebrew/share/zsh/site-functions ]] &&
+    fpath+=(/opt/homebrew/share/zsh/site-functions)
 
   # ------------------ compinit ------------------
   _zsh_compinit

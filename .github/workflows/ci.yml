@@ -47,7 +47,7 @@ jobs:
             -exec shellcheck -S warning {} +
 
       - name: shfmt (.editorconfig is the authority, -d must stay silent)
-        run: shfmt -d run setup scripts .config/shell .bashrc .bash_profile
+        run: shfmt -d run setup scripts .config/shell .bashrc .bash_profile .zshenv .config/zsh
 
       # yamllint is a pinned authority tool: unused, the pin is a lie.
       - name: yamllint (workflows, dependabot)
