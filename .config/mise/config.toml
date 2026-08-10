@@ -1,6 +1,7 @@
 # Majors PINNED on purpose: "latest" installs a different version depending
 # on the install date -> two machines diverge, "reproducible" becomes false.
 # Minor/patch updates still flow via `mise upgrade`; bump majors HERE.
+# "latest" is reserved for low-risk plumbing (tree-sitter, usage, pipx).
 [tools]
 neovim = "0.12" # major.minor pin, like the others (a patch pin would
 # drift from the comment above at the next release)
@@ -12,5 +13,7 @@ tree-sitter = "latest"
 usage = "latest"       # required by `mise completion` (bash/zsh)
 
 shellcheck = "0.11"
-shfmt = "3.13"  # 3.13: zsh support — the authority covers the zsh files too
+shfmt = "3.13"  # 3.13: zsh support — the authority covers the zsh files
+                # too. Upstream calls that support incomplete: zsh diffs
+                # get READ, never applied blindly.
 yamllint = "1"

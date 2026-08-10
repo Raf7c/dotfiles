@@ -48,7 +48,13 @@ jobs:
             -exec shellcheck -S warning {} +
 
       - name: shfmt (.editorconfig is the authority, -d must stay silent)
-        run: shfmt -d run setup scripts .config/shell .bashrc .bash_profile .zshenv .config/zsh
+        # shfmt SKIPS hidden files when walking a directory and has no flag
+        # to include them: every zsh file must be listed EXPLICITLY or it
+        # is silently unchecked.
+        run: >
+          shfmt -d run setup scripts .config/shell .bashrc .bash_profile
+          .zshenv .config/zsh/.zshenv .config/zsh/.zshrc
+          .config/zsh/.zprofile .config/zsh/fzf.zsh .config/zsh/zinit.zsh
 
       # yamllint is a pinned authority tool: unused, the pin is a lie.
       - name: yamllint (workflows, dependabot)

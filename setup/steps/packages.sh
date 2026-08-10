@@ -142,3 +142,13 @@ else
   [ "$DRY_RUN" = 1 ] || hash -r
   log_ok "Linux packages ($OS) ok"
 fi
+
+# Four 2026 mise CVEs (worst: config trust-check bypass) are fixed in
+# 2026.6.4 — GHSA-436v-8fw5-4mj8 et al. Refuse to stay silent below.
+if command -v mise >/dev/null 2>&1; then
+  _mv=$(mise --version 2>/dev/null | awk '{print $1}')
+  if [ -n "$_mv" ] && [ "$(printf '%s\n' 2026.6.4 "$_mv" | sort -V | head -n1)" != "2026.6.4" ]; then
+    log_warn "mise $_mv < 2026.6.4 (known CVEs) -> upgrade it"
+  fi
+  unset _mv
+fi

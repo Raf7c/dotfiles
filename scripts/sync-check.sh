@@ -5,6 +5,10 @@
 set -eu
 
 DOT="${DOTFILES:-$HOME/.dotfiles}"
+[ -e "$DOT/run" ] || {
+  printf 'not a dotfiles repo: %s (set DOTFILES)\n' "$DOT" >&2
+  exit 2
+}
 SCHOOL="${1:-}"
 if [ -z "$SCHOOL" ]; then
   for _c in "$HOME/dotifiles42" "$HOME/lab/github/dotifiles42"; do
@@ -26,7 +30,13 @@ set -- \
   .config/kitty/themes/latte.conf \
   .config/kitty/themes/mocha.conf \
   .config/tmux/themes/latte.conf \
-  .config/tmux/themes/mocha.conf
+  .config/tmux/themes/mocha.conf \
+  .gitmodules
+# Known, DELIBERATE divergences kept out of the list:
+#   .config/git/ignore   (the claude line is personal-repo only)
+#   .editorconfig        (same rules, different section order)
+#   .config/tmux/tmux.conf (identical logic; two comments carry per-repo
+#                           truths: who guarantees the copy tools, RAM note)
 
 _fail=0
 for _f in "$@"; do

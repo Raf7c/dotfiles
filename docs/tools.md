@@ -75,6 +75,10 @@ ssh-keygen cannot sign with FIDO2 `sk-*` keys. Fedora needs neither — its
 stock openssh ships with FIDO2 support, which is why the gitsign step
 writes no `program` override there (`setup/steps/gitsign.sh`).
 
+Version floor: **mise ≥ 2026.6.4** — four 2026 advisories (config
+trust-check bypass among them) are fixed there; the packages step warns
+below it.
+
 ---
 
 See also: [installer.md](installer.md) — how these tools get installed ·

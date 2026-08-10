@@ -54,11 +54,11 @@ manual by design, a per-OS hook would cost more than it returns.
 
 ## Clipboard
 
-`y` pipes to the copy tool picked from the platform — pbcopy (macOS),
-wl-copy (Wayland), xclip (X11). Picked, not probed: the packages step
-**guarantees** wl-clipboard and xclip on Fedora, pbcopy is built into
-macOS. `set-clipboard on` additionally emits OSC 52, so a copy inside an
-SSH + tmux session lands in the local clipboard, zero remote-side binary.
+Every copy helper is **probed** (`command -v`) before use — pbcopy
+(macOS), wl-copy (Wayland), xclip (X11). If none exists (root-free
+install, bare server): plain tmux selection as fallback, and
+`set-clipboard on` still emits OSC 52 — the terminal gets the copy, SSH
+included, zero remote-side binary required.
 
 ## Plugins (via TPM, cloned into `plugins/`, gitignored)
 
