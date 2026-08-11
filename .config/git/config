@@ -71,14 +71,6 @@
 [transfer]
     fsckObjects = true
 
-[alias]
-    d = diff
-    ck = checkout
-    cm = commit
-    cma = commit -a
-    st = status
-    br = branch
-    bra = branch -a
 [gpg]
     format = ssh
 

@@ -65,6 +65,10 @@ if [[ -r "${ZINIT_HOME}/zinit.zsh" ]]; then
   # ------------------ Plugins ------------------
   zinit light Aloxaf/fzf-tab
 
+  # fzf-git.sh: CTRL-G widgets over git objects. Guarded on fzf — without
+  # it the widgets would exist and fail on use.
+  ((${+commands[fzf]})) && zinit wait lucid light-mode for junegunn/fzf-git.sh
+
   zinit wait lucid for \
     zsh-users/zsh-syntax-highlighting \
     atload"_zsh_autosuggest_start" \

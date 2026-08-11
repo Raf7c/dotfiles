@@ -28,6 +28,21 @@ alias path='printf "%s\n" "$PATH" | tr ":" "\n"'
 # ------------------ Editor ------------------
 alias v='nvim'
 
+# ------------------ Git ------------------
+# Shell aliases, NOT git aliases: `gst` beats `git st`. The trade-off is
+# stated: these live only in interactive shells — a script, another shell
+# or an IDE calling git sees plain git.
+if command -v git >/dev/null 2>&1; then
+  alias g='git'
+  alias gst='git status'
+  alias gd='git diff'
+  alias gck='git checkout'
+  alias gcm='git commit'
+  alias gcma='git commit -a'
+  alias gbr='git branch'
+  alias gbra='git branch -a'
+fi
+
 # ------------------ Git clone helpers ------------------
 # ghc <repo> -> clone git@github.com:$GITUSER/<repo> into $GHREPOS/<repo>
 ghc() { git clone -- "git@github.com:${GITUSER}/$1.git" "${GHREPOS}/$1" && cd -- "${GHREPOS}/$1" || return 1; }

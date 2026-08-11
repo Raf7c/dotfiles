@@ -70,6 +70,7 @@ The zsh plugins loaded (tmux plugins: see
 |---|---|
 | [fzf-tab](https://github.com/Aloxaf/fzf-tab) | the Tab completion menu goes through fzf |
 | [zsh-completions](https://github.com/zsh-users/zsh-completions) | extra completion definitions |
+| [fzf-git.sh](https://github.com/junegunn/fzf-git.sh) | `Ctrl-G` pickers over git objects (`wait lucid`, loaded only when fzf is present) |
 | [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) | command-line colouring (loaded `wait lucid`: after the prompt) |
 | [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions) | greyed-out suggestion from history (`wait lucid` too) |
 

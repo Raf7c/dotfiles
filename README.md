@@ -42,6 +42,12 @@ Details, load order and design decisions: [docs/architecture.md](docs/architectu
 
 ## Quick start
 
+Optional first step — so the very first commit already signs: with the
+YubiKey plugged in, retrieve the resident signing key (`ssh-keygen -K`,
+then rename the retrieved `*_signing` pair to `~/.ssh/id_signing_sk` /
+`.pub`). Skipping it costs nothing: run `./run install gitsign` once the
+key is in place.
+
 ```sh
 git clone --recurse-submodules git@github.com:Raf7c/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles

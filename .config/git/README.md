@@ -73,17 +73,16 @@ exactly the file the gitsign step looks for — `./run install gitsign`
 writes `user.signingkey` and `commit.gpgsign` into `config.local` on its
 own.
 
+Order does not matter, only comfort does: key in place **before**
+`./run install` and the very first commit signs already; key arriving
+later, and one `./run install gitsign` re-wires everything.
+
 ## Aliases
 
-| Alias | Becomes |
-|---|---|
-| `d` | `diff` |
-| `ck` | `checkout` |
-| `cm` | `commit` |
-| `cma` | `commit -a` |
-| `st` | `status` |
-| `br` | `branch` |
-| `bra` | `branch -a` |
+None here, on purpose: they are **shell** aliases (`gst`, not `git st`)
+and live in `shell/aliases.sh` — see
+[docs/keymaps.md](../../docs/keymaps.md). Accepted cost: they exist only
+in interactive shells; scripts and tools call plain git.
 
 ## Notable defaults
 
