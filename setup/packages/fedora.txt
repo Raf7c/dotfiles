@@ -29,6 +29,7 @@ just
 # infra / automation
 ansible
 ansible-lint
+podman
 
 # secrets / security
 gnupg2
