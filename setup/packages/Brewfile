@@ -1,4 +1,5 @@
 # Sections mirror fedora.txt so the two files read side by side.
+# Who installs what, on which OS: docs/tools.md — one table, both OSes.
 
 # ------------------------------ formulas ------------------------------
 
@@ -9,7 +10,7 @@ brew "zsh"
 brew "bash"
 brew "bash-completion@2"
 
-# modern CLI — each tool's "replaces + why": docs/tools.md
+# modern CLI
 brew "tree"
 brew "eza"
 brew "zoxide"
@@ -28,42 +29,35 @@ brew "just"
 
 # prompt & runtimes
 brew "starship"
-brew "mise"    # runtimes (node, python, rust, neovim) AND the pinned
-               # authority tools (shellcheck, shfmt, yamllint) — one
-               # installer per tool, versions in .config/mise/config.toml
+brew "mise"
 
 # infra / automation
 brew "ansible"
 brew "ansible-lint"
 
 # network
-brew "cloudflared"   # macOS only (not installed on Fedora)
+brew "cloudflared"
 
-# secrets / security (Fedora equivalents in fedora.txt)
+# secrets / security
 brew "gnupg"
-brew "age"                  # modern file encryption
-brew "sops"                 # secrets in git (age/KMS backends)
-brew "age-plugin-yubikey"   # age identities backed by a YubiKey
-brew "ykman"                # YubiKey Manager CLI
-brew "openssh"              # macOS only: Apple's ssh-keygen lacks FIDO2/sk support
-brew "libfido2"             # macOS only: FIDO2 lib for the sk-* keys above
+brew "age"
+brew "sops"
+brew "age-plugin-yubikey"
+brew "ykman"
+brew "openssh"
+brew "libfido2"
 
 # ------------------------------- casks --------------------------------
 
 # terminal & font
 cask "ghostty"
-cask "kitty"   # fallback, mirrors ghostty — see .config/kitty
-# Nerd Font: starship, eza --icons and the tmux status bar print glyphs
-# from its private range — without it the prompt is a row of tofu.
-# Family name: "JetBrainsMono Nerd Font Mono" (ghostty/config).
+cask "kitty"
 cask "font-jetbrains-mono-nerd-font"
 
 # dev GUI
-# (claude code CLI: official script in packages.sh, NOT brew — the
-#  formula lags behind Anthropic's release pace)
 cask "jetbrains-toolbox"
 cask "gitkraken"
-cask "docker-desktop"   # engine + CLI (the `docker` formula is CLI-only)
+cask "docker-desktop"
 
 # productivity
 cask "raycast"

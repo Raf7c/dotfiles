@@ -1,7 +1,7 @@
-# Parsed by packages.sh: every uncommented FIRST word is a dnf package —
-# one per line. A commented tool is a decision, not an absence: its
-# install route lives right here, in its own section.
-# Sections mirror the Brewfile so the two files read side by side.
+# dnf packages, one per line: packages.sh reads the FIRST word of every
+# uncommented line. Sections mirror the Brewfile.
+# Everything NOT in this file — installed by ./run, by mise, by hand, or
+# deliberately absent — is in docs/tools.md: one table, both OSes.
 
 # core — shell, multiplexer, vcs
 git
@@ -10,7 +10,7 @@ zsh
 bash
 bash-completion
 
-# modern CLI — each tool's "replaces + why": docs/tools.md
+# modern CLI
 tree
 eza
 zoxide
@@ -20,67 +20,28 @@ fd-find
 ripgrep
 btop
 jq
-# lazygit         # COPR atim/lazygit — third-party repo, install by hand
 
 # build & tasks
 make
 cmake
 just
 
-# prompt & runtimes
-# starship        # not in the dnf repos: official script -> ~/.local/bin (packages.sh)
-# mise            # not in the dnf repos: https://mise.run -> ~/.local/bin (packages.sh);
-#                 # then installs the runtimes AND the pinned authority tools
-#                 # (shellcheck, shfmt, yamllint) — .config/mise/config.toml
-# neovim          # via mise (config.toml), NOT dnf: one installer per tool,
-#                 # no shadowed copy
-
 # infra / automation
-ansible           # dnf version may lag behind brew: acceptable for personal use
+ansible
 ansible-lint
-# docker          # use podman (dnf install podman) or moby-engine instead
-# cloudflared     # deliberately NOT installed on Fedora (macOS only, via brew)
-# claude-code     # official script (curl https://claude.ai/install.sh | bash), see packages.sh
 
 # secrets / security
-# (openssh + libfido2 are NOT needed here: Fedora's stock openssh already
-#  signs with FIDO2 sk-* keys — the Brewfile ships them only to fix Apple's)
 gnupg2
-age               # modern file encryption
-yubikey-manager   # ykman: Fedora package name differs from the CLI
-# sops            # not in the base repos: binary from the getsops GitHub releases
-# age-plugin-yubikey  # not packaged: cargo install age-plugin-yubikey (rust via mise)
+age
+yubikey-manager
 
 # system integration
-util-linux-user   # chsh (not installed by default on Fedora)
-wl-clipboard      # tmux copy-pipe (Wayland: wl-copy)
-xclip             # tmux copy-pipe (X11 fallback)
+util-linux-user
+wl-clipboard
+xclip
 
-# terminal & font
+# terminal
 kitty
-# ghostty         # COPR pgdev/ghostty (kitty from the repos is the fallback)
-# A Nerd Font is REQUIRED (starship prompt, eza --icons, tmux status bar:
-# all use glyphs from the Nerd Font private range).
-# Fedora packages some of them:
-#     sudo dnf install jetbrains-mono-fonts   # NO Nerd Font glyphs
-# The patched build is not in the base repos. WITHOUT root, install it in
-# the user font directory — no sudo, no COPR:
-#     mkdir -p ~/.local/share/fonts
-#     # download JetBrainsMono.zip from the nerd-fonts releases, then:
-#     unzip -o JetBrainsMono.zip -d ~/.local/share/fonts/JetBrainsMonoNerd
-#     fc-cache -f ~/.local/share/fonts
-# (fontconfig picks up ~/.local/share/fonts by default; the terminal must
-#  then be pointed at "JetBrainsMono Nerd Font".)
 
 # browsers
 firefox
-
-# GUI apps (Brewfile casks): Fedora routes, not automated
-# obsidian           # flatpak install flathub md.obsidian.Obsidian
-# gitkraken          # flatpak install flathub com.axosoft.GitKraken
-# jetbrains-toolbox  # official tarball (jetbrains.com/toolbox-app); no dnf/flatpak
-# keymapp            # official tarball (zsa.io/flash); needs libwebkit2gtk 4.1
-# google-chrome      # dnf install fedora-workstation-repositories, enable the
-#                    # google-chrome repo, then dnf install google-chrome-stable
-# claude (desktop)   # no official Linux build: claude.ai in the browser
-# docker-desktop     # use podman instead (see docker above)
