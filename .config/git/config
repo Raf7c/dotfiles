@@ -14,9 +14,6 @@
 [init]
     defaultBranch = main
 
-[core]
-    ignorecase = false
-
 [diff]
     algorithm = histogram
     colorMoved = plain

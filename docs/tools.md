@@ -13,8 +13,9 @@ tool that needs more probably deserves its own page.
    (`fedora.txt`) on Fedora.
 2. **No-sudo recipes** — starship, mise and claude-code are not in the
    Fedora repos: official scripts into `~/.local/bin`, idempotent
-   (`command -v` first), downloaded **then** executed — never a straight
-   `curl | sh`.
+   (`command -v` first), downloaded **then** executed — which guards
+   against running a truncated download, nothing more: no checksum, no
+   signature. `curl | sh` avoided for that one reason.
 3. **Documented, by hand** — whatever needs a third-party repo or has no
    package: COPR (lazygit, ghostty), GitHub binary (sops), cargo
    (age-plugin-yubikey), the Nerd Font, GUI apps. Each has its recipe as a
@@ -71,13 +72,16 @@ and `yubikey-manager` come from the base repos, sops and
 age-plugin-yubikey do not (see the comments in `fedora.txt`).
 
 Homebrew openssh + libfido2 exist only to fix a macOS gap: Apple's
-ssh-keygen cannot sign with FIDO2 `sk-*` keys. Fedora needs neither — its
+ssh-keygen cannot sign with FIDO2 `sk-*` keys. Side effect: the formula
+is not keg-only, so brew's `ssh` shadows Apple's — any `UseKeychain` in
+`~/.ssh/config` needs an `IgnoreUnknown UseKeychain` line before it. Fedora needs neither — its
 stock openssh ships with FIDO2 support, which is why the gitsign step
 writes no `program` override there (`setup/steps/gitsign.sh`).
 
-Version floor: **mise ≥ 2026.6.4** — four 2026 advisories (config
-trust-check bypass among them) are fixed there; the packages step warns
-below it.
+Version floor: **mise ≥ 2026.7.14** — the 2026 advisories (config
+trust-check bypass and its incomplete-fix follow-up) are fixed there;
+the packages step warns below it. A floor is perishable: it gets revised
+whenever the check is touched.
 
 ---
 

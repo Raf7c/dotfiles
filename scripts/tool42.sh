@@ -20,9 +20,9 @@ command -v pipx >/dev/null 2>&1 || {
   exit 1
 }
 # Norminette — https://github.com/42school/norminette
-pipx install --force norminette
+pipx upgrade --install norminette
 # c_formatter_42 — https://github.com/dawnbeen/c_formatter_42
-pipx install --force c-formatter-42
+pipx upgrade --install c-formatter-42
 
 printf 'Verifying...\n'
 if command -v norminette >/dev/null 2>&1; then

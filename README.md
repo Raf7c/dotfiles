@@ -83,8 +83,9 @@ delete at your convenience. Backups live in
 What an install leaves beyond `$HOME`, honestly: the login shell (`chsh -s
 /bin/bash` reverts it, `/etc/shells` keeps one line), Homebrew and its
 packages on macOS, the dnf packages on Fedora — and, back inside
-`$HOME`, three binaries in `~/.local/bin` (mise, starship, claude) that
-no package manager owns. `packages` is the only module
+`$HOME`, binaries in `~/.local/bin` that no package manager owns:
+claude on macOS (mise and starship come from brew there); all three on
+Fedora. `packages` is the only module
 that needs sudo — a root-free install is
 `./run install symlinks directories gitsign plugins`.
 

@@ -59,6 +59,10 @@ then point ssh at the auth key:
 
 ```
 # ~/.ssh/config
+# First, globally: brew's openssh (installed for FIDO2) shadows Apple's
+# ssh and knows no UseKeychain — IgnoreUnknown must precede any use.
+IgnoreUnknown UseKeychain
+
 Host github.com
   IdentityFile ~/.ssh/github_sk
   IdentitiesOnly yes
@@ -95,5 +99,4 @@ own.
 | `commit.verbose` | the diff below the commit message, in the editor |
 | `help.autocorrect = prompt` | suggests the fix, never runs it on its own |
 | `branch.sort` / `tag.sort` | recent branches first, version-sorted tags |
-| `core.ignorecase = false` | case collisions become visible (the macOS FS itself does not see them) |
 | `merge/diff.tool = editor` | follows `$EDITOR` — change the editor once, diff and merge follow; `trustExitCode = false`: an editor exit code says nothing about a merge |

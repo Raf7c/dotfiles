@@ -46,7 +46,10 @@ if [ -r "$_zinit" ] && command -v zsh >/dev/null 2>&1; then
   # -f: skip every startup file. -i would source the whole interactive
   # config (compinit, plugins, tools) with no terminal attached — slow,
   # side effects, and upgrade would then depend on .zshrc being healthy.
-  run zsh -fc "source '$_zinit'; zinit self-update; zinit update --all" ||
+  # -f skips startup files but INHERITS the exported ZDOTDIR: without
+  # ZCOMPDUMP_PATH, zinit's own compinit would drop its dump inside the
+  # repo ($ZDOTDIR). Same path expression as zinit.zsh.
+  run zsh -fc "typeset -gA ZINIT; ZINIT[ZCOMPDUMP_PATH]=\"${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-\${HOST}-\${ZSH_VERSION}\"; source '$_zinit'; zinit self-update; zinit update --all" ||
     log_warn "zinit: update failed"
 else
   log_info "zinit not installed -> skipped (installs on first zsh)"

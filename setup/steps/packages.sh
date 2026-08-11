@@ -143,12 +143,14 @@ else
   log_ok "Linux packages ($OS) ok"
 fi
 
-# Four 2026 mise CVEs (worst: config trust-check bypass) are fixed in
-# 2026.6.4 — GHSA-436v-8fw5-4mj8 et al. Refuse to stay silent below.
+# Security floor — PERISHABLE data, revised whenever this file is touched.
+# 2026.7.14 closes the July advisories (shell-args via untrusted local
+# config, High — the incomplete-fix follow-up to the June batch) on top of
+# the June ones (GHSA-436v-8fw5-4mj8 et al.).
 if command -v mise >/dev/null 2>&1; then
   _mv=$(mise --version 2>/dev/null | awk '{print $1}')
-  if [ -n "$_mv" ] && [ "$(printf '%s\n' 2026.6.4 "$_mv" | sort -V | head -n1)" != "2026.6.4" ]; then
-    log_warn "mise $_mv < 2026.6.4 (known CVEs) -> upgrade it"
+  if [ -n "$_mv" ] && [ "$(printf '%s\n' 2026.7.14 "$_mv" | sort -V | head -n1)" != "2026.7.14" ]; then
+    log_warn "mise $_mv < 2026.7.14 (known CVEs) -> upgrade it"
   fi
   unset _mv
 fi
