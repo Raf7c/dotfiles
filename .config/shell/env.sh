@@ -45,4 +45,18 @@ env_path_prepend() {
 env_path_prepend "$HOME/.local/bin"
 env_path_prepend "${XDG_CONFIG_HOME}/scripts"
 env_path_prepend "${XDG_DATA_HOME}/mise/shims" # mise shims first
+
+# Append: same guards, opposite priority — an extra that must never
+# shadow a real tool. The -d check also keeps this macOS-only entry out
+# of Fedora's PATH for free, no OS test needed.
+env_path_append() {
+  [ -d "$1" ] || return 0
+  case ":$PATH:" in *":$1:"*) return 0 ;; esac
+  PATH="$PATH:$1"
+}
+# JetBrains Toolbox CLI launchers (idea, pycharm…). The path contains a
+# space: every read of PATH here is quoted, and zsh keeps it as one array
+# element — verified.
+env_path_append "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
+
 export PATH
