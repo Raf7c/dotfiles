@@ -45,7 +45,10 @@ symlinks step, is now the only bootstrap — `$HOME` only, no privilege.
 ## XDG layout
 
 `$HOME` holds only four entry files (`.zshenv`, `.bashrc`, `.bash_profile`,
-and the `~/.config` links). Everything else lives under XDG:
+and the `~/.config` links). Everything else **this repo controls** lives
+under XDG — third-party tools that ignore the spec keep their own
+dotdirs, and `env.sh` redirects the few that accept it (`ANSIBLE_HOME`,
+`npm_config_cache`):
 
 | Path | Contents |
 |---|---|

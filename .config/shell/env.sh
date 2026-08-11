@@ -32,6 +32,11 @@ if command -v firefox >/dev/null 2>&1; then export BROWSER="firefox"; fi
 # ------------------ Tools / history files (XDG) ------------------
 export LESSHISTFILE="${XDG_CACHE_HOME}/less/history"
 export PYTHON_HISTORY="${XDG_DATA_HOME}/python/history"
+# Third-party tools that default to ~/<dotdir> and accept a redirect:
+# one line each, one directory less at the root of $HOME. Only for tools
+# this machine actually runs — an unused redirect is dead config.
+export ANSIBLE_HOME="${XDG_DATA_HOME}/ansible" # collections, roles, tmp
+export npm_config_cache="${XDG_CACHE_HOME}/npm"
 
 # ------------------ PATH ------------------
 # Prepend <dir> if it exists and is not already in PATH. POSIX (works
