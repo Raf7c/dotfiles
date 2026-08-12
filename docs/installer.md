@@ -5,7 +5,8 @@ framework, no dependency beyond git and coreutils.
 
 ## Design contract
 
-Every step honours the same four rules:
+Every step honours the same four rules, and this page is where they are
+written down: the step files themselves say what they do, not how they behave.
 
 1. **Idempotent.** A second run performs zero action (links tested by
    inode, `mkdir -p`, markers). Two consecutive `./run install` are the
@@ -41,18 +42,22 @@ setup/commands/*.sh     the update / upgrade flows
 `STEPS` in `run` fixes the order; each step is one file in
 `setup/steps/`. What each does, and what it costs:
 
-| # | Step | What it does | sudo | network |
-|---|---|---|---|---|
-| 1 | `prereqs` | package manager + base tools (Homebrew on macOS, `git`/`curl` on Fedora) | Fedora | yes |
-| 2 | `submodules` | init/sync the submodules, then attach each to its branch | no | yes |
-| 3 | `directories` | create the XDG directories the shells need before first start | no | no |
-| 4 | `migrate` | move legacy history files (`~/.bash_history`, `~/.lesshst`…) to XDG | no | no |
-| 5 | `symlinks` | apply `manifest.sh`, backing up anything real it replaces | no | no |
-| 6 | `packages` | `brew bundle` / `dnf`, then the no-sudo recipes (mise, starship, claude) | Fedora | yes |
-| 7 | `gitsign` | generate `config.local` from the keys this machine has | no | no |
-| 8 | `runtimes` | install what `mise` declares (node, python, rust, neovim, linters) | no | yes |
-| 9 | `plugins` | clone TPM (zinit clones itself at first zsh start) | no | yes |
-| 10 | `shell` | `chsh` to zsh, asking first, and appends to `/etc/shells` | yes | no |
+| # | Step | What it does | sudo | network | needs |
+|---|---|---|---|---|---|
+| 1 | `prereqs` | package manager + base tools (Homebrew on macOS, `git`/`curl` on Fedora) | Fedora | yes | nothing |
+| 2 | `submodules` | init/sync the submodules, then attach each to its branch | no | yes | git, and access to the submodule remote |
+| 3 | `directories` | create the XDG directories the shells need before first start | no | no | nothing |
+| 4 | `migrate` | move legacy history files (`~/.bash_history`, `~/.lesshst`…) to XDG | no | no | `directories` |
+| 5 | `symlinks` | apply `manifest.sh`, backing up anything real it replaces | no | no | `submodules`, so the submodule is populated when linked |
+| 6 | `packages` | `brew bundle` / `dnf`, then the no-sudo recipes (mise, starship, claude) | Fedora | yes | `prereqs` |
+| 7 | `gitsign` | generate `config.local` from the keys this machine has | no | no | nothing |
+| 8 | `runtimes` | install what `mise` declares (node, python, rust, neovim, linters) | no | yes | `packages`, for mise on the PATH |
+| 9 | `plugins` | clone TPM (zinit clones itself at first zsh start) | no | yes | `prereqs` for git, `symlinks` for `~/.config/tmux` |
+| 10 | `shell` | `chsh` to zsh, asking first, and appends to `/etc/shells` | yes | no | `packages`, `chsh` needs zsh installed |
+
+The order in `STEPS` is that dependency chain, nothing more. A missing
+dependency is a clean skip with a log line, never a crash: **runtimes**
+without mise, **plugins** without network, **shell** without zsh.
 
 Three deserve a note: **migrate** runs once per machine and never returns;
 **gitsign** never overwrites a hand-written `config.local`; **shell** is

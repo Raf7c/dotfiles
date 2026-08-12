@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
-# Command upgrade: bump the versions of installed tools.
-# Does NOT touch the dotfiles structure (that's install/update); no git pull.
-# Tolerant: a failure on one tool does not stop the others. Sourced by `run`.
+# Command upgrade: bump tool versions. Touches no dotfiles STRUCTURE (links,
+# directories: that is install/update) and runs no git pull. A failure on one
+# tool does not stop the others.
 
 # --- Package manager ---
 if is_macos; then
@@ -13,8 +13,7 @@ if is_macos; then
     log_warn "brew missing -> macOS package update skipped"
   fi
 else
-  # The heaviest action of the repo (full system upgrade, kernel included)
-  # asks first: chsh does, this must too. -y/--dry-run answer yes already.
+  # A full system upgrade, kernel included: it asks first, like chsh does.
   if confirm "Upgrade every system package (sudo dnf upgrade)?"; then
     run sudo dnf upgrade --refresh -y || log_warn "dnf upgrade: failed"
   fi
@@ -25,8 +24,7 @@ if command -v mise >/dev/null 2>&1; then
   # On macOS the mise binary is updated by brew; elsewhere it self-updates.
   is_macos || run mise self-update || log_warn "mise self-update: failed"
   run mise upgrade || log_warn "mise upgrade: failed"
-  # Invalidate the cached shell completions (see .zshrc/.bashrc): they are
-  # regenerated at the next shell start with the fresh mise.
+  # Invalidate the cached completions: regenerated at the next shell start.
   run rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/mise-completion.zsh" \
     "${XDG_CACHE_HOME:-$HOME/.cache}/bash/mise-completion.bash"
 else
@@ -43,12 +41,10 @@ fi
 # --- zinit (zsh): self-update + plugins ---
 _zinit="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh"
 if [ -r "$_zinit" ] && command -v zsh >/dev/null 2>&1; then
-  # -f: skip every startup file. -i would source the whole interactive
-  # config (compinit, plugins, tools) with no terminal attached: slow,
-  # side effects, and upgrade would then depend on .zshrc being healthy.
-  # -f skips startup files but INHERITS the exported ZDOTDIR: without
-  # ZCOMPDUMP_PATH, zinit's own compinit would drop its dump inside the
-  # repo ($ZDOTDIR). Same path expression as zinit.zsh.
+  # -f: no startup file. -i would source the whole interactive config with no
+  # terminal attached, and make upgrade depend on .zshrc being healthy.
+  # -f still INHERITS the exported ZDOTDIR, so without ZCOMPDUMP_PATH zinit's
+  # own compinit drops its dump inside the repo. Same path as zinit.zsh.
   run zsh -fc "typeset -gA ZINIT; ZINIT[ZCOMPDUMP_PATH]=\"${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-\${HOST}-\${ZSH_VERSION}\"; source '$_zinit'; zinit self-update; zinit update --all" ||
     log_warn "zinit: update failed"
 else
@@ -63,9 +59,9 @@ else
   log_info "TPM not installed -> skipped"
 fi
 
-# --- git submodules (e.g. nvim): bump to the LATEST remote commit ---
-# (unlike `update` which resyncs to the pinned commit). The submodule pointer
-# changes in the repo -> commit afterwards if you want to freeze it.
+# --- git submodules (nvim): bump to the LATEST remote commit ---
+# `update` resyncs to the pinned commit instead. The pointer moves in the repo:
+# commit afterwards to freeze it.
 if [ -f "$DOTFILES_DIR/.gitmodules" ]; then
   run git -C "$DOTFILES_DIR" submodule update --remote --recursive --merge ||
     log_warn "submodule --remote: failed"

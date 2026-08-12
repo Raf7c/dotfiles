@@ -1,7 +1,6 @@
 #!/usr/bin/env sh
-# setup/manifest.sh: symlink DATA (no logic here).
-# Format: "<source in the repo>  <target under $HOME>". One target per line.
-#
+# setup/manifest.sh: DATA only, no logic.
+# Format: "<source in the repo>  <target under $HOME>", one per line.
 # Adding a config = adding ONE line.
 
 dotfiles_links() {
@@ -20,17 +19,16 @@ dotfiles_links() {
 scripts                .config/scripts
 
 # --- startup files at the root of $HOME ---
-# .zshenv is the ZDOTDIR bootstrap: it is what lets zsh find .config/zsh
-# WITHOUT sudo (the /etc/zshenv route needs root, see steps/shell.sh).
+# .zshenv is the ZDOTDIR bootstrap: what lets zsh find .config/zsh without
+# root. See docs/architecture.md.
 .zshenv                .zshenv
 .bashrc                .bashrc
 .bash_profile          .bash_profile
 EOF
 }
 
-# Directories to create (absolute paths, computed from XDG, unquoted heredoc).
-# One directory per line. Without them zsh silently drops history and
-# compinit caching (the state/cache dirs are never auto-created).
+# Directories to create, one per line. Without them zsh silently drops history
+# and compinit caching: nothing auto-creates the state and cache dirs.
 dotfiles_dirs() {
   cat <<EOF
 ${XDG_CONFIG_HOME:-$HOME/.config}
@@ -47,9 +45,8 @@ EOF
 }
 
 # History migrations: "<old absolute path>  <new absolute location>".
-# Move legacy history files from the root to their XDG directory.
-# UNQUOTED heredoc (<<EOF): $HOME and the ${XDG_*:-default} are EXPANDED here,
-# so the targets automatically follow any XDG customization.
+# UNQUOTED heredoc: $HOME and ${XDG_*:-default} are expanded here, so the
+# targets follow any XDG customization for free.
 dotfiles_history_migrations() {
   cat <<EOF
 $HOME/.bash_history    ${XDG_STATE_HOME:-$HOME/.local/state}/bash/history

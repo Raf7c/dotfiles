@@ -1,7 +1,6 @@
 #!/usr/bin/env sh
-# sync-check.sh verifies the cross-repo contract: files both dotfiles repos
-# promise to keep byte-identical. Read-only. Usage:
-#   sync-check.sh [path-to-school-repo]
+# Verifies the cross-repo contract: the files both dotfiles repos promise to
+# keep byte-identical. Read-only. Usage: sync-check.sh [path-to-school-repo]
 set -eu
 
 DOT="${DOTFILES:-$HOME/.dotfiles}"

@@ -1,16 +1,7 @@
 #!/usr/bin/env sh
-# Step shell: switch the login shell to zsh.
-#
-# ZDOTDIR is bootstrapped from ~/.zshenv (linked by the symlinks step), not
-# from /etc/zshenv: no root, no leak into other users, `zsh -f` stays pristine.
-#
-# Contract:
-#   - idempotent: chsh only if the current shell is not already zsh
-#   - OS: all
-#   - sudo: only to append to /etc/shells, and only if chsh is accepted
-#   - order: placed AFTER packages (chsh requires zsh installed) and at the end
-#     of install ("system changes last"); if zsh is missing, we skip cleanly.
-#   - dry-run: handled by hand for the `sudo tee` (redirections, outside run()).
+# Step shell: switch the login shell to zsh. ZDOTDIR is bootstrapped from
+# ~/.zshenv, not /etc/zshenv: no root, no leak into other users, `zsh -f` stays
+# pristine. Last step on purpose: system changes come last.
 
 # ---------- Login shell = zsh ----------
 _zsh=$(command -v zsh 2>/dev/null || true)

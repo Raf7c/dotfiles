@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
-# Common environment, shared by bash and zsh (POSIX syntax).
-# Also the BASH_ENV target: kept MINIMAL on purpose (env + PATH only,
-# nothing interactive) so non-interactive bash scripts stay predictable.
+# Environment shared by bash and zsh, POSIX syntax. Also the BASH_ENV target,
+# hence MINIMAL on purpose: env and PATH only, nothing interactive, so
+# non-interactive scripts stay predictable.
 
 # ------------------ XDG Base Directories ------------------
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
@@ -32,16 +32,14 @@ if command -v firefox >/dev/null 2>&1; then export BROWSER="firefox"; fi
 # ------------------ Tools / history files (XDG) ------------------
 export LESSHISTFILE="${XDG_CACHE_HOME}/less/history"
 export PYTHON_HISTORY="${XDG_DATA_HOME}/python/history"
-# Third-party tools that default to ~/<dotdir> and accept a redirect:
-# one line each, one directory less at the root of $HOME. Only for tools
-# this machine actually runs: an unused redirect is dead config.
+# Tools that default to ~/<dotdir> and accept a redirect: one directory less at
+# the root of $HOME. Only tools this machine runs; an unused redirect is dead.
 export ANSIBLE_HOME="${XDG_DATA_HOME}/ansible" # collections, roles, tmp
 export npm_config_cache="${XDG_CACHE_HOME}/npm"
 
 # ------------------ PATH ------------------
-# Prepend <dir> if it exists and is not already in PATH. POSIX (works
-# sourced from bash AND zsh). zsh re-asserts the final order itself
-# (_zsh_build_path in .zshenv / .zprofile, after `brew shellenv`).
+# Prepend <dir> if it exists and is not already there. zsh re-asserts the final
+# order itself. See docs/architecture.md, the PATH story.
 env_path_prepend() {
   [ -d "$1" ] || return 0
   case ":$PATH:" in *":$1:"*) return 0 ;; esac
@@ -51,17 +49,15 @@ env_path_prepend "$HOME/.local/bin"
 env_path_prepend "${XDG_CONFIG_HOME}/scripts"
 env_path_prepend "${XDG_DATA_HOME}/mise/shims" # mise shims first
 
-# Append: same guards, opposite priority, an extra that must never
-# shadow a real tool. The -d check also keeps this macOS-only entry out
-# of Fedora's PATH for free, no OS test needed.
+# Appended, not prepended: an extra that must never shadow a real tool. The -d
+# check keeps this macOS-only entry out of Fedora's PATH, no OS test needed.
 env_path_append() {
   [ -d "$1" ] || return 0
   case ":$PATH:" in *":$1:"*) return 0 ;; esac
   PATH="$PATH:$1"
 }
-# JetBrains Toolbox CLI launchers (idea, pycharm…). The path contains a
-# space: every read of PATH here is quoted, and zsh keeps it as one array
-# element, verified.
+# JetBrains Toolbox launchers (idea, pycharm…). The path contains a space:
+# every read of PATH here is quoted, and zsh keeps it as one array element.
 env_path_append "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 
 export PATH

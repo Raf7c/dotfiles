@@ -18,15 +18,11 @@ else
   _c_bold=''
 fi
 
-# Failure accounting. Counter FILES (not variables): log_warn/log_error are
-# often called inside `… | while` pipelines, i.e. subshells, where a variable
-# increment would be lost.
-#
-# The files live in a PRIVATE directory created by mktemp -d (mode 0700,
-# unpredictable name) instead of a $$-derived name in a world-writable /tmp:
-# a predictable name can be pre-created as a symlink by another user, and it
-# survives the run when it crashes. A trap removes the directory on every
-# exit path.
+# Failure accounting in FILES, not variables: log_warn/log_error are often
+# called inside `… | while` pipelines, i.e. subshells, where an increment would
+# be lost. They live in a private mktemp -d directory (0700, unpredictable
+# name): a $$-derived name in a world-writable /tmp can be pre-created as a
+# symlink by another user. Traps remove it on every exit path.
 _log_dir=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-run.XXXXXX") || {
   printf 'log.sh: cannot create the temporary directory\n' >&2
   exit 1
@@ -34,10 +30,9 @@ _log_dir=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-run.XXXXXX") || {
 _log_warns="$_log_dir/warns"
 _log_errors="$_log_dir/errors"
 
-# log_cleanup : remove the counter directory. Idempotent (rm -rf).
 log_cleanup() { rm -rf -- "$_log_dir"; }
-# INT/TERM: clean up THEN exit with the conventional 128+signal code
-# (the EXIT trap would otherwise be the only one to fire, on some shells).
+# INT/TERM exit with the conventional 128+signal code: on some shells the EXIT
+# trap would otherwise be the only one to fire.
 trap 'log_cleanup' EXIT
 trap 'log_cleanup; exit 130' INT
 trap 'log_cleanup; exit 143' TERM
@@ -54,12 +49,11 @@ log_error() {
   printf '.\n' >>"$_log_errors"
 }
 
-# log_reset_counts : forget the warnings/errors logged so far (preamble noise).
+# Forget what was logged so far (preamble noise).
 log_reset_counts() { rm -f -- "$_log_warns" "$_log_errors"; }
 
-# log_summary LABEL : final report; returns 1 if any error was logged, so
-# each command can end with an honest exit code (raw printf: the summary
-# itself must not increment the counters it reports).
+# Returns 1 if any error was logged, so each command ends with an honest exit
+# code. Raw printf: the summary must not increment the counters it reports.
 log_summary() {
   _lw=0
   _le=0

@@ -1,7 +1,6 @@
-# Auto theme based on macOS/Linux appearance
 theme = light:Catppuccin Latte,dark:Catppuccin Mocha
 
-# macOS option (ignored on Linux)
+# Ignored on Linux.
 macos-option-as-alt = true
 
 window-decoration = true

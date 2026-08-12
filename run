@@ -3,11 +3,10 @@
 
 set -eu
 
-# Resolve $0 THROUGH the symlinks before deriving the repo root: `run` is
-# meant to be reachable from ~/.dotfiles/run or from a link in the PATH, and
-# dirname of a link points at the link, not at the repo.
-# `readlink -f` is GNU-only (missing on macOS < 12), so walk the chain by
-# hand: POSIX, and CDPATH='' (not `CDPATH=`, SC1007) keeps `cd` silent.
+# Resolve $0 THROUGH the symlinks: `run` is reachable from a link in the PATH,
+# and dirname of a link points at the link, not at the repo. `readlink -f` is
+# GNU-only, so walk the chain by hand. CDPATH='' (not `CDPATH=`, SC1007)
+# keeps `cd` silent.
 _self=$0
 case "$_self" in
   */*) ;;
@@ -33,8 +32,7 @@ done
 DOTFILES_DIR=$(CDPATH='' cd -- "$(dirname -- "$_self")" && pwd)
 export DOTFILES_DIR
 
-# SINGLE source of truth for the order. To insert a step: create
-# setup/steps/<name>.sh then add <name> here, at the right position.
+# Single source of truth for the order. See docs/installer.md, adding a step.
 STEPS="prereqs submodules directories migrate symlinks packages gitsign runtimes plugins shell"
 export STEPS
 
@@ -109,9 +107,8 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-# Options are parsed: from here on, step names are only ever expanded
-# unquoted ($STEPS_ARG). Disable globbing so `./run install '*'` (or a stray
-# file named like a step) can never turn into a list of filenames.
+# From here on step names are expanded unquoted ($STEPS_ARG). Disable globbing
+# so `./run install '*'` can never turn into a list of filenames.
 set -f
 
 # Steps only apply to install (update/upgrade have a fixed scope).
@@ -121,8 +118,8 @@ if [ "$cmd" != install ] && [ -n "$STEPS_ARG" ]; then
   exit 2
 fi
 
-# Validate step names (exact match against $STEPS): a typo must fail
-# loudly, not silently "succeed" by running nothing.
+# Exact match against $STEPS: a typo must fail loudly, not silently "succeed"
+# by running nothing.
 for _m in $STEPS_ARG; do
   _found=0
   for _s in $STEPS; do [ "$_s" = "$_m" ] && _found=1; done
@@ -134,8 +131,8 @@ done
 
 RUN_TS=$(date +%Y%m%d%H%M%S) # unique run timestamp (backup directory)
 
-# SINGLE source of truth for the repos root (also set by shell/env.sh for
-# interactive shells): the manifest uses ${REPOS} without any fallback.
+# Single source of truth for the repos root (env.sh sets it for interactive
+# shells): the manifest uses ${REPOS} with no fallback.
 REPOS="${REPOS:-$HOME/lab}"
 
 export DRY_RUN ASSUME_YES STEPS_ARG RUN_TS REPOS

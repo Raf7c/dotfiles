@@ -1,18 +1,7 @@
 #!/usr/bin/env sh
-# Step plugins: shell/tmux plugin managers.
-#
-# - TPM (tmux): cloned explicitly (idempotent: only if missing).
-# - zinit (zsh): NOTHING to do here, it self-installs on the first zsh launch
-#   (see .config/zsh/zinit.zsh).
-#
-# Contract:
-#   - idempotent: clone only if the .git directory is missing
-#   - OS: all; no sudo
-#   - depends on symlinks (~/.config/tmux in place) and prereqs (git)
-#   - dry-run: via run()
-#
-# Note: since ~/.config/tmux is a link to the repo, TPM lands in
-# .config/tmux/plugins/, already git-ignored.
+# Step plugins: clone TPM (tmux). zinit has nothing to do here, it self-installs
+# on the first zsh launch (.config/zsh/zinit.zsh). Since ~/.config/tmux is a
+# link to the repo, TPM lands in .config/tmux/plugins/, already gitignored.
 
 _tpm_dir="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tpm"
 
@@ -21,13 +10,13 @@ if [ -d "$_tpm_dir/.git" ]; then
 else
   require_cmd git || return 0
   log_info "cloning TPM -> ${_tpm_dir#"$HOME"/}"
-  # No network / GitHub unreachable is NOT a reason to abort the install:
-  # tmux works without its plugins, the user replays `./run install plugins`.
+  # No network is not a reason to abort: tmux works without its plugins, and
+  # `./run install plugins` replays this.
   run git clone --depth 1 -- https://github.com/tmux-plugins/tpm "$_tpm_dir" ||
     log_warn "TPM: clone failed (network?), tmux plugins not installed"
 fi
 
-# Install the plugins listed in tmux.conf without opening tmux (if tmux is there).
+# Install what tmux.conf lists, without opening tmux.
 if command -v tmux >/dev/null 2>&1 && [ -x "$_tpm_dir/bin/install_plugins" ]; then
   run "$_tpm_dir/bin/install_plugins" ||
     log_warn "TPM: plugin install failed (network?), retry with: prefix + I"

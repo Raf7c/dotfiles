@@ -1,8 +1,5 @@
 #!/usr/bin/env sh
-# Command: install -> ready. Idempotent.
-# Runs ALL setup/steps/ (or the selection passed to
-# `./run install <names>`, e.g. `./run install symlinks packages`).
-# Sourced by `run` (lib/* loaded, OS detected, flags exported).
+# Command install: run every step, or only those named on the command line.
 
 # shellcheck disable=SC2086
 run_steps ${STEPS_ARG:-}

@@ -1,22 +1,10 @@
 #!/usr/bin/env sh
-# Step packages: install CLI packages/apps.
-#
-# Scope ("repo + safe recipes"):
-#   1. repo packages     (packages/fedora.txt -> pkg_install)   [Fedora]
-#   2. safe recipes WITHOUT sudo/repo: mise + starship (scripts) -> ~/.local/bin
-#      + claude code (official script, BOTH OSes: no brew on purpose,
-#        releases move faster than the formula; not packaged for Fedora)
-#   3. out of scope (lazygit) -> warning, without blocking
-#
-# Contract:
-#   - idempotent: brew bundle / dnf; `command -v` before the recipes
-#   - OS: macOS -> brew bundle Brewfile; Fedora -> pkg_install + recipes
-#   - sudo: yes on Fedora (dnf); NOT for mise/starship (~/.local/bin)
-#   - dry-run: via run(), + handled by hand for curl|sh
-#   - end: hash -r (so runtimes finds mise)
+# Step packages: the repo packages (Brewfile / fedora.txt) plus the recipes
+# that need neither sudo nor a third-party repo (mise, starship, claude code).
+# Who installs what, and what stays in your hands: docs/packages.md.
 
-# _install_mise: official script -> ~/.local/bin (mise: brew on macOS, else here).
-# (mise is NOT in the Fedora repos: the official script is the way, no sudo.)
+# mise is not in the Fedora repos: the official script into ~/.local/bin is the
+# only route that needs no sudo. macOS gets it from brew instead.
 _install_mise() {
   command -v mise >/dev/null 2>&1 && {
     log_ok "mise already present"
@@ -31,8 +19,8 @@ _install_mise() {
     return 0
   fi
   log_info "installing mise…"
-  # Download THEN execute (no curl|sh): a failed/truncated download must
-  # never reach the shell. Pin a published checksum here to go further.
+  # Download THEN execute, never curl|sh: a truncated download must not reach
+  # the shell. Pin a published checksum here to go further.
   _tmp=$(mktemp) || {
     log_warn "mise: mktemp failed"
     return 0
@@ -45,7 +33,6 @@ _install_mise() {
   rm -f -- "$_tmp"
 }
 
-# _install_starship: official script -> ~/.local/bin (no sudo).
 _install_starship() {
   command -v starship >/dev/null 2>&1 && {
     log_ok "starship already present"
@@ -70,9 +57,8 @@ _install_starship() {
   rm -f -- "$_tmp"
 }
 
-# _install_claude: official native installer -> ~/.local/bin (no sudo).
-# Deliberately NOT via brew (formula lags behind releases) nor dnf (not
-# packaged). The native install self-updates in the background.
+# Native installer on BOTH OSes: the brew formula lags behind releases and
+# Fedora does not package it. It self-updates in the background afterwards.
 _install_claude() {
   command -v claude >/dev/null 2>&1 && {
     log_ok "claude code already present"
@@ -102,14 +88,13 @@ _install_claude() {
 # --- logic ---
 
 if is_macos; then
-  # brew missing on macOS = broken install (prereqs failed?): fail loudly,
-  # don't silently skip every package.
+  # No brew on macOS means prereqs failed: fail loudly rather than silently
+  # skipping every package.
   if [ "$DRY_RUN" != 1 ] && ! require_cmd brew; then
     log_error "brew required on macOS -> install aborted"
     return 1
   fi
-  # run_soft: one formula that fails to build / one dead tap must not take
-  # the whole install with it. The failure is logged and the summary counts it.
+  # run_soft: one formula that fails to build must not take the install with it.
   run_soft brew bundle --file "$DOTFILES_DIR/setup/packages/Brewfile"
 
   # safe recipe (outside brew on purpose)
@@ -134,19 +119,16 @@ else
   _install_starship
   _install_claude
 
-  # out of scope: lazygit (Fedora -> COPR atim/lazygit)
-  # Deliberately out of scope (needs a third-party COPR): INFO, not a
-  # warning: nothing is broken and nothing is expected from the user.
+  # Out of scope on purpose (third-party COPR): INFO, not a warning, since
+  # nothing is broken and nothing is expected from you.
   command -v lazygit >/dev/null 2>&1 || log_info "lazygit missing -> COPR atim/lazygit (see ${_list##*/})"
 
   [ "$DRY_RUN" = 1 ] || hash -r
   log_ok "Linux packages ($OS) ok"
 fi
 
-# Security floor: PERISHABLE data, revised whenever this file is touched.
-# 2026.7.14 closes the July advisories (shell-args via untrusted local
-# config, High; the incomplete-fix follow-up to the June batch) on top of
-# the June ones (GHSA-436v-8fw5-4mj8 et al.).
+# Security floor. PERISHABLE: the version and what it closes are documented in
+# docs/packages.md, revise both together.
 if command -v mise >/dev/null 2>&1; then
   _mv=$(mise --version 2>/dev/null | awk '{print $1}')
   if [ -n "$_mv" ] && [ "$(printf '%s\n' 2026.7.14 "$_mv" | sort -V | head -n1)" != "2026.7.14" ]; then

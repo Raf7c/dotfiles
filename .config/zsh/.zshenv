@@ -1,19 +1,16 @@
 #!/usr/bin/env zsh
 
-# Common environment (XDG, EDITOR, history files…) shared with bash:
-# one single source of truth, POSIX syntax.
-# Guarded: .zshenv is read by every zsh, scripts included. A partial install
-# would otherwise error on every invocation and pollute every script's stdout.
+# The environment shared with bash, one source of truth in POSIX syntax.
+# Guarded: this file is read by every zsh, scripts included, and a partial
+# install would otherwise pollute every script's stdout.
 _env="${XDG_CONFIG_HOME:-$HOME/.config}/shell/env.sh"
 [[ -r "$_env" ]] && source "$_env"
 unset _env
 
 # ------------------ PATH ------------------
-# env.sh already prepended what's needed; this function RE-ASSERTS our
-# order (mise shims first) and dedups. -g: modifies the global param from
-# within the function. -U: deduplicates keeping the first occurrence.
-# (N-/): removes non-existent directories. Called again in .zprofile to
-# reassert order AFTER `brew shellenv`.
+# Re-asserts our order after env.sh, and again in .zprofile after
+# `brew shellenv`. -U dedups keeping the first occurrence, (N-/) drops
+# directories that do not exist. See docs/architecture.md, the PATH story.
 _zsh_build_path() {
   typeset -gU path PATH
   path=(

@@ -6,5 +6,4 @@ if [[ -x /opt/homebrew/bin/brew ]]; then
   export HOMEBREW_NO_ANALYTICS=1
 fi
 
-# All the common + interactive config:
 [[ -r ~/.bashrc ]] && source ~/.bashrc

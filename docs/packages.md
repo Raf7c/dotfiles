@@ -84,6 +84,9 @@ day, so two machines set up a month apart would diverge and
 "reproducible" would stop being true. Minor and patch updates still flow
 through `./run upgrade`; majors get bumped in the file, deliberately.
 
+`latest` is reserved for low-risk plumbing, the three entries above that
+nothing depends on version-wise: pipx, tree-sitter and usage.
+
 ## Fedora, the by-hand recipes
 
 One block per line of the table above, in the same order.
@@ -182,11 +185,17 @@ Fedora needs neither, its stock openssh shipping with FIDO2 support,
 which is why the gitsign step writes no `program` override there
 (`setup/steps/gitsign.sh`).
 
+Two version floors are enforced, and both are **perishable data**: they live
+here, and the code points back at this page rather than repeating them.
+
+| Tool | Floor | What it closes | Enforced by |
+|---|---|---|---|
+| mise | **2026.7.14** | the July advisory on shell arguments taken from an untrusted local config (High), the incomplete-fix follow-up to it, and the June batch (GHSA-436v-8fw5-4mj8 and friends) | `setup/steps/packages.sh` warns below it |
+| tmux | **3.6b** | CVE-2026-11623, a Sixel use-after-free. `allow-passthrough on` is precisely what lets those sequences reach the terminal | nothing automatic, check `tmux -V` |
+
 > [!IMPORTANT]
-> Version floor: **mise ≥ 2026.7.14**. The 2026 advisories (config
-> trust-check bypass, and the incomplete fix that followed) are only
-> closed there; the packages step warns below it. A floor is perishable:
-> it gets revised whenever the check is touched.
+> Revise this table whenever you touch either check. A floor that is never
+> revised stops being a floor and becomes folklore.
 
 ---
 

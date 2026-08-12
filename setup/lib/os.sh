@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
-# lib/os.sh: OS detection and specifics. Sourced by run.
-# Exposes: OS ∈ {macos, fedora, unknown}.
+# lib/os.sh: OS detection. Exposes OS ∈ {macos, fedora, unknown}.
 
 detect_os() {
   case "$(uname -s)" in
@@ -31,13 +30,11 @@ detect_os() {
 is_macos() { [ "${OS:-}" = macos ]; }
 is_fedora() { [ "${OS:-}" = fedora ]; }
 
-# pkg_install PKG... : install packages via dnf (Fedora).
-# (macOS goes through `brew bundle`, not this function.)
+# Fedora only: macOS goes through `brew bundle`, not this function.
 pkg_install() {
   [ "$#" -gt 0 ] || return 0
   case "${OS:-}" in
-    # run_soft: an unreachable mirror or one renamed package must be
-    # reported, not abort the run (`set -e`) before the rest of the steps.
+    # run_soft: an unreachable mirror must be reported, not abort the run.
     fedora) run_soft sudo dnf install -y "$@" ;;
     *)
       log_warn "pkg_install: unsupported OS ($OS)"

@@ -1,15 +1,7 @@
 #!/usr/bin/env sh
-# Step prereqs: package manager + base tools.
-#
-# Contract:
-#   - idempotent: command -v before installing
-#   - macOS: install Homebrew if missing (the installer also sets up the Command
-#            Line Tools -> git), then load its env IN THIS RUN (eval shellenv).
-#            Confirmation (unless --yes) since it's a system bootstrap.
-#   - Linux: git + curl via the native package manager (sudo); no confirm (packages).
-#   - after any install: `hash -r` (refresh command lookup)
-#   - dry-run: via run(), EXCEPT the Homebrew command (`$(curl …)` substitution)
-#     which is handled by hand so curl is not executed in dry-run.
+# Step prereqs: package manager + base tools. macOS installs Homebrew, which
+# also brings the Command Line Tools and therefore git; Fedora installs
+# git + curl. Asks before the Homebrew bootstrap: it is a system change.
 
 if is_macos; then
   # ------------------ Homebrew ------------------
@@ -21,8 +13,8 @@ if is_macos; then
     else
       log_info "installing Homebrew…"
       [ "$ASSUME_YES" = 1 ] && export NONINTERACTIVE=1
-      # Download THEN execute: a failed curl must fail loudly, not expand
-      # to an empty string silently executed by `bash -c`.
+      # Download THEN execute: a failed curl must not expand to an empty
+      # string silently executed by `bash -c`.
       _hb=$(curl -fsSL -- https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh) ||
         {
           log_error "Homebrew: download failed (network?)"
@@ -39,7 +31,8 @@ if is_macos; then
     log_warn "Homebrew not installed -> packages will fail on macOS"
   fi
 
-  # Load brew in THIS run (Apple Silicon only: /opt/homebrew).
+  # Load brew in THIS run, so the packages step finds it. Apple Silicon path
+  # only: gitsign.sh is the one that has to cover intel too.
   if [ "$DRY_RUN" != 1 ]; then
     [ -x /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
     hash -r
@@ -50,7 +43,7 @@ else
   [ "$DRY_RUN" != 1 ] && hash -r
 fi
 
-# Final check (non-blocking: install may have been declined / partial).
+# Non-blocking: the install may have been declined.
 if [ "$DRY_RUN" != 1 ]; then
   command -v git >/dev/null 2>&1 || log_warn "git not found after prereqs"
   command -v curl >/dev/null 2>&1 || log_warn "curl not found after prereqs"
