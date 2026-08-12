@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# lib/os.sh — OS detection and specifics. Sourced by run.
+# lib/os.sh: OS detection and specifics. Sourced by run.
 # Exposes: OS ∈ {macos, fedora, unknown}.
 
 detect_os() {

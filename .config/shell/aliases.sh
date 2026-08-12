@@ -30,7 +30,7 @@ alias v='nvim'
 
 # ------------------ Git ------------------
 # Shell aliases, NOT git aliases: `gst` beats `git st`. The trade-off is
-# stated: these live only in interactive shells — a script, another shell
+# stated: these live only in interactive shells. A script, another shell
 # or an IDE calling git sees plain git.
 if command -v git >/dev/null 2>&1; then
   alias g='git'

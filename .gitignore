@@ -20,5 +20,5 @@
 .config/git/config.local
 
 # compinit cache: ours goes to XDG (~/.cache/zsh), but any compinit run
-# without -d drops its dump at the default $ZDOTDIR path — inside this repo.
+# without -d drops its dump at the default $ZDOTDIR path, inside this repo.
 .config/zsh/.zcompdump*

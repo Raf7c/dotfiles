@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Common environment (XDG, EDITOR, PATH…) shared with zsh — POSIX file.
+# Common environment (XDG, EDITOR, PATH…) shared with zsh, POSIX file.
 # Guarded like every other source: a partial install must not error on
 # every bash start.
 _env="${XDG_CONFIG_HOME:-$HOME/.config}/shell/env.sh"
@@ -12,7 +12,7 @@ unset _env
 # without leaking interactive behaviour into scripts.
 # :- default everywhere below: if env.sh could not be sourced (partial
 # install), an empty XDG_* silently turns "${XDG_STATE_HOME}/bash/history"
-# into "/bash/history" — an unwritable path, and no history at all.
+# into "/bash/history", an unwritable path, and no history at all.
 export BASH_ENV="${XDG_CONFIG_HOME:-$HOME/.config}/shell/env.sh"
 
 # ===================== Beyond: interactive only =====================

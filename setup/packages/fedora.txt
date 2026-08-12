@@ -1,9 +1,9 @@
 # dnf packages, one per line: packages.sh reads the FIRST word of every
 # uncommented line. Sections mirror the Brewfile.
-# Everything NOT in this file — installed by ./run, by mise, by hand, or
-# deliberately absent — is in docs/tools.md: one table, both OSes.
+# Everything NOT in this file (installed by ./run, by mise, by hand, or
+# deliberately absent) is in docs/packages.md: one table, both OSes.
 
-# core — shell, multiplexer, vcs
+# core: shell, multiplexer, vcs
 git
 tmux
 zsh

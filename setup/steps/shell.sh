@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Module: shell — switch the login shell to zsh.
+# Step shell: switch the login shell to zsh.
 #
 # ZDOTDIR is bootstrapped from ~/.zshenv (linked by the symlinks step), not
 # from /etc/zshenv: no root, no leak into other users, `zsh -f` stays pristine.

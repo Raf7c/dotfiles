@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# lib/log.sh — log helpers (POSIX). Colors when output is a terminal
+# lib/log.sh: log helpers (POSIX). Colors when output is a terminal
 # and NO_COLOR is unset. Sourced by run.
 
 if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then

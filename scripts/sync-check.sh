@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# sync-check.sh — verify the cross-repo contract: files both dotfiles repos
+# sync-check.sh verifies the cross-repo contract: files both dotfiles repos
 # promise to keep byte-identical. Read-only. Usage:
 #   sync-check.sh [path-to-school-repo]
 set -eu
@@ -16,7 +16,7 @@ if [ -z "$SCHOOL" ]; then
   done
 fi
 [ -d "${SCHOOL:-}" ] || {
-  printf 'school repo not found — pass its path as argument\n' >&2
+  printf 'school repo not found, pass its path as argument\n' >&2
   exit 2
 }
 

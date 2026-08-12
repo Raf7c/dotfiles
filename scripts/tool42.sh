@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# tool42.sh — install norminette (42 school) + c_formatter_42.
+# tool42.sh: install norminette (42 school) + c_formatter_42.
 # Usage: ./tool42.sh
 set -eu
 
@@ -12,16 +12,16 @@ command -v python3 >/dev/null 2>&1 || {
 printf 'Installing norminette (42school) and c_formatter_42...\n'
 
 # pipx, not pip: PEP 668 (externally-managed-environment) blocks
-# `pip install --user` on current Fedora and mise-managed pythons — and
+# `pip install --user` on current Fedora and mise-managed pythons, and
 # the old fallback dropped --user, which is worse. pipx is installed by
 # mise (config.toml).
 command -v pipx >/dev/null 2>&1 || {
   printf 'Error: pipx required -> mise install pipx\n' >&2
   exit 1
 }
-# Norminette — https://github.com/42school/norminette
+# Norminette: https://github.com/42school/norminette
 pipx upgrade --install norminette
-# c_formatter_42 — https://github.com/dawnbeen/c_formatter_42
+# c_formatter_42: https://github.com/dawnbeen/c_formatter_42
 pipx upgrade --install c-formatter-42
 
 printf 'Verifying...\n'

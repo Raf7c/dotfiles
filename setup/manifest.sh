@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# setup/manifest.sh — symlink DATA (no logic here).
+# setup/manifest.sh: symlink DATA (no logic here).
 # Format: "<source in the repo>  <target under $HOME>". One target per line.
 #
 # Adding a config = adding ONE line.
@@ -21,14 +21,14 @@ scripts                .config/scripts
 
 # --- startup files at the root of $HOME ---
 # .zshenv is the ZDOTDIR bootstrap: it is what lets zsh find .config/zsh
-# WITHOUT sudo (the /etc/zshenv route needs root — see steps/shell.sh).
+# WITHOUT sudo (the /etc/zshenv route needs root, see steps/shell.sh).
 .zshenv                .zshenv
 .bashrc                .bashrc
 .bash_profile          .bash_profile
 EOF
 }
 
-# Directories to create (absolute paths, computed from XDG — unquoted heredoc).
+# Directories to create (absolute paths, computed from XDG, unquoted heredoc).
 # One directory per line. Without them zsh silently drops history and
 # compinit caching (the state/cache dirs are never auto-created).
 dotfiles_dirs() {

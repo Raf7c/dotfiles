@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Module: directories — create the required XDG directories.
+# Step directories: create the required XDG directories.
 # Contract:
 #
 #   - idempotent: mkdir -p

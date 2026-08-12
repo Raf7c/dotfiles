@@ -5,7 +5,7 @@
 # Sourced by `run` (lib/* loaded, OS detected, flags exported).
 
 # shellcheck disable=SC2086
-run_steps ${MODULES:-}
+run_steps ${STEPS_ARG:-}
 
 log_step "install done."
 log_summary install || exit 1

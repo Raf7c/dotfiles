@@ -1,10 +1,10 @@
 #!/usr/bin/env zsh
-# ~/.zshenv — ZDOTDIR bootstrap, WITHOUT sudo.
+# ~/.zshenv: ZDOTDIR bootstrap, WITHOUT sudo.
 #
 # zsh reads this file (as $ZDOTDIR/.zshenv, ZDOTDIR defaulting to $HOME) on
 # EVERY invocation: login, interactive and scripts. It is the only hook that
 # exists before ZDOTDIR does, hence the only way to point zsh at
-# ~/.config/zsh without writing to /etc — see setup/steps/shell.sh, which
+# ~/.config/zsh without writing to /etc, see setup/steps/shell.sh, which
 # needs sudo and affects every user of the machine.
 #
 # If /etc/zshenv already sets ZDOTDIR, zsh reads $ZDOTDIR/.zshenv directly

@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# lib/util.sh — general helpers (POSIX). Depends on log.sh (already sourced).
+# lib/util.sh: general helpers (POSIX). Depends on log.sh (already sourced).
 # The DRY_RUN / ASSUME_YES flags and DOTFILES_DIR are set by run.
 
 : "${DRY_RUN:=0}"

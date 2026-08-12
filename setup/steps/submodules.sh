@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Module: submodules — initialize/sync the repo's git submodules
+# Step submodules: initialize/sync the repo's git submodules
 #
 # Contract:
 #   - idempotent: `submodule update --init` is a no-op if already up to date;
@@ -19,7 +19,7 @@ if [ -f "$DOTFILES_DIR/.gitmodules" ]; then
   if run git -C "$DOTFILES_DIR" submodule update --init --recursive; then
     log_ok "submodules synced (pinned commit)"
   else
-    log_error "submodule update failed (network / SSH access?) — step stopped"
+    log_error "submodule update failed (network / SSH access?), step stopped"
     return 0
   fi
 
@@ -58,5 +58,5 @@ if [ -f "$DOTFILES_DIR/.gitmodules" ]; then
       log_ok "submodule $_path -> branch $_branch"
     done
 else
-  log_info "no submodule (.gitmodules missing) — nothing to do"
+  log_info "no submodule (.gitmodules missing), nothing to do"
 fi

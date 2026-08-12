@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Module: runtimes — install the tools managed by mise (from its config).
+# Step runtimes: install the tools managed by mise (from its config).
 #
 # Prerequisite: `mise` on the PATH (installed by packages, + hash -r).
 # We CHECK it explicitly here to avoid "mise: command not found".

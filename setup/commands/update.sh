@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Command: update — sync the machine with the repo.
+# Command update: sync the machine with the repo.
 # = `git pull` (fast-forward only) + replay the RECONCILING steps.
 # Does NOT bump versions (that's `upgrade`'s job). Sourced by `run`.
 
@@ -10,7 +10,7 @@ if [ "$DRY_RUN" = 1 ]; then
 elif git -C "$DOTFILES_DIR" pull --ff-only; then
   log_ok "repo up to date"
 else
-  log_warn "git pull --ff-only failed (local changes / divergence?) — continuing with current state"
+  log_warn "git pull --ff-only failed (local changes / divergence?), continuing with current state"
 fi
 
 # Replay the subset that brings the machine back in sync with the repo:

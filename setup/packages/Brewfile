@@ -1,9 +1,9 @@
 # Sections mirror fedora.txt so the two files read side by side.
-# Who installs what, on which OS: docs/tools.md — one table, both OSes.
+# Who installs what, on which OS: docs/packages.md, one table, both OSes.
 
 # ------------------------------ formulas ------------------------------
 
-# core — shell, multiplexer, vcs
+# core: shell, multiplexer, vcs
 brew "git"
 brew "tmux"
 brew "zsh"

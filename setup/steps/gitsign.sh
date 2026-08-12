@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Module: gitsign — generate the machine-local git signing config.
+# Step gitsign: generate the machine-local git signing config.
 # Contract:
 #
 #   - idempotent: the file is rewritten only when its content changes
@@ -54,7 +54,7 @@ fi
 # --- build the wanted content ----------------------------------------------
 # Inside log.sh's PRIVATE mktemp -d directory (0700, unpredictable name,
 # removed by its EXIT trap): a $$-derived name in world-writable /tmp can
-# be pre-created as a symlink by another local user — arbitrary file write.
+# be pre-created as a symlink by another local user: arbitrary file write.
 _gs_tmp="${_log_dir:?log.sh not sourced}/gitsign"
 {
   printf '%s\n' "$_gs_mark"

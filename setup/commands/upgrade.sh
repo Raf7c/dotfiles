@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Command: upgrade — bump the versions of installed tools.
+# Command upgrade: bump the versions of installed tools.
 # Does NOT touch the dotfiles structure (that's install/update); no git pull.
 # Tolerant: a failure on one tool does not stop the others. Sourced by `run`.
 
@@ -14,7 +14,7 @@ if is_macos; then
   fi
 else
   # The heaviest action of the repo (full system upgrade, kernel included)
-  # asks first — chsh does, this must too. -y/--dry-run answer yes already.
+  # asks first: chsh does, this must too. -y/--dry-run answer yes already.
   if confirm "Upgrade every system package (sudo dnf upgrade)?"; then
     run sudo dnf upgrade --refresh -y || log_warn "dnf upgrade: failed"
   fi
@@ -44,7 +44,7 @@ fi
 _zinit="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh"
 if [ -r "$_zinit" ] && command -v zsh >/dev/null 2>&1; then
   # -f: skip every startup file. -i would source the whole interactive
-  # config (compinit, plugins, tools) with no terminal attached — slow,
+  # config (compinit, plugins, tools) with no terminal attached: slow,
   # side effects, and upgrade would then depend on .zshrc being healthy.
   # -f skips startup files but INHERITS the exported ZDOTDIR: without
   # ZCOMPDUMP_PATH, zinit's own compinit would drop its dump inside the

@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Module: migrate — move legacy history files (~/.bash_history, ~/.zsh_history…)
+# Step migrate: move legacy history files (~/.bash_history, ~/.zsh_history…)
 # to their XDG location.
 #
 # Contract:

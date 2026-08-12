@@ -34,7 +34,7 @@ export LESSHISTFILE="${XDG_CACHE_HOME}/less/history"
 export PYTHON_HISTORY="${XDG_DATA_HOME}/python/history"
 # Third-party tools that default to ~/<dotdir> and accept a redirect:
 # one line each, one directory less at the root of $HOME. Only for tools
-# this machine actually runs — an unused redirect is dead config.
+# this machine actually runs: an unused redirect is dead config.
 export ANSIBLE_HOME="${XDG_DATA_HOME}/ansible" # collections, roles, tmp
 export npm_config_cache="${XDG_CACHE_HOME}/npm"
 
@@ -51,7 +51,7 @@ env_path_prepend "$HOME/.local/bin"
 env_path_prepend "${XDG_CONFIG_HOME}/scripts"
 env_path_prepend "${XDG_DATA_HOME}/mise/shims" # mise shims first
 
-# Append: same guards, opposite priority — an extra that must never
+# Append: same guards, opposite priority, an extra that must never
 # shadow a real tool. The -d check also keeps this macOS-only entry out
 # of Fedora's PATH for free, no OS test needed.
 env_path_append() {
@@ -61,7 +61,7 @@ env_path_append() {
 }
 # JetBrains Toolbox CLI launchers (idea, pycharm…). The path contains a
 # space: every read of PATH here is quoted, and zsh keeps it as one array
-# element — verified.
+# element, verified.
 env_path_append "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 
 export PATH

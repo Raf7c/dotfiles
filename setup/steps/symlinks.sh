@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Module: symlinks — apply the link manifest.
+# Step symlinks: apply the link manifest.
 #
 # Contract:
 #   - idempotent: link_with_backup does nothing if the link is already correct,

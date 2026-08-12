@@ -27,7 +27,7 @@ export FZF_DEFAULT_OPTS='
 --preview-window=right:65%:wrap:border-left'
 
 # Reusable preview command (shell variable: no need to export it).
-# bat is optional too — fall back to head, which is always there.
+# bat is optional too: fall back to head, which is always there.
 if ((${+commands[bat]})); then
   _FZF_PREVIEW_CMD='bat --color=always --style=plain,numbers --line-range=:500 {}'
 else
@@ -50,7 +50,7 @@ bindkey '^F' _fzf_file_no_hidden
 # ------------------ fzf-git.sh: plain-command aliases ------------------
 # The plugin binds CTRL-G CTRL-{F,B,T,R,H,S,L,W,E}; these call the very
 # same functions as commands. Difference worth knowing: the binding
-# INSERTS the selection on the command line, the alias PRINTS it — so
+# INSERTS the selection on the command line, the alias PRINTS it, so
 # `git switch $(gfb)` works. gf* namespace on purpose: it can never
 # collide with the g* git aliases of shell/aliases.sh.
 alias gff='_fzf_git_files'

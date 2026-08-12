@@ -1,12 +1,13 @@
 # tmux
 
-Everything tmux lives here, next to its config — bindings, theme,
+Everything tmux lives here, next to its config: bindings, theme,
 clipboard, plugins.
 
 Prefix: **`Ctrl-Space`** (`C-b` unbound). vi keys everywhere, windows and
 panes numbered from 1 (renumbered on close), 100k lines of history per
-pane (scrollback is RAM), `escape-time 10` (the upstream default — 0 can
-split escape sequences over slow ssh), `focus-events` (nvim autoread),
+pane (scrollback is RAM), `escape-time 10` (the upstream default since
+3.5, and a documented cure for flaky `M-` bindings at 0),
+`focus-events` (nvim autoread),
 `allow-passthrough` (OSC/images through tmux), `detach-on-destroy off`
 (destroying the last session switches to another instead of detaching).
 
@@ -42,23 +43,37 @@ releasing the button).
 ## Theme
 
 Hand-written status bar on the
-[Catppuccin](https://github.com/catppuccin/catppuccin) palette — not the
+[Catppuccin](https://github.com/catppuccin/catppuccin) palette, not the
 official plugin: two files in `themes/` (`latte.conf` / `mocha.conf`), zero
 extra dependency.
 Selected automatically **at server start**: macOS appearance (`defaults`)
 or GNOME (`gsettings`), falling back to **mocha** when undetectable (ssh,
-headless server — a pale bar would be unreadable there, the reverse still
-reads). `TMUX_THEME=light|dark` forces the choice. No continuous
-re-evaluation: after an OS light/dark switch, `prefix r` re-applies —
-manual by design, a per-OS hook would cost more than it returns.
+headless server, where a pale bar would be unreadable and the reverse
+still reads). `TMUX_THEME=light|dark` forces the choice. No continuous
+re-evaluation: after an OS light/dark switch, `prefix r` re-applies. That
+is manual by design, since a per-OS hook would cost more than it
+returns.
 
 ## Clipboard
 
-Every copy helper is **probed** (`command -v`) before use — pbcopy
+Every copy helper is **probed** (`command -v`) before use: pbcopy
 (macOS), wl-copy (Wayland), xclip (X11). If none exists (root-free
 install, bare server): plain tmux selection as fallback, and
-`set-clipboard on` still emits OSC 52 — the terminal gets the copy, SSH
-included, zero remote-side binary required.
+`set-clipboard on` still emits OSC 52, so the terminal gets the copy, SSH
+included, with no remote-side binary required.
+
+## Sessions
+
+resurrect + continuum save every 15 minutes and restore at server start,
+into `~/.local/share/tmux/resurrect/` (XDG; the plugin's own default is
+`~/.tmux/`, which this config overrides). Manual controls, when the
+automatic ones are not enough: `prefix Ctrl-s` saves, `prefix Ctrl-r`
+restores. Pane contents come back too (`capture-pane-contents`), and nvim
+sessions with them.
+
+The right side of the status bar, cpu, memory and disk, is drawn by the
+cpu-mem-monitor plugin. Without it, or without python3, the bar is simply
+shorter. Nothing else depends on it.
 
 ## Plugins (via TPM, cloned into `plugins/`, gitignored)
 
@@ -70,5 +85,5 @@ included, zero remote-side binary required.
 | [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum) | auto-save every 15 min, restore at server start |
 | [tmux-cpu-mem-monitor](https://github.com/hendrikmi/tmux-cpu-mem-monitor) | cpu / mem / disk in the bar (needs python3). Individual-maintainer upstream, knowingly accepted: it publishes no tag to pin, and exposure stays bounded to `prefix I`/`U` |
 
-Unpinned — same policy as zinit:
+Unpinned, same policy as zinit:
 [docs/architecture.md](../../docs/architecture.md).

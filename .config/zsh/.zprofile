@@ -8,6 +8,6 @@ if [[ -x /opt/homebrew/bin/brew ]]; then
 fi
 
 # brew just prepended the PATH; reassert our priorities (mise shims first)
-# by reusing the function defined in .zshenv — no duplicated list.
+# by reusing the function defined in .zshenv, no duplicated list.
 _zsh_build_path
 export PATH

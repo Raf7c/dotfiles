@@ -27,22 +27,22 @@ ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 # shell (degraded: no plugins), never startup errors.
 # Test the FILE we are going to source, not just the directory: an
 # interrupted clone (Ctrl-C, network drop) leaves a directory that passes
-# `-d` but has no zinit.zsh — the bootstrap would then never retry, and
+# `-d` but has no zinit.zsh: the bootstrap would then never retry, and
 # `git clone` into a non-empty directory refuses to run anyway. Purge it.
 if [[ ! -r "${ZINIT_HOME}/zinit.zsh" ]]; then
   [[ -d "${ZINIT_HOME}" ]] && rm -rf -- "${ZINIT_HOME}"
   if ((${+commands[git]})); then
     mkdir -p -- "${ZINIT_HOME:h}"
     git clone --depth 1 -- https://github.com/zdharma-continuum/zinit.git "${ZINIT_HOME}" ||
-      print -u2 "zinit: clone failed (network?) — plugins skipped this session"
+      print -u2 "zinit: clone failed (network?), plugins skipped this session"
   else
-    print -u2 "zinit: git missing — plugins skipped this session"
+    print -u2 "zinit: git missing, plugins skipped this session"
   fi
 fi
 
 if [[ -r "${ZINIT_HOME}/zinit.zsh" ]]; then
   # zinit reruns compinit itself during `zinit update`; without this it
-  # writes the dump at the DEFAULT location — $ZDOTDIR/.zcompdump, i.e.
+  # writes the dump at the DEFAULT location, $ZDOTDIR/.zcompdump, i.e.
   # inside this repo. Point it at the same XDG path _zsh_compinit uses.
   typeset -gA ZINIT
   ZINIT[ZCOMPDUMP_PATH]="${XDG_CACHE_HOME:-${HOME}/.cache}/zsh/zcompdump-${HOST}-${ZSH_VERSION}"
@@ -65,7 +65,7 @@ if [[ -r "${ZINIT_HOME}/zinit.zsh" ]]; then
   # ------------------ Plugins ------------------
   zinit light Aloxaf/fzf-tab
 
-  # fzf-git.sh: CTRL-G widgets over git objects. Guarded on fzf — without
+  # fzf-git.sh: CTRL-G widgets over git objects. Guarded on fzf: without
   # it the widgets would exist and fail on use.
   ((${+commands[fzf]})) && zinit wait lucid light-mode for junegunn/fzf-git.sh
 

@@ -1,11 +1,13 @@
-# Keymaps
+# Usage
 
-Every binding this configuration adds or changes. Defaults are not listed.
+Everything you type: the bindings this configuration adds or changes, and
+the aliases it defines. Stock defaults are not listed.
 
-## zsh — line editing (vi mode)
+## zsh: line editing (vi mode)
 
 `bindkey -v`, `KEYTIMEOUT=10` (100 ms to leave insert mode). bash mirrors
-it (`set -o vi` in `.bashrc`) — same reflexes in the fallback shell.
+it (`set -o vi` in `.bashrc`), so the reflexes carry over to the fallback
+shell.
 
 | Key | Action | Source |
 |---|---|---|
@@ -17,13 +19,13 @@ it (`set -o vi` in `.bashrc`) — same reflexes in the fallback shell.
 | `Tab` | fzf-tab completion menu (`<`/`>` switch groups, `Tab` moves down) | fzf-tab |
 
 fzf uses `fd` when present, `find` otherwise; previews use `bat`, then
-`head` as fallback — every binding works on a machine that has none of the
-three.
+`head` as fallback, so every binding works on a machine that has none of
+the three.
 
 ## tmux
 
 Documented with its config:
-[.config/tmux/README.md](../.config/tmux/README.md) — bindings, theme,
+[.config/tmux/README.md](../.config/tmux/README.md): bindings, theme,
 clipboard, plugins.
 
 ## Shell aliases and functions
@@ -33,22 +35,23 @@ clipboard, plugins.
 | `ls` / `ll` / `la` / `lt` | `eza` with icons, git status, tree | eza (fallback: `ls -lh`) |
 | `cat` | `bat` | bat |
 | `diff` | `diff --color=auto` | GNU diff (probed) |
-| `v` | `nvim` | — |
-| `path` | `$PATH`, one directory per line | — |
+| `v` | `nvim` | nothing |
+| `path` | `$PATH`, one directory per line | nothing |
 | `g` / `gst` / `gd` / `gck` / `gcm` / `gcma` / `gbr` / `gbra` | git / status / diff / checkout / commit / commit -a / branch / branch -a | git |
-| `ghc <repo>` | clones `github.com:$GITUSER/<repo>` into `$GHREPOS`, then cd | — |
-| `glc <repo>` | same for GitLab into `$GLREPOS` | — |
+| `ghc <repo>` | clones `github.com:$GITUSER/<repo>` into `$GHREPOS`, then cd | nothing |
+| `glc <repo>` | same for GitLab into `$GLREPOS` | nothing |
 
 `GITUSER`, `REPOS` (`~/lab`), `GHREPOS` (`$REPOS/github`) and `GLREPOS`
-(`$REPOS/gitlab`) are set in `shell/env.sh` — change them there. The
+(`$REPOS/gitlab`) are set in `shell/env.sh`, which is where you change
+them. The
 directories are created by `./run install` (directories step).
 
-These are **shell** aliases, not git aliases — `gst`, not `git st`. What
+These are **shell** aliases, not git aliases: `gst`, not `git st`. What
 that costs is written where they live (`shell/aliases.sh`): outside an
 interactive shell, git answers to plain git only. The git config itself
 is documented at [.config/git/README.md](../.config/git/README.md).
 
-## git objects — fzf-git.sh
+## git objects: fzf-git.sh
 
 [fzf-git.sh](https://github.com/junegunn/fzf-git.sh), loaded by zinit
 when fzf is present. Every binding starts with `Ctrl-G`; the same
@@ -68,15 +71,17 @@ functions are also reachable as plain `gf*` commands.
 | `Ctrl-G ?` | `gfk` | the list of these bindings |
 
 The binding **inserts** the selection into the command line; the alias
-**prints** it — `git switch $(gfb)`. Inside the picker: `Ctrl-O` opens
+**prints** it, hence `git switch $(gfb)`. Inside the picker: `Ctrl-O` opens
 in the browser, `Alt-E` in `$EDITOR`, `Ctrl-/` cycles the preview.
 
-## Ghostty
+## Terminals
 
-No custom binding for now — stock defaults. Notable behaviours:
-`copy-on-select = clipboard`, `macos-option-as-alt = true`.
+Neither ghostty nor kitty carries a custom binding. Stock defaults on
+both is what keeps muscle memory portable between them. Notable
+behaviours: `copy-on-select`, `macos-option-as-alt`. Configuration:
+[terminals.md](terminals.md).
 
 ---
 
-See also: [tools.md](tools.md) — the tools behind these bindings ·
-[terminals.md](terminals.md) — ghostty, kitty and their setup.
+See also: [tools.md](tools.md) for the tools behind these bindings, and
+[terminals.md](terminals.md) for ghostty, kitty and their configuration.

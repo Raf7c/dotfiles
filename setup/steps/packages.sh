@@ -1,10 +1,10 @@
 #!/usr/bin/env sh
-# Module: packages — install CLI packages/apps.
+# Step packages: install CLI packages/apps.
 #
 # Scope ("repo + safe recipes"):
 #   1. repo packages     (packages/fedora.txt -> pkg_install)   [Fedora]
 #   2. safe recipes WITHOUT sudo/repo: mise + starship (scripts) -> ~/.local/bin
-#      + claude code (official script, BOTH OSes: no brew on purpose —
+#      + claude code (official script, BOTH OSes: no brew on purpose,
 #        releases move faster than the formula; not packaged for Fedora)
 #   3. out of scope (lazygit) -> warning, without blocking
 #
@@ -136,16 +136,16 @@ else
 
   # out of scope: lazygit (Fedora -> COPR atim/lazygit)
   # Deliberately out of scope (needs a third-party COPR): INFO, not a
-  # warning — nothing is broken and nothing is expected from the user.
+  # warning: nothing is broken and nothing is expected from the user.
   command -v lazygit >/dev/null 2>&1 || log_info "lazygit missing -> COPR atim/lazygit (see ${_list##*/})"
 
   [ "$DRY_RUN" = 1 ] || hash -r
   log_ok "Linux packages ($OS) ok"
 fi
 
-# Security floor — PERISHABLE data, revised whenever this file is touched.
+# Security floor: PERISHABLE data, revised whenever this file is touched.
 # 2026.7.14 closes the July advisories (shell-args via untrusted local
-# config, High — the incomplete-fix follow-up to the June batch) on top of
+# config, High; the incomplete-fix follow-up to the June batch) on top of
 # the June ones (GHSA-436v-8fw5-4mj8 et al.).
 if command -v mise >/dev/null 2>&1; then
   _mv=$(mise --version 2>/dev/null | awk '{print $1}')

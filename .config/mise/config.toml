@@ -13,7 +13,7 @@ tree-sitter = "latest"
 usage = "latest"       # required by `mise completion` (bash/zsh)
 
 shellcheck = "0.11"
-shfmt = "3.13"  # 3.13: zsh support — the authority covers the zsh files
+shfmt = "3.13"  # 3.13: zsh support, the authority covers the zsh files
                 # too. Upstream calls that support incomplete: zsh diffs
                 # get READ, never applied blindly.
 yamllint = "1"

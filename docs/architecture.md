@@ -1,14 +1,14 @@
 # Architecture
 
 How a shell goes from "process starts" to "prompt ready", and the decisions
-behind it. Verified by execution — these chains were traced, not guessed.
+behind it. Verified by execution: these chains were traced, not guessed.
 
 ## zsh startup
 
 ```mermaid
 flowchart TD
     A["zsh starts"] --> B["~/.zshenv<br/><i>every invocation, scripts included</i><br/>exports ZDOTDIR, chains to the real .zshenv<br/>(zsh reads only ONE .zshenv)"]
-    B --> C["$ZDOTDIR/.zshenv<br/>sources shell/env.sh — XDG dirs, EDITOR,<br/>PATH (typeset -gU: deduplicated)"]
+    B --> C["$ZDOTDIR/.zshenv<br/>sources shell/env.sh: XDG dirs, EDITOR,<br/>PATH (typeset -gU: deduplicated)"]
     C -->|login only| D["$ZDOTDIR/.zprofile<br/>brew shellenv (macOS) + PATH re-assertion"]
     C -->|interactive| E["$ZDOTDIR/.zshrc"]
     D -->|interactive| E
@@ -34,19 +34,28 @@ flowchart TD
 `env.sh` is the single source of truth shared by both shells: POSIX syntax,
 sourced exactly once per shell.
 
-## Why the bootstrap needs no root
+## Why the zsh bootstrap needs no root
 
 `ZDOTDIR` used to be set from `/etc/zshenv` (written with sudo). Three
 flaws: the whole zsh config depended on root, the block leaked into every
 other user's shell, and `/etc/zshenv` is read even by `zsh -f`, so a
 "pristine" shell never was. `~/.zshenv`, linked from this repo by the
-symlinks step, is now the only bootstrap — `$HOME` only, no privilege.
+symlinks step, is now the only bootstrap. `$HOME` only, no privilege.
+
+Not to be confused with installing: `./run` does ask for sudo, for
+Homebrew, for dnf and for `chsh` ([installer.md](installer.md)). The
+difference is lifetime. A package is installed once, on a machine where you
+are admin, with your consent; `/etc/zshenv` was re-read at every shell
+start, for every user. Take sudo away from an already-installed machine and
+the configuration keeps working: nothing in the startup chain lives outside
+`$HOME`, which is exactly what makes the school repo possible without ever
+touching the system.
 
 ## XDG layout
 
 `$HOME` holds only four entry files (`.zshenv`, `.bashrc`, `.bash_profile`,
 and the `~/.config` links). Everything else **this repo controls** lives
-under XDG — third-party tools that ignore the spec keep their own
+under XDG. Third-party tools that ignore the spec keep their own
 dotdirs, and `env.sh` redirects the few that accept it (`ANSIBLE_HOME`,
 `npm_config_cache`):
 
@@ -59,6 +68,58 @@ dotdirs, and `env.sh` redirects the few that accept it (`ANSIBLE_HOME`,
 
 Every `XDG_*` read outside `env.sh` carries its `:-` default: each file
 must survive being loaded without the shared environment.
+
+## The PATH story
+
+Four actors touch `PATH`, in this order, and each has a reason:
+
+1. **`env.sh`** prepends `~/.local/bin`, `~/.config/scripts` and the mise
+   shims, that last one therefore **first** in the result: a project's
+   pinned runtime must win over anything the OS ships. It also *appends*
+   the JetBrains launchers: an extra that must never shadow a real tool.
+2. **`$ZDOTDIR/.zshenv`** rebuilds the array with `typeset -gU path PATH`
+   (deduplicated, first occurrence wins) and drops entries that do not
+   exist (`(N-/)`).
+3. **`.zprofile`** re-runs that same function **after `brew shellenv`**.
+   Homebrew prepends `/opt/homebrew/bin`, which would otherwise sit ahead
+   of the mise shims and hand you brew's node instead of the pinned one.
+4. **`.bashrc`** ends with an awk first-wins dedup: bash has no
+   `typeset -U`, and `mise activate --shims` re-prepends a directory the
+   inherited `PATH` already carried.
+
+Checking the result: `path` prints one entry per line. The mise shims must be
+first, and no entry twice.
+
+## History
+
+Both shells write under XDG, never at the root of `$HOME`, and both keep
+100k entries:
+
+| | zsh | bash |
+|---|---|---|
+| file | `~/.local/state/zsh/history` | `~/.local/state/bash/history` |
+| shared between live sessions | `SHARE_HISTORY` | `history -a` in `PROMPT_COMMAND` |
+| duplicates | `HIST_IGNORE_DUPS`, `HIST_EXPIRE_DUPS_FIRST`, `HIST_FIND_NO_DUPS` | `HISTCONTROL=ignoreboth:erasedups` |
+| a leading space hides the command | `HIST_IGNORE_SPACE` | `ignoreboth` covers it |
+
+`EXTENDED_HISTORY` (zsh) stores a timestamp and duration per entry, and it
+must be set **before** the file is first written, switching it on later
+leaves a half-formatted history. The directory has to exist or zsh
+silently stops saving; that is what the `directories` step is for.
+
+## Completion
+
+`compinit -i` runs from `zinit.zsh` with a dump keyed by **host and zsh
+version** (`zcompdump-$HOST-$ZSH_VERSION`): a shared `$HOME` over NFS, or
+a zsh upgrade, must never reuse an incompatible dump. `-i` skips the
+"insecure directories" prompt, because a question at shell start is a broken
+shell. The dump is rebuilt only when older than a day.
+
+Behaviour worth knowing: matching is **case-insensitive** one way
+(`m:{a-z}={A-Za-z}`: type lowercase, match either), the menu is drawn by
+**fzf-tab** (hence `menu no`: zsh must not open its own), and colours come
+from `dircolors` when it exists. Without it the completion list is
+monochrome, nothing more.
 
 ## Third-party code policy
 
@@ -78,15 +139,16 @@ The zsh plugins loaded (tmux plugins: see
 | [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions) | greyed-out suggestion from history (`wait lucid` too) |
 
 They are **unpinned on purpose**, with the argument stated precisely: a
-full-SHA pin protects against tag mutation (the real-world vector —
+full-SHA pin protects against tag mutation (the real-world vector:
 existing tags repointed at a malicious commit), but the zsh ecosystem has
 no bump tooling, so hand-written pins go stale and then get bumped without
 review anyway. Exposure stays limited to a fresh install or
 `./run upgrade`, both user-triggered. GitHub Actions are the opposite
-case — bump tooling exists (Dependabot) — so the CI pins full commit SHAs.
+case, since bump tooling exists there (Dependabot), so the CI pins full
+commit SHAs.
 
-To see what a machine actually runs, and spot clones still on disk but no
-longer declared:
+<details>
+<summary>Listing what a machine actually runs, orphans included</summary>
 
 ```sh
 for d in "${XDG_DATA_HOME:-$HOME/.local/share}"/zinit/plugins/*/ \
@@ -106,6 +168,8 @@ for d in "${XDG_DATA_HOME:-$HOME/.local/share}"/zinit/plugins/*/ \
 done
 ```
 
+</details>
+
 ## Environment variables reaching beyond the repo
 
 - **`BASH_ENV`** → `env.sh`: every non-interactive bash on the machine
@@ -114,5 +178,6 @@ done
 
 ---
 
-See also: [installer.md](installer.md) — how these chains get set up ·
-[keymaps.md](keymaps.md) — what the interactive shell offers once started.
+See also: [installer.md](installer.md) for how these chains get set up,
+and [usage.md](usage.md) for what the interactive shell offers once
+started.

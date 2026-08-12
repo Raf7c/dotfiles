@@ -1,6 +1,6 @@
 # The repo's quality bar on a neutral runner: three-shell syntax,
 # shellcheck (warning and above), shfmt against .editorconfig.
-# Actions are pinned to full commit SHAs: a tag is mutable — the
+# Actions are pinned to full commit SHAs: a tag is mutable, the
 # tj-actions attack (CVE-2025-30066) repointed existing tags; a SHA
 # cannot be repointed. Dependabot proposes the bumps.
 ---
@@ -26,7 +26,7 @@ jobs:
           sudo apt-get install -y -q dash zsh
 
       # Same shellcheck/shfmt versions as every machine: mise reads the
-      # repo's own config.toml — one version source for local and CI.
+      # repo's own config.toml, one version source for local and CI.
       - uses: jdx/mise-action@e6a8b3978addb5a52f2b4cd9d91eafa7f0ab959d  # v4.2.0
         env:
           MISE_GLOBAL_CONFIG_FILE: ${{ github.workspace }}/.config/mise/config.toml

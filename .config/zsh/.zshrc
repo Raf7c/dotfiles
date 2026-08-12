@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 # ------------------ History ------------------
-# :- defaults: .zshrc must survive without env.sh loaded — an empty
+# :- defaults: .zshrc must survive without env.sh loaded. An empty
 # XDG_STATE_HOME would silently lose the history to /zsh/history.
 HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
 HISTSIZE=100000
@@ -25,7 +25,7 @@ setopt NOBEEP
 setopt NUMERIC_GLOB_SORT
 
 bindkey -v
-# Not exported: ZLE-local. 100 ms — lower splits escape sequences over ssh.
+# Not exported: ZLE-local. 100 ms, lower splits escape sequences over ssh.
 KEYTIMEOUT=10
 
 # ------------------ GPG ------------------
@@ -42,7 +42,7 @@ source "${ZDOTDIR}/zinit.zsh"
 # ------------------ Completion zstyle ------------------
 zstyle ':completion::complete:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompcache"
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-# dircolors feeds LS_COLORS; guarded — macOS without coreutils just gets
+# dircolors feeds LS_COLORS; guarded: macOS without coreutils just gets
 # no completion colors.
 if ((${+commands[dircolors]})); then
   eval "$(dircolors -b)"
@@ -50,7 +50,7 @@ elif ((${+commands[gdircolors]})); then
   eval "$(gdircolors -b)"
 fi
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-# menu no: required by fzf-tab — it must capture the unambiguous prefix
+# menu no: required by fzf-tab, it must capture the unambiguous prefix
 # instead of zsh opening its own selection menu.
 zstyle ':completion:*' menu no
 
@@ -71,7 +71,7 @@ zstyle ':fzf-tab:*' fzf-min-height 20
 zstyle ':fzf-tab:*' switch-group '<' '>'
 zstyle ':fzf-tab:*' fzf-bindings 'tab:down'
 
-# Register zinit completion — ONLY if zinit really loaded (see zinit.zsh:
+# Register zinit completion, ONLY if zinit really loaded (see zinit.zsh:
 # without git or without network it does not). Otherwise every TAB on
 # `zinit` autoloads a completion for a command that does not exist.
 if ((${+functions[zinit]})); then

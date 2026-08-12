@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Module: prereqs — package manager + base tools.
+# Step prereqs: package manager + base tools.
 #
 # Contract:
 #   - idempotent: command -v before installing

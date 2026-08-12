@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# bootstrap-aidd.sh — install my agent config on a fresh machine.
+# bootstrap-aidd.sh: install my agent config on a fresh machine.
 # Clones aidd + library into ~/.config/aiddconf, then deploys the symlinks.
 # Idempotent: safe to re-run (clone if missing, pull otherwise).
 set -eu

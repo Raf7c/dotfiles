@@ -4,7 +4,7 @@
 extends: default
 
 rules:
-  # SHA-pinned `uses:` lines are 90-105 chars by construction — a full
+  # SHA-pinned `uses:` lines are 90-105 chars by construction, a full
   # 40-char commit SHA cannot shrink, and the pin is a security choice.
   line-length:
     max: 120
