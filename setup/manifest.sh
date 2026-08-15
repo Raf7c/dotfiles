@@ -21,7 +21,9 @@ scripts                .config/scripts
 # --- startup files at the root of $HOME ---
 # .zshenv is the ZDOTDIR bootstrap: what lets zsh find .config/zsh without
 # root. See docs/architecture.md.
+# .vimrc: the historic path, the only one every vim reads.
 .zshenv                .zshenv
+.vimrc                 .vimrc
 .bashrc                .bashrc
 .bash_profile          .bash_profile
 EOF

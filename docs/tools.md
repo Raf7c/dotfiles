@@ -20,6 +20,17 @@ each one comes from on which OS: [packages.md](packages.md).
 | [jq](https://github.com/jqlang/jq) | nothing | JSON on the command line |
 | [just](https://github.com/casey/just) | nothing | named-command runner. NOT a make replacement: make builds (C, incremental targets), just runs repo tasks without the .PHONY ceremony |
 
+## Editors: nvim, and vim behind it
+
+nvim carries the real config, as a submodule
+([.config/nvim](https://github.com/Raf7c/nvimconf)). `vim` gets four lines
+in `.vimrc` so a file edited without nvim keeps the same indentation:
+**tabs, never spaces, four columns wide**.
+
+`~/.vimrc` and not the XDG path on purpose: vim only reads
+`~/.config/vim/vimrc` since 9.1.0327, so the XDG route would be ignored in
+silence on an older vim.
+
 ## Prompt: starship
 
 `.config/starship.toml`, one file for zsh and bash. The choice that

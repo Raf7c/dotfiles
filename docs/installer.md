@@ -108,7 +108,6 @@ code.
 
 | Script | Effect |
 |---|---|
-| `sync-check.sh` | verifies the cross-repo contract: the files both dotfiles repos keep byte-identical (kitty, tmux themes) |
 | `osx.sh` | rewrites ~15 macOS `defaults` (Dock, Finder, screenshots) and disables the Spotlight shortcut. Read it before running |
 | `tool42.sh` | installs norminette + c_formatter_42 (needs pipx, installed by mise). Lives HERE because the school repo installs nothing by design |
 | `bootstrap-aidd.sh` | clones two private repos into `~/.config/aiddconf` and deploys their links |

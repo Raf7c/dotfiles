@@ -31,7 +31,7 @@ takes a fresh machine (**macOS** or **Fedora**) to a ready workstation.
 - **Theme**: Catppuccin, auto light/dark
 - **Terminals**: ghostty · kitty
 - **Multiplexer**: tmux
-- **Editors**: nvim · JetBrains
+- **Editors**: nvim · vim (fallback) · JetBrains
 
 ## Highlights
 
@@ -76,6 +76,7 @@ scripts/             manual scripts, on the PATH, never run by ./run
 docs/                architecture, installer, maintenance, usage, packages, tools, terminals
 .config/             everything linked into ~/.config (zsh, tmux, git, kitty…)
 .zshenv .bashrc .bash_profile    the three files zsh and bash need in $HOME
+.vimrc                           four options for the fallback vim: tabs, width 4
 .editorconfig .yamllint.yml      formatting authorities, read by the CI
 .github/             CI workflow + Dependabot
 ```

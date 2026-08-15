@@ -22,9 +22,6 @@ on every push to `main`/`dev` and on every pull request:
 - **shfmt** against `.editorconfig`, where `-d` must stay silent.
 - **yamllint** on `.github`, with `.yamllint.yml` stating which of its
   defaults bend and why (a SHA-pinned `uses:` line cannot fit 80 columns).
-- **contract**: a second job clones the school repo and runs
-  `scripts/sync-check.sh`: the files both repos promise to keep
-  byte-identical are diffed, not trusted.
 
 > [!CAUTION]
 > Handed a directory, shfmt and `find` silently skip dotfiles. Every zsh
@@ -51,6 +48,7 @@ No health-check script: the checks that matter are one command each.
 | an install did something unexpected | replay it: `./run install -n` prints every command and writes nothing |
 | plugins missing after an update | `./run upgrade`, then `exec zsh` |
 | tmux ignores the config | `tmux kill-server`, since options are read once, at server start |
+| vim indents with spaces | `vim --version`, then `:verbose set expandtab?`: the line names the file that won |
 | history is not saved | the directory must exist and be writable: `ls -ld ~/.local/state/zsh ~/.local/state/bash` |
 | a signature will not verify | [git](../.config/git/README.md): checking, and the key's validity window |
 | a stray file appears in `$HOME` | some tool ignores XDG: check `env.sh` for a redirect, else delete it ([tools.md](tools.md)) |
