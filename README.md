@@ -52,7 +52,7 @@ takes a fresh machine (**macOS** or **Fedora**) to a ready workstation.
 
 ## Non-goals
 
-No framework and no plugin manager for the installer: ten steps of POSIX
+No framework and no plugin manager for the installer: eleven steps of POSIX
 sh are easier to audit than a dependency. No system-wide or multi-user
 install: everything lives in `$HOME` except the package layer. No
 Windows, no WSL: untested, therefore unclaimed.

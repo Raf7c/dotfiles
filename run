@@ -33,7 +33,7 @@ DOTFILES_DIR=$(CDPATH='' cd -- "$(dirname -- "$_self")" && pwd)
 export DOTFILES_DIR
 
 # Single source of truth for the order. See docs/installer.md, adding a step.
-STEPS="prereqs submodules directories migrate symlinks packages gitsign runtimes plugins shell"
+STEPS="prereqs submodules directories migrate symlinks packages gitsign runtimes extras plugins shell"
 export STEPS
 
 usage() {

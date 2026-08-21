@@ -35,6 +35,8 @@ podman
 gnupg2
 age
 yubikey-manager
+pcsc-lite
+pcsc-lite-devel
 
 # system integration
 util-linux-user

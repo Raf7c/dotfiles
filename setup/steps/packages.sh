@@ -119,10 +119,6 @@ else
   _install_starship
   _install_claude
 
-  # Out of scope on purpose (third-party COPR): INFO, not a warning, since
-  # nothing is broken and nothing is expected from you.
-  command -v lazygit >/dev/null 2>&1 || log_info "lazygit missing -> COPR atim/lazygit (see ${_list##*/})"
-
   [ "$DRY_RUN" = 1 ] || hash -r
   log_ok "Linux packages ($OS) ok"
 fi

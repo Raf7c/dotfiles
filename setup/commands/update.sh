@@ -12,8 +12,8 @@ else
   log_warn "git pull --ff-only failed (local changes / divergence?), continuing with current state"
 fi
 
-# prereqs / migrate / shell are one-time. gitsign stays out too: a key added
-# later needs `./run install gitsign` by hand (docs/installer.md).
+# prereqs / migrate / shell are one-time. gitsign and extras stay out too: both
+# ask questions, and `update -y` would answer them for you (docs/installer.md).
 run_steps submodules directories symlinks packages runtimes plugins
 
 log_step "update done."

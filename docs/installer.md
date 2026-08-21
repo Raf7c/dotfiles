@@ -52,31 +52,48 @@ setup/commands/*.sh     the update / upgrade flows
 | 6 | `packages` | `brew bundle` / `dnf`, then the no-sudo recipes (mise, starship, claude) | Fedora | yes | `prereqs` |
 | 7 | `gitsign` | generate `config.local` from the keys this machine has | no | no | nothing |
 | 8 | `runtimes` | install what `mise` declares (node, python, rust, neovim, linters) | no | yes | `packages`, for mise on the PATH |
-| 9 | `plugins` | clone TPM (zinit clones itself at first zsh start) | no | yes | `prereqs` for git, `symlinks` for `~/.config/tmux` |
-| 10 | `shell` | `chsh` to zsh, asking first, and appends to `/etc/shells` | yes | no | `packages`, `chsh` needs zsh installed |
+| 9 | `extras` | Fedora only: the four tools Fedora does not package (lazygit, sops, age-plugin-yubikey, the Nerd Font) | Fedora, for the COPR only | yes | `runtimes`, for cargo |
+| 10 | `plugins` | clone TPM (zinit clones itself at first zsh start) | no | yes | `prereqs` for git, `symlinks` for `~/.config/tmux` |
+| 11 | `shell` | `chsh` to zsh, asking first, and appends to `/etc/shells` | yes | no | `packages`, `chsh` needs zsh installed |
 
 The order in `STEPS` is that dependency chain, nothing more. A missing
 dependency is a clean skip with a log line, never a crash: **runtimes**
 without mise, **plugins** without network, **shell** without zsh.
 
-Three deserve a note: **migrate** runs once per machine and never returns;
-**gitsign** never overwrites a hand-written `config.local`; **shell** is
-the only step that needs sudo on macOS too.
+Four deserve a note: **migrate** runs once per machine and never returns;
+**gitsign** never overwrites a hand-written `config.local`; **shell** is the
+only step that needs sudo on macOS too; **extras** is a clean no-op on macOS,
+where brew carries all four.
 
 ## What each command replays
 
 | Step | `install` | `update` | `upgrade` |
 |---|---|---|---|
-| prereqs, migrate, gitsign, shell | ✓ | | |
+| prereqs, migrate, gitsign, extras, shell | ✓ | | |
 | submodules, directories, symlinks, packages, runtimes, plugins | ✓ | ✓ | |
-| version bumps (brew/dnf, mise, zinit, TPM, submodules to latest) | | | ✓ |
+| version bumps (brew/dnf, mise, zinit, TPM, age-plugin-yubikey, submodules to latest) | | | ✓ |
 
-`update` replays only what re-syncs a machine with the repo. `upgrade`
-runs no step at all; it moves versions.
+The line between the two groups is not "what is risky", it is **where the
+truth lives**. The six replayed steps read the repo: `manifest.sh`,
+`fedora.txt`, `config.toml`, `.gitmodules`. Edit one of those, push, and the
+other machine needs `update` to catch up. `gitsign` reads `~/.ssh`, and
+`extras` reads what is already installed plus your answer about a COPR. No
+`git pull` can change either input, so replaying them after a pull would
+recompute the same answer from the same data.
 
-> [!NOTE]
-> `gitsign` is not in that list. A signing key added after the install
-> needs `./run install gitsign` by hand, `update` will not pick it up.
+The practical consequence: a signing key added later needs
+`./run install gitsign`, and a COPR declined once is offered again by
+`./run install extras`, never by an update. Which is also why `-y` cannot
+enable a third-party repo behind your back: the step it lives in is not in
+the update list at all.
+
+> [!IMPORTANT]
+> The **step** and the **tools it installed** are two different things.
+> `upgrade` runs no step, yet it does maintain two of the four: lazygit rides
+> the `dnf upgrade` it already performs, and age-plugin-yubikey has its own
+> `cargo install --force` line in `upgrade.sh`. sops moves only when its pin
+> is bumped in the repo, the font not at all
+> ([packages.md](packages.md)).
 
 ## Adding a step
 
@@ -103,6 +120,22 @@ The libs are already sourced, so use them rather than reinventing:
 Never call `exit` in a step: it kills `run` itself and the summary with
 it. Use `return 1`: `run_steps` catches it and `log_summary` owns the exit
 code.
+
+## Third-party repos: asked, never assumed
+
+The `extras` step has exactly one place where `./run` adds a package source it
+does not control: the lazygit COPR. That is a decision, so it goes through
+`confirm`, the same helper `chsh` and the Homebrew bootstrap use. Declining is
+a logged skip, not a failure, and the by-hand recipe stays in
+[packages.md](packages.md).
+
+The other three need no sudo and no third-party repo: sops and
+the Nerd Font are downloaded, checked against the checksums file published
+with the same release, and only then installed; age-plugin-yubikey is built by
+the cargo that mise already provides. A checksum from the same origin as the
+download proves integrity, not authenticity: it catches a truncated or altered
+transfer, not a compromised release. Proving authenticity would mean verifying
+the sigstore bundle with cosign, which is not part of this stack.
 
 ## Manual scripts (`scripts/`, on the PATH, never run by `./run`)
 

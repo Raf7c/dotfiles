@@ -31,6 +31,22 @@ else
   log_warn "mise missing -> runtime update skipped"
 fi
 
+# --- age-plugin-yubikey (extras step; cargo never re-installs on its own) ---
+# The other three extras are pinned or inert: sops moves when its version is
+# bumped in setup/steps/extras.sh and committed, the font is an unpacked
+# archive, lazygit rides `dnf upgrade` above.
+if command -v age-plugin-yubikey >/dev/null 2>&1; then
+  _up_cargo=$(command -v cargo 2>/dev/null ||
+    printf '%s' "${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims/cargo")
+  if [ -x "$_up_cargo" ]; then
+    run "$_up_cargo" install --force --root "$HOME/.local" age-plugin-yubikey ||
+      log_warn "age-plugin-yubikey: upgrade failed"
+  else
+    log_warn "age-plugin-yubikey: no cargo, upgrade skipped"
+  fi
+  unset _up_cargo
+fi
+
 # --- Claude Code (native installer; self-updates, but stay explicit) ---
 if command -v claude >/dev/null 2>&1; then
   run claude update || log_warn "claude update: failed"

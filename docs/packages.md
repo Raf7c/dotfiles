@@ -3,19 +3,23 @@
 Where every tool comes from on each OS, and what is left for you to do
 by hand. Why a given tool is here at all: [tools.md](tools.md).
 
-## Three install tiers
+## Four install tiers
 
-`setup/steps/packages.sh` installs in three tiers, and the package files
-stay bare lists: what is **not** in them is described here, once.
+Two steps install software, and the package files stay bare lists: what is
+**not** in them is described here, once.
 
-1. **Native package manager.** `brew bundle` (Brewfile) on macOS, `dnf`
-   (`fedora.txt`) on Fedora.
-2. **No-sudo recipes.** starship, mise and claude-code are missing from
-   the Fedora repos: official scripts into `~/.local/bin`, idempotent
-   (`command -v` first), downloaded **then** executed, which guards
-   against running a truncated download.
-3. **By hand.** Whatever needs a third-party repo or has no package.
-   The installer reports (INFO) and never blocks; the recipes are below.
+1. **Native package manager** (`packages`). `brew bundle` (Brewfile) on
+   macOS, `dnf` (`fedora.txt`) on Fedora.
+2. **No-sudo recipes** (`packages`). starship, mise and claude-code are
+   missing from the Fedora repos: official scripts into `~/.local/bin`,
+   idempotent (`command -v` first), downloaded **then** executed, which
+   guards against running a truncated download.
+3. **What Fedora does not package** (`extras`, Fedora only). One COPR, asked
+   before it is enabled, plus two downloads verified against the checksums
+   published with the same release and one cargo build. macOS gets all four
+   from brew, so the step is a no-op there.
+4. **By hand.** The five GUI apps, because none of them publishes anything
+   worth verifying. Recipes below.
 
 ## Installed for you
 
@@ -36,27 +40,62 @@ Legend: **brew** / **cask** = Brewfile · **dnf** = fedora.txt · **mise** =
 | starship · mise | brew | **`./run`**, official script into `~/.local/bin` |
 | claude-code | **`./run`** | **`./run`** |
 | runtimes and the pinned linters | mise | mise |
+| lazygit | brew | **`./run`** `extras`, COPR, asked first |
+| sops · Nerd Font | brew, cask | **`./run`** `extras`, download + checksum |
+| age-plugin-yubikey | brew | **`./run`** `extras`, `cargo install` |
+
+## What the `extras` step does on Fedora
+
+Four tools, and none of them is a matter of taste: each was checked against
+`packages.fedoraproject.org` and is genuinely absent from the Fedora
+repositories. Fedora ships the plain `jetbrains-mono-fonts`, which is not the
+same font: the patched build carries the glyphs, the plain one does not.
+
+| Tool | In Fedora? | Source used | Checked how |
+|---|---|---|---|
+| lazygit | no | COPR `dejan/lazygit`, from lazygit's README | dnf, COPR signature |
+| sops | no | the `linux.<arch>` binary of a pinned release | SHA-256 against `checksums.txt` |
+| Nerd Font | plain family only | `JetBrainsMono.tar.xz`, latest release | SHA-256 against `SHA-256.txt` |
+| age-plugin-yubikey | no | `cargo install`, rust comes from mise | crates.io |
+
+Only lazygit asks, because it is the only one adding a package source: a COPR
+is signed by whoever maintains it, not by Fedora. The other three touch
+nothing outside `$HOME` and need no sudo.
+
+What keeps them up to date afterwards is not the same for all four, and the
+difference is deliberate:
+
+| Tool | Kept current by |
+|---|---|
+| lazygit | `./run upgrade`, through `dnf upgrade`: a COPR is a repo like any other |
+| age-plugin-yubikey | `./run upgrade`, `cargo install --force` |
+| sops | **you**: bump the version in `setup/steps/extras.sh`, commit, rerun `./run install extras`. Same rule as a mise pin, a version change is a tracked edit |
+| Nerd Font | nothing. An unpacked archive with no security surface; delete the directory and rerun the step to refresh it |
+
+Two details that bite. `cargo install age-plugin-yubikey` will not compile
+without the `pcsc-lite-devel` headers, and the plugin will not talk to the
+YubiKey without `pcsc-lite` and its `pcscd` service: both are in
+`fedora.txt`. And cargo drops its own registry cache in `~/.cargo` whatever
+happens, only the binary is redirected to `~/.local/bin`.
 
 ## Fedora: what stays in your hands
 
-Six things the installer will not do for you, because each needs a
-third-party repo or has no package at all. It says so (INFO) and carries
-on.
+The five GUI apps, and only them. None publishes a checksum worth the code
+it would take to verify, and two ship a tarball whose URL has to be
+discovered through an API.
 
 | Tool | macOS gets it from | On Fedora, you |
 |---|---|---|
-| lazygit | brew | enable COPR `atim/lazygit` |
-| ghostty | cask | enable COPR `pgdev/ghostty` (kitty from dnf is the fallback) |
-| sops | brew | drop the binary from the getsops GitHub releases |
-| age-plugin-yubikey | brew | `cargo install age-plugin-yubikey` |
-| Nerd Font | cask `font-jetbrains-mono-nerd-font` | unzip it into `~/.local/share/fonts` (recipe below) |
-| jetbrains-toolbox · gitkraken · obsidian · keymapp · google-chrome | cask | flatpak, official tarball or vendor repo (recipes below) |
+| obsidian · gitkraken | cask | `flatpak install` from flathub |
+| google-chrome | cask | enable Google's own repo |
+| jetbrains-toolbox · keymapp | cask | official tarball, unpacked by hand |
 
 ## macOS only, on purpose
 
 | Tool | Why nothing on Fedora |
 |---|---|
 | openssh · libfido2 | Fedora's stock openssh already signs `sk-*` keys |
+| ghostty | its own docs call every Linux package a community build and say installing one means accepting a third party could have tampered with it. kitty comes from dnf and does the same job |
 | cloudflared | deliberately not installed there |
 | raycast · claude (desktop) | no Linux build exists |
 
@@ -89,62 +128,26 @@ nothing depends on version-wise: pipx, tree-sitter and usage.
 
 ## Fedora, the by-hand recipes
 
-One block per line of the table above, in the same order.
-
 <details>
-<summary><b>lazygit and ghostty</b>, from COPR</summary>
+<summary><b>Declined the COPR, or want it later</b></summary>
 
-Enabling a third-party repo is a decision, not a detail, which is why the
-installer leaves these two alone.
+The `extras` step offers it again on every `./run install extras`, and never
+during an update. To do it yourself, this is exactly what it would run:
 
 ```sh
-sudo dnf copr enable atim/lazygit && sudo dnf install lazygit
-sudo dnf copr enable pgdev/ghostty && sudo dnf install ghostty
+sudo dnf copr enable dejan/lazygit && sudo dnf install lazygit
 ```
 
 </details>
 
 <details>
-<summary><b>sops</b>, a prebuilt binary</summary>
+<summary><b>The Nerd Font</b>, once it is installed</summary>
 
-Take the `linux.amd64` asset from the latest release on
-`github.com/getsops/sops`, then:
-
-```sh
-chmod +x ~/Downloads/sops-*.linux.amd64
-mv ~/Downloads/sops-*.linux.amd64 ~/.local/bin/sops
-```
-
-</details>
-
-<details>
-<summary><b>age-plugin-yubikey</b>, through cargo</summary>
-
-Not packaged anywhere, but rust is already there through mise:
-
-```sh
-cargo install age-plugin-yubikey
-```
-
-</details>
-
-<details>
-<summary><b>The Nerd Font</b>, required and not in the repos</summary>
-
-Required, not cosmetic: starship, `eza --icons` and the tmux status bar
-all draw glyphs from its private range, and without it the prompt is a
-row of empty boxes. Fedora packages the plain JetBrains Mono, which has
-none of those glyphs, and the patched build is not in the repos.
-Installing it in the user font directory needs neither sudo nor COPR.
-Download `JetBrainsMono.zip` from the nerd-fonts releases, then:
-
-```sh
-mkdir -p ~/.local/share/fonts
-unzip -o ~/Downloads/JetBrainsMono.zip -d ~/.local/share/fonts/JetBrainsMonoNerd
-fc-cache -f ~/.local/share/fonts
-```
-
-Then point the terminal at the family name `JetBrainsMono Nerd Font`.
+The step unpacks it into `~/.local/share/fonts/JetBrainsMonoNerd` and
+refreshes the cache. What it cannot do is pick it for you: point the
+terminal at the family name `JetBrainsMono Nerd Font`. Without it the
+prompt is a row of empty boxes, since starship, `eza --icons` and the tmux
+status bar all draw from its private glyph range.
 
 </details>
 
@@ -158,9 +161,10 @@ flatpak install flathub md.obsidian.Obsidian com.axosoft.GitKraken
 ```
 
 The last three have no package at all: **jetbrains-toolbox** is a tarball
-from `jetbrains.com/toolbox-app`, **keymapp** a tarball from
-`zsa.io/flash` (it needs `libwebkit2gtk` 4.1), and **google-chrome** comes
-from Google's own repo:
+from `jetbrains.com/toolbox-app`, unpacked anywhere you own and started
+once with `./bin/jetbrains-toolbox`, which writes its own `.desktop` entry;
+**keymapp** a tarball from `zsa.io/flash` (it needs `libwebkit2gtk` 4.1);
+and **google-chrome** comes from Google's own repo:
 
 ```sh
 sudo dnf install fedora-workstation-repositories
@@ -173,9 +177,9 @@ sudo dnf install google-chrome-stable
 ## Security
 
 Secrets and YubiKey tooling on both platforms: age, sops,
-age-plugin-yubikey and ykman via the Brewfile on macOS; on Fedora, `age`
-and `yubikey-manager` come from the base repos, sops and
-age-plugin-yubikey do not (see the comments in `fedora.txt`).
+age-plugin-yubikey and ykman via the Brewfile on macOS; on Fedora, `age`,
+`yubikey-manager` and the `pcsc-lite` pair come from the base repos, while
+sops and age-plugin-yubikey are handled by the `extras` step.
 
 Homebrew openssh + libfido2 exist only to fix a macOS gap: Apple's
 ssh-keygen cannot sign with FIDO2 `sk-*` keys. Side effect: the formula
