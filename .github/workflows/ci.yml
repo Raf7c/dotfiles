@@ -51,6 +51,22 @@ jobs:
             -exec shellcheck -S warning {} +
           shellcheck -S warning -s bash .bashrc .bash_profile
 
+      # A step is SOURCED by run_steps: an `exit` there kills run itself and
+      # skips log_summary, silently. Neither shellcheck nor shfmt can see it,
+      # it is valid sh. See docs/installer.md, the step contract.
+      - name: no exit in a sourced step
+        run: |
+          rc=0
+          for f in setup/steps/*.sh; do
+            # Strip comments first: "log_summary owns the exit code" is prose.
+            if sed 's/#.*//' "$f" |
+              grep -nE '(^|[;&|[:space:]])exit([[:space:]]|$)'; then
+              echo "::error file=$f::a step must return, never exit"
+              rc=1
+            fi
+          done
+          exit "$rc"
+
       - name: shfmt (.editorconfig is the authority, -d must stay silent)
         # shfmt SKIPS hidden files when walking a directory and has no flag
         # to include them: every zsh file must be listed EXPLICITLY or it
