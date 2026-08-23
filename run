@@ -38,6 +38,7 @@ Examples:
   ./run install -n                    # preview, run nothing
   ./run install symlinks packages     # only these steps
   ./run install -y                    # install without any confirmation prompt
+  ./run update                        # git pull, then resync from the repo
   ./run upgrade -n                    # preview the updates
 
 Details: README.md

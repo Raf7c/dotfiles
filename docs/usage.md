@@ -32,9 +32,12 @@ clipboard, plugins.
 
 | Alias | Becomes | Needs |
 |---|---|---|
-| `ls` / `ll` / `la` / `lt` | `eza` with icons, git status, tree | eza (fallback: `ls -lh`) |
+| `ll` / `la` | `eza -lh` / `eza -lah`, icons and git status | eza (fallback: `ls -lh` / `ls -lah`) |
+| `lt` | `eza --tree --icons` | eza (fallback: `tree`) |
+| `ls` | `eza --icons` | eza only: without it, `ls` stays the system `ls` |
 | `cat` | `bat` | bat |
 | `diff` | `diff --color=auto` | GNU diff (probed) |
+| `df` | `df -h` | nothing |
 | `v` | `nvim` | nothing |
 | `path` | `$PATH`, one directory per line | nothing |
 | `g` / `gst` / `gd` / `gck` / `gcm` / `gcma` / `gbr` / `gbra` | git / status / diff / checkout / commit / commit -a / branch / branch -a | git |

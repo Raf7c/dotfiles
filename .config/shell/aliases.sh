@@ -10,6 +10,12 @@ if command -v eza >/dev/null 2>&1; then
 else
   alias ll='ls -lh'
   alias la='ls -lah'
+  # `tree` is in both package lists, so it is the honest fallback for the tree
+  # view. `ls` gets no alias on purpose: without eza it IS the system ls, and
+  # adding flags here would mean picking between BSD and GNU spellings.
+  if command -v tree >/dev/null 2>&1; then
+    alias lt='tree'
+  fi
 fi
 
 command -v bat >/dev/null 2>&1 && alias cat='bat'

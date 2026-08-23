@@ -65,8 +65,10 @@ included, with no remote-side binary required.
 ## Sessions
 
 resurrect + continuum save every 15 minutes and restore at server start,
-into `~/.local/share/tmux/resurrect/` (XDG; the plugin's own default is
-`~/.tmux/`, which this config overrides). Manual controls, when the
+into `~/.local/share/tmux/resurrect/`, set explicitly: the plugin already
+defaults to XDG, except when `~/.tmux/resurrect` survives from an older
+setup, where it goes back there (see the Resurrect section of
+`tmux.conf`). Manual controls, when the
 automatic ones are not enough: `prefix Ctrl-s` saves, `prefix Ctrl-r`
 restores. Pane contents come back too (`capture-pane-contents`), and nvim
 sessions with them.

@@ -1,9 +1,11 @@
 #!/usr/bin/env sh
 # Command upgrade: bump tool versions. Touches no dotfiles STRUCTURE (links,
 # directories: that is install/update) and runs no git pull. A failure on one
-# tool does not stop the others.
+# tool does not stop the others. Each block announces itself with log_step, so
+# an interrupted upgrade shows where it stopped.
 
 # --- Package manager ---
+log_step "upgrade: system packages"
 if is_macos; then
   if command -v brew >/dev/null 2>&1; then
     run brew update || log_warn "brew update: failed"
@@ -20,6 +22,7 @@ else
 fi
 
 # --- mise (runtimes, within the limits of ~/.config/mise/config.toml) ---
+log_step "upgrade: mise runtimes"
 if command -v mise >/dev/null 2>&1; then
   # On macOS the mise binary is updated by brew; elsewhere it self-updates.
   is_macos || run mise self-update || log_warn "mise self-update: failed"
@@ -32,6 +35,7 @@ else
 fi
 
 # --- age-plugin-yubikey: cargo never re-installs on its own ---
+log_step "upgrade: age-plugin-yubikey"
 # is_fedora, not just `command -v`: on macOS it comes from brew, and a cargo
 # copy in ~/.local/bin would shadow it for good, since env.sh puts that
 # directory ahead of /opt/homebrew/bin. What moves the other three:
@@ -49,6 +53,7 @@ if is_fedora && command -v age-plugin-yubikey >/dev/null 2>&1; then
 fi
 
 # --- Claude Code (native installer; self-updates, but stay explicit) ---
+log_step "upgrade: claude code"
 if command -v claude >/dev/null 2>&1; then
   run claude update || log_warn "claude update: failed"
 else
@@ -56,6 +61,7 @@ else
 fi
 
 # --- zinit (zsh): self-update + plugins ---
+log_step "upgrade: zinit"
 _zinit="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh"
 if [ -r "$_zinit" ] && command -v zsh >/dev/null 2>&1; then
   # -f: no startup file. -i would source the whole interactive config with no
@@ -69,6 +75,7 @@ else
 fi
 
 # --- TPM (tmux): update plugins without opening tmux ---
+log_step "upgrade: TPM"
 _tpm="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tpm"
 if [ -x "$_tpm/bin/update_plugins" ]; then
   run "$_tpm/bin/update_plugins" all || log_warn "TPM: update failed"
@@ -77,6 +84,7 @@ else
 fi
 
 # --- git submodules (nvim): bump to the LATEST remote commit ---
+log_step "upgrade: submodules"
 # `update` resyncs to the pinned commit instead. The pointer moves in the repo:
 # commit afterwards to freeze it.
 if [ -f "$DOTFILES_DIR/.gitmodules" ]; then

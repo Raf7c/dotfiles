@@ -30,11 +30,13 @@ EOF
 }
 
 # Directories to create, one per line. The two shells DO create their own
-# history and cache dirs (.bashrc:23,64 · .zshrc:9,98 · zinit.zsh:12); the ones
+# history and cache dirs (each mkdir -p's beside its HISTFILE and its compdump,
+# in .bashrc, .zshrc and zinit.zsh — names, not line numbers, so this comment
+# cannot rot); the ones
 # that really need this step are the others: less and python drop their history
 # silently when the directory is missing, ghc/glc clone into ~/lab without
 # creating it, and ~/.local/bin has to exist BEFORE a shell starts or
-# env_path_prepend skips it (env.sh:44) and every tool installed there falls
+# env_path_prepend skips it (its `[ -d "$1" ]` guard) and every tool there falls
 # off the PATH. The shell dirs stay listed as a belt: this step runs before any
 # first shell, it cannot depend on a .zshrc having been read.
 dotfiles_dirs() {

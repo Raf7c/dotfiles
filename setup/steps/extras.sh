@@ -189,3 +189,6 @@ command -v flatpak >/dev/null 2>&1 ||
 hash -r
 unset _ex_sops_version _ex_arch _ex_asset _ex_url _ex_tmp _ex_want _ex_got _ex_fontdir _ex_cargo _ex_bin
 unset _fv_asset _fv_sums _fv_label
+# Same rule as packages.sh: steps are sourced in the same shell.
+unset -f _ex_install_lazygit _ex_fetch_verified _ex_install_sops \
+  _ex_install_age_plugin _ex_install_font

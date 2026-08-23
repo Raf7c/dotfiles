@@ -5,6 +5,23 @@
 
 _tpm_dir="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tpm"
 
+# TPM lands INSIDE ~/.config/tmux, which symlinks points at the repo. Run alone
+# before symlinks, this would clone into a real directory that symlinks later
+# backs up and replaces — orphaning the clone, and reporting success. The
+# dependency is documented (docs/installer.md, the steps table); enforce it.
+if [ ! -L "${XDG_CONFIG_HOME:-$HOME/.config}/tmux" ]; then
+  if [ "$DRY_RUN" = 1 ]; then
+    # Faithful preview, same reasoning as runtimes.sh: in a real run symlinks
+    # has linked ~/.config/tmux four steps earlier, so do not report a blocker
+    # that only exists because the preview created nothing.
+    log_info "[dry-run] plugins: assumes the FULL run, where symlinks links"
+    log_info "          ~/.config/tmux first; alone and early, this step would skip"
+    return 0
+  fi
+  log_warn "plugins: ~/.config/tmux is not the repo link yet -> run 'symlinks' first"
+  return 0
+fi
+
 if [ -d "$_tpm_dir/.git" ]; then
   log_ok "TPM already present"
 else
@@ -19,7 +36,7 @@ fi
 # Install what tmux.conf lists, without opening tmux.
 if command -v tmux >/dev/null 2>&1 && [ -x "$_tpm_dir/bin/install_plugins" ]; then
   run "$_tpm_dir/bin/install_plugins" ||
-    log_warn "TPM: plugin install failed (network?), retry with: prefix + I"
+    log_warn "TPM: plugin install failed (network, or tmux.conf unreadable), retry with: prefix + I"
 fi
 
 log_info "zinit: no action (self-installs on first zsh)"

@@ -19,8 +19,9 @@ on every push to `main`/`dev` and on every pull request:
 - **syntax**: `dash -n` over the POSIX scripts, `bash -n`, and `zsh -n`
   over every zsh file, found by `find` (see the caution below).
 - **shellcheck**, warning level and above.
-- **shfmt** against `.editorconfig`, where `-d` must stay silent. This is the
-  step whose files are **listed explicitly**.
+- **shfmt** against `.editorconfig`, where `-d` must stay silent. Every file it
+  checks is **listed explicitly**; shellcheck names two of its own (`.bashrc`,
+  `.bash_profile`), which its `find` cannot reach.
 - **yamllint** on `.github` **and on `.yamllint.yml` itself**, that file
   stating which of its defaults bend and why (a SHA-pinned `uses:` line
   cannot fit 80 columns).

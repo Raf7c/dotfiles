@@ -106,7 +106,8 @@ the update list at all.
    `setup/commands/update.sh`. The rule is the one above: replay it only if
    its input lives in the repo. That list is hand-written on purpose, so
    nothing joins `update` behind your back — which also means nothing
-   reminds you.
+   reminds you. A *typo* in that list is caught — `run_steps` logs an error and
+   the command exits 1 — but an *omission* is not, and cannot be.
 4. `./run install <name> -n`, then twice for real: the second run must be
    a no-op.
 
@@ -116,7 +117,7 @@ The libs are already sourced, so use them rather than reinventing:
 |---|---|
 | `run <cmd…>` | run it, or print it under `--dry-run`. The default for anything that writes |
 | `run_soft <cmd…>` | same, but a failure is logged and counted instead of stopping the run (network, package managers) |
-| `run_steps <names…>` | run steps by name, capturing each exit code |
+| `run_steps <names…>` | run steps by name, capturing each exit code. A name matching no step is an error, not a silent skip |
 | `log_step/info/ok/warn/error` | the only output channel; warn and error feed the final summary |
 | `confirm "question?"` | asks on `/dev/tty`; yes under `-y` and `--dry-run` |
 | `link_with_backup <src> <dst>` | inode-compared link, backup and restore-on-failure included |

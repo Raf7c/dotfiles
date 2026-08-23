@@ -8,7 +8,8 @@ hash -r
 if ! command -v mise >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/mise" ]; then
   if [ "$DRY_RUN" = 1 ]; then
     # Faithful preview: in a real run packages installs mise just before.
-    log_info "[dry-run] mise trust + mise install (mise installed by packages)"
+    log_info "[dry-run] mise trust + mise install — assumes the FULL run, where"
+    log_info "          packages installs mise first; alone, this step would skip"
     return 0
   fi
   log_warn "mise missing -> step skipped (install via packages)"
