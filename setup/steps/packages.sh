@@ -32,9 +32,9 @@ _install_script() {
     return 0
   }
   if curl -fsSL -o "$_tmp" -- "$_is_url"; then
-    "$_is_interp" "$_tmp" "$@" || log_warn "$_is_label: installation failed"
+    "$_is_interp" "$_tmp" "$@" || log_error "$_is_label: installation failed"
   else
-    log_warn "$_is_label: download failed"
+    log_error "$_is_label: download failed"
   fi
   rm -f -- "$_tmp"
 }
@@ -106,8 +106,8 @@ fi
 # docs/packages.md, revise both together.
 if command -v mise >/dev/null 2>&1; then
   _mv=$(mise --version 2>/dev/null | awk '{print $1}')
-  if [ -n "$_mv" ] && [ "$(printf '%s\n' 2026.8.9 "$_mv" | sort -V | head -n1)" != "2026.8.9" ]; then
-    log_warn "mise $_mv < 2026.8.9 (known CVEs) -> upgrade it"
+  if [ -n "$_mv" ] && [ "$(printf '%s\n' 2026.6.5 "$_mv" | sort -V | head -n1)" != "2026.6.5" ]; then
+    log_warn "mise $_mv < 2026.6.5 (published advisories) -> upgrade it"
   fi
   unset _mv
 fi

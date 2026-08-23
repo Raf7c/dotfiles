@@ -65,7 +65,7 @@ dotdirs, and `env.sh` redirects the few that accept it (`ANSIBLE_HOME`,
 | `~/.config/*` | symlinks into this repo (see `setup/manifest.sh`) |
 | `~/.local/state` | shell histories, backups |
 | `~/.cache` | compinit dumps, completion caches |
-| `~/.local/share` | zinit, mise, python history |
+| `~/.local/share` | zinit, mise, python history, the Nerd Font, tmux sessions |
 
 Every `XDG_*` read outside `env.sh` carries its `:-` default: each file
 must survive being loaded without the shared environment.
@@ -173,8 +173,9 @@ done
 
 ## Environment variables reaching beyond the repo
 
-- **`BASH_ENV`** → `env.sh`: every non-interactive bash on the machine
-  inherits the same PATH and XDG variables. Cost: one file read per script.
+- **`BASH_ENV`** → `env.sh`: every non-interactive bash started from a shell
+  of yours inherits the same PATH and XDG variables. It is exported by
+  `.bashrc`, so a cron job or a systemd unit does not see it. Cost: one file read per script.
 - **`NO_COLOR`**: turns off every installer colour (`setup/lib/log.sh`).
 
 ---

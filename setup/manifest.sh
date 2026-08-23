@@ -29,16 +29,18 @@ scripts                .config/scripts
 EOF
 }
 
-# Directories to create, one per line. The two shells DO create their own
-# history and cache dirs (each mkdir -p's beside its HISTFILE and its compdump,
-# in .bashrc, .zshrc and zinit.zsh — names, not line numbers, so this comment
-# cannot rot); the ones
-# that really need this step are the others: less and python drop their history
-# silently when the directory is missing, ghc/glc clone into ~/lab without
-# creating it, and ~/.local/bin has to exist BEFORE a shell starts or
-# env_path_prepend skips it (its `[ -d "$1" ]` guard) and every tool there falls
-# off the PATH. The shell dirs stay listed as a belt: this step runs before any
-# first shell, it cannot depend on a .zshrc having been read.
+# Directories to create, one per line. The shells DO create their own state and
+# cache dirs: .bashrc and .zshrc each mkdir -p beside their HISTFILE and beside
+# the mise completion cache, zinit.zsh beside its compdump. (Names, not line
+# numbers, so this comment cannot rot.) They stay listed anyway as a belt: this
+# step runs before any first shell and cannot depend on a .zshrc having been
+# read. What only this step provides:
+#   - ~/.cache/less and ~/.local/share/python: less and python drop their
+#     history in silence when the directory is missing, and neither creates it.
+#   - ~/.local/bin: it must exist BEFORE a shell starts or env_path_prepend
+#     skips it (its `[ -d "$1" ]` guard) and every tool there falls off PATH.
+#   - ~/lab/github and ~/lab/gitlab: `git clone` would create them on demand,
+#     so this is only so `cd $GHREPOS` works before the first clone.
 dotfiles_dirs() {
   cat <<EOF
 ${XDG_CONFIG_HOME:-$HOME/.config}

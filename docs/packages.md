@@ -10,8 +10,9 @@ Two steps install software, and the package files stay bare lists: what is
 
 1. **Native package manager** (`packages`). `brew bundle` (Brewfile) on
    macOS, `dnf` (`fedora.txt`) on Fedora.
-2. **No-sudo recipes** (`packages`). starship, mise and claude-code are
-   missing from the Fedora repos: official scripts into `~/.local/bin`,
+2. **No-sudo recipes** (`packages`). starship and mise are missing from the
+   Fedora repos; claude-code runs on **both** OSes because the brew formula
+   lags behind its releases. Official scripts into `~/.local/bin`,
    idempotent (`command -v`, **then** `~/.local/bin` directly: a shell started
    before that directory existed does not carry it on its PATH, and
    `command -v` alone would reinstall on every run), downloaded **then**
@@ -27,7 +28,8 @@ Two steps install software, and the package files stay bare lists: what is
 
 `./run install` handles everything in this table, on both systems.
 Legend: **brew** / **cask** = Brewfile · **dnf** = fedora.txt · **mise** =
-`.config/mise/config.toml` · **`./run`** = a recipe in `packages.sh`.
+`.config/mise/config.toml` · **`./run`** = a recipe in `packages.sh`, or in
+`extras.sh` where the row says `extras`.
 
 | Tool | macOS | Fedora |
 |---|---|---|
@@ -40,7 +42,7 @@ Legend: **brew** / **cask** = Brewfile · **dnf** = fedora.txt · **mise** =
 | chsh | built in | dnf `util-linux-user` |
 | PC/SC, the smart-card layer the YubiKey PIV applet talks to | built into macOS | dnf `pcsc-lite` (+ `pcsc-lite-devel`, needed to compile age-plugin-yubikey) |
 | wl-clipboard · xclip | pbcopy is built in | dnf |
-| containers | cask `docker-desktop` | dnf `podman` (rootless; `podman-docker` adds the `docker` command name) |
+| containers | cask `docker-desktop` | dnf `podman` (rootless; add `podman-docker` by hand if you want the `docker` command name) |
 | starship · mise | brew | **`./run`**, official script into `~/.local/bin` |
 | claude-code | **`./run`** | **`./run`** |
 | runtimes and the pinned linters | mise | mise |
@@ -58,7 +60,7 @@ same font: the patched build carries the glyphs, the plain one does not.
 | Tool | In Fedora? | Source used | Checked how |
 |---|---|---|---|
 | lazygit | no | COPR `dejan/lazygit`, from lazygit's README | dnf, COPR signature |
-| sops | no | the `linux.<arch>` binary of a pinned release | SHA-256 against `checksums.txt` |
+| sops | no | the `linux.<arch>` binary of a pinned release | SHA-256 against `sops-v<version>.checksums.txt` |
 | Nerd Font | plain family only | `JetBrainsMono.tar.xz`, latest release | SHA-256 against `SHA-256.txt` |
 | age-plugin-yubikey | no | `cargo install`, rust comes from mise | crates.io |
 
@@ -198,7 +200,7 @@ here, and the code points back at this page rather than repeating them.
 
 | Tool | Floor | What it closes | Enforced by |
 |---|---|---|---|
-| mise | **2026.8.9** | the June batch (GHSA-436v-8fw5-4mj8 and friends, closed in 2026.6.4), the July advisory on shell arguments read from an untrusted local config (GHSA-g74g-rg72-j2p3, the incomplete-fix follow-up to CVE-2026-55448, closed in 2026.7.14), and the August GitLab/Forgejo token leak (GHSA-w8pw-h853-frw2, closed in 2026.8.9) | `setup/steps/packages.sh` warns below it |
+| mise | **2026.6.5** | every advisory below was checked to exist before being written here. [GHSA-f94h-j2qg-fxw3](https://github.com/advisories/GHSA-f94h-j2qg-fxw3): a repo-controlled version escaped the install directory through a symlink, closed in 2026.6.1. [GHSA-436v-8fw5-4mj8](https://github.com/advisories/GHSA-436v-8fw5-4mj8) (CVE-2026-35533, High): local settings were loaded before the trust check, closed in 2026.6.4. Then 2026.6.5 made `github`/`gitlab`/`forgejo.credential_command` global-only ([#10356](https://github.com/jdx/mise/pull/10356)), so a local config can no longer point a credential helper at a third-party host — no GHSA was filed for it, which is why the floor sits here and not at 2026.6.4 | `setup/steps/packages.sh` warns below it |
 | tmux | **3.6b** | CVE-2026-11623, a Sixel use-after-free. The floor is the only thing that closes it: `allow-passthrough` does not gate Sixel, upstream parses the image before reading that option | nothing automatic, `tmux -V`, and `tmux display -p '#{sixel_support}'` for whether the build carries Sixel at all |
 
 > [!IMPORTANT]

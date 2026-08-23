@@ -82,7 +82,13 @@ run_steps() {
 # never run blindly.
 confirm() {
   [ "$ASSUME_YES" = 1 ] && return 0
-  [ "$DRY_RUN" = 1 ] && return 0
+  if [ "$DRY_RUN" = 1 ]; then
+    # Answer yes so the preview shows the full path, but SAY that the real
+    # run will ask: an installer that prompts before touching a third-party
+    # repo must not hide the prompt in its own preview.
+    log_info "[dry-run] would ask: $1"
+    return 0
+  fi
   # /dev/tty, not fd 0: a previous step (brew bundle, curl|sh) may have eaten
   # stdin. -r would only test permission bits, so actually OPEN the device;
   # the subshell is required because a redirection error on a special builtin
@@ -108,6 +114,9 @@ backup_file() {
   _abs=$1
   case "$_abs" in
     "$HOME"/*) _rel=${_abs#"$HOME"/} ;;
+    # Unreachable from the two callers here: both pass paths under $HOME.
+    # Kept, like pkg_install's `*)`, as the behaviour of a documented public
+    # helper for a future caller that does not.
     *) _rel=$(basename "$_abs") ;;
   esac
   _bdest="$BACKUP_DIR/$_rel"
@@ -139,6 +148,10 @@ link_with_backup() {
   _src="$DOTFILES_DIR/$1"
   _dst="$HOME/$2"
   if [ ! -e "$_src" ]; then
+    # Warn, do not refuse: a missing source is usually a submodule not yet
+    # initialised, and the other links are still worth applying. The school
+    # repo takes the opposite view on purpose (its docs/architecture.md):
+    # its run has no per-step accounting, so it stops.
     log_warn "source missing, link skipped: $1"
     return 0
   fi

@@ -57,7 +57,8 @@ setup/commands/*.sh     one per command: install / update / upgrade
 
 The order in `STEPS` is that dependency chain, nothing more. A missing
 dependency is a clean skip with a log line, never a crash: **runtimes**
-without mise, **plugins** without network, **shell** without zsh.
+without mise, **plugins** without network or before **symlinks**, **shell**
+without zsh.
 
 Five deserve a note: **migrate** runs once per machine and never returns;
 **gitsign** never overwrites a hand-written `config.local`; **prereqs** and

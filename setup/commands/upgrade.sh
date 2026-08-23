@@ -50,6 +50,8 @@ if is_fedora && command -v age-plugin-yubikey >/dev/null 2>&1; then
     log_warn "age-plugin-yubikey: no cargo, upgrade skipped"
   fi
   unset _up_cargo
+else
+  log_info "age-plugin-yubikey: brew owns it on macOS, absent here otherwise -> skipped"
 fi
 
 # --- Claude Code (native installer; self-updates, but stay explicit) ---
@@ -90,6 +92,8 @@ log_step "upgrade: submodules"
 if [ -f "$DOTFILES_DIR/.gitmodules" ]; then
   run git -C "$DOTFILES_DIR" submodule update --remote --recursive --merge ||
     log_warn "submodule --remote: failed"
+else
+  log_info "no .gitmodules -> skipped"
 fi
 
 log_step "upgrade done."

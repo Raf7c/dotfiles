@@ -9,7 +9,7 @@ each one comes from on which OS: [packages.md](packages.md).
 | Tool | Replaces | Why |
 |---|---|---|
 | [eza](https://github.com/eza-community/eza) | ls | icons, git status column, tree view, wired into `ls/ll/la/lt` |
-| [bat](https://github.com/sharkdp/bat) | cat | syntax highlighting; also the fzf preview engine (config: `numbers,changes,header`) |
+| [bat](https://github.com/sharkdp/bat) | cat | syntax highlighting; also the fzf preview engine (config: `numbers,changes,header`; the fzf preview overrides it with `plain,numbers`) |
 | [fd](https://github.com/sharkdp/fd) | find | saner syntax, .gitignore-aware; feeds fzf |
 | [ripgrep](https://github.com/BurntSushi/ripgrep) | grep | fast recursive search, .gitignore-aware |
 | [fzf](https://github.com/junegunn/fzf) | nothing | the fuzzy layer: history (`^R`), files (`^T`, `^F`), cd (`Alt-C`), Tab menu |

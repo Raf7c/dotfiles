@@ -7,7 +7,7 @@
 dotfiles_dirs | while IFS= read -r _dir; do
   [ -z "${_dir:-}" ] && continue
   case "$_dir" in \#*) continue ;; esac
-  run mkdir -p "$_dir"
+  run mkdir -p -- "$_dir"
 done
 
 log_ok "XDG directories ready"

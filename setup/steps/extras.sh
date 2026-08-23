@@ -3,10 +3,6 @@
 # against packages.fedoraproject.org (docs/packages.md). Fedora only, brew
 # carries all four on macOS. Not replayed by `update`, see docs/installer.md.
 
-# PERISHABLE: bump deliberately. The download is checked against the checksums
-# file published with THAT release, so version and check move together.
-_ex_sops_version="3.13.3"
-
 # packages and runtimes just wrote binaries: drop the shell's command cache.
 hash -r
 
@@ -20,6 +16,12 @@ if ! is_fedora; then
   fi
   return 0
 fi
+
+# Set AFTER the OS guard: the macOS return above would skip the unset at the
+# bottom of this file and leak this into the next steps.
+# PERISHABLE: bump deliberately. The download is checked against the checksums
+# file published with THAT release, so version and check move together.
+_ex_sops_version="3.13.3"
 
 # --- lazygit -----------------------------------------------------------------
 # dejan/lazygit is the COPR lazygit's own README points at. It asks first
@@ -127,9 +129,14 @@ _ex_install_age_plugin() {
   # cargo never touches PATH, so a shell started before that directory existed
   # would rebuild on every run. Same fallback as mise, starship, claude and
   # sops — and the most expensive one to get wrong, this one compiles Rust.
-  if command -v age-plugin-yubikey >/dev/null 2>&1 ||
-    [ -x "$HOME/.local/bin/age-plugin-yubikey" ]; then
+  if command -v age-plugin-yubikey >/dev/null 2>&1; then
     log_ok "age-plugin-yubikey already present"
+    return 0
+  fi
+  # Two hits, two messages, like _install_script: seeing "(~/.local/bin)" is
+  # how you learn your PATH does not carry that directory yet.
+  if [ -x "$HOME/.local/bin/age-plugin-yubikey" ]; then
+    log_ok "age-plugin-yubikey already present (~/.local/bin)"
     return 0
   fi
   # On a fresh machine the shell started BEFORE mise existed, so env.sh could

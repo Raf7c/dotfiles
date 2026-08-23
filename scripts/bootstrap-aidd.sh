@@ -4,7 +4,7 @@
 # Idempotent: safe to re-run (clone if missing, pull otherwise).
 set -eu
 
-readonly CONF="$HOME/.config/aiddconf"
+readonly CONF="${XDG_CONFIG_HOME:-$HOME/.config}/aiddconf"
 readonly AIDD_URL="git@github.com:Raf7c/aidd.git"
 readonly LIB_URL="git@github.com:Raf7c/aidd-library.git"
 

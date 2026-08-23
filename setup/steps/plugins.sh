@@ -3,8 +3,6 @@
 # on the first zsh launch (.config/zsh/zinit.zsh). Since ~/.config/tmux is a
 # link to the repo, TPM lands in .config/tmux/plugins/, already gitignored.
 
-_tpm_dir="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tpm"
-
 # TPM lands INSIDE ~/.config/tmux, which symlinks points at the repo. Run alone
 # before symlinks, this would clone into a real directory that symlinks later
 # backs up and replaces — orphaning the clone, and reporting success. The
@@ -16,11 +14,16 @@ if [ ! -L "${XDG_CONFIG_HOME:-$HOME/.config}/tmux" ]; then
     # that only exists because the preview created nothing.
     log_info "[dry-run] plugins: assumes the FULL run, where symlinks links"
     log_info "          ~/.config/tmux first; alone and early, this step would skip"
+    log_info "          then: git clone tpm -> .config/tmux/plugins/tpm"
+    log_info "          then: tpm/bin/install_plugins (what tmux.conf lists)"
     return 0
   fi
   log_warn "plugins: ~/.config/tmux is not the repo link yet -> run 'symlinks' first"
   return 0
 fi
+
+# Set AFTER the guard: the two early returns above would skip the unset below.
+_tpm_dir="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tpm"
 
 if [ -d "$_tpm_dir/.git" ]; then
   log_ok "TPM already present"

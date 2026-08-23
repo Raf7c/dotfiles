@@ -19,9 +19,10 @@ on every push to `main`/`dev` and on every pull request:
 - **syntax**: `dash -n` over the POSIX scripts, `bash -n`, and `zsh -n`
   over every zsh file, found by `find` (see the caution below).
 - **shellcheck**, warning level and above.
-- **shfmt** against `.editorconfig`, where `-d` must stay silent. Every file it
-  checks is **listed explicitly**; shellcheck names two of its own (`.bashrc`,
-  `.bash_profile`), which its `find` cannot reach.
+- **shfmt** against `.editorconfig`, where `-d` must stay silent. It walks three
+  directories and then names every file a directory walk would SKIP — the
+  dotfiles — one by one; shellcheck names two of its own the same way
+  (`.bashrc`, `.bash_profile`), which its `find` cannot reach.
 - **yamllint** on `.github` **and on `.yamllint.yml` itself**, that file
   stating which of its defaults bend and why (a SHA-pinned `uses:` line
   cannot fit 80 columns).
@@ -31,7 +32,8 @@ on every push to `main`/`dev` and on every pull request:
 > include them. Every zsh file has to be named on the command line, or it
 > goes unchecked without a word: that is how `.zshrc` escaped the formatter
 > for a week. `find` does list them, which is why the syntax step can get
-> away with `-name '.z*'`.
+> reaches them with `-name '.z*' -o -name '*.zsh'` — plus `.zshenv`, spelled
+> out in the loop, since that `find` walks `.config/zsh` only.
 
 shellcheck, shfmt and yamllint are installed by `mise-action` reading this
 repo's own `.config/mise/config.toml`, so local and CI lint with the same
