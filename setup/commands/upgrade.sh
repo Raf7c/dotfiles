@@ -31,11 +31,12 @@ else
   log_warn "mise missing -> runtime update skipped"
 fi
 
-# --- age-plugin-yubikey (extras step; cargo never re-installs on its own) ---
-# The other three extras are pinned or inert: sops moves when its version is
-# bumped in setup/steps/extras.sh and committed, the font is an unpacked
-# archive, lazygit rides `dnf upgrade` above.
-if command -v age-plugin-yubikey >/dev/null 2>&1; then
+# --- age-plugin-yubikey: cargo never re-installs on its own ---
+# is_fedora, not just `command -v`: on macOS it comes from brew, and a cargo
+# copy in ~/.local/bin would shadow it for good, since env.sh puts that
+# directory ahead of /opt/homebrew/bin. What moves the other three:
+# docs/packages.md.
+if is_fedora && command -v age-plugin-yubikey >/dev/null 2>&1; then
   _up_cargo=$(command -v cargo 2>/dev/null ||
     printf '%s' "${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims/cargo")
   if [ -x "$_up_cargo" ]; then

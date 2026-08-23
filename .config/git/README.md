@@ -119,6 +119,17 @@ the old line and its commits stop verifying: the signature is still in
 the object, but nothing can confirm it any more. Same on GitHub: unregister
 the old public key and those commits fall back to Unverified.
 
+> [!NOTE]
+> That is exactly what happened here, and it is a **deliberate** choice, not
+> an oversight. The July 2026 key was retired without a `valid-before` line,
+> so the 32 commits it signed (19 here, 13 in the school repo, up to
+> 2026-08-04) no longer verify, locally or on GitHub once the old public key
+> is unregistered. Only one person ever wrote them, the current key is the
+> only one in use, and carrying a retired credential forward to rescue three
+> weeks of history was judged not worth it. A branch ruleset requiring signed
+> commits does not change this: it applies to what is pushed from now on, not
+> retroactively to history already on the branch.
+
 ## Aliases
 
 None here, on purpose: they are **shell** aliases (`gst`, not `git st`)

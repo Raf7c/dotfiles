@@ -2,6 +2,7 @@
 
 # The environment shared with zsh. Guarded like every other source.
 _env="${XDG_CONFIG_HOME:-$HOME/.config}/shell/env.sh"
+# shellcheck source=/dev/null  # path known only at runtime; guarded by -r
 [[ -r "$_env" ]] && source "$_env"
 unset _env
 
@@ -29,8 +30,8 @@ shopt -s cmdhist
 shopt -s checkwinsize # keep LINES/COLUMNS up to date on resize
 # Share history across sessions, zsh's SHARE_HISTORY. Idempotent.
 case "${PROMPT_COMMAND:-}" in
-*"history -a"*) ;;
-*) PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}" ;;
+  *"history -a"*) ;;
+  *) PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}" ;;
 esac
 
 # ------------------ Line editing ------------------
@@ -63,6 +64,7 @@ if command -v mise >/dev/null 2>&1; then
     mkdir -p -- "${_mc%/*}"
     mise completion bash >"$_mc" 2>/dev/null || rm -f -- "$_mc"
   fi
+  # shellcheck source=/dev/null  # generated file; guarded by -r
   [[ -r "$_mc" ]] && source "$_mc"
   unset _mc
 fi

@@ -24,9 +24,11 @@ on every push to `main`/`dev` and on every pull request:
   defaults bend and why (a SHA-pinned `uses:` line cannot fit 80 columns).
 
 > [!CAUTION]
-> Handed a directory, shfmt and `find` silently skip dotfiles. Every zsh
-> file has to be named on the command line, or it goes unchecked without
-> a word: that is how `.zshrc` escaped the formatter for a week.
+> Handed a **directory**, shfmt silently skips dotfiles and has no flag to
+> include them. Every zsh file has to be named on the command line, or it
+> goes unchecked without a word: that is how `.zshrc` escaped the formatter
+> for a week. `find` does list them, which is why the syntax step can get
+> away with `-name '.z*'`.
 
 shellcheck, shfmt and yamllint are installed by `mise-action` reading this
 repo's own `.config/mise/config.toml`, so local and CI lint with the same

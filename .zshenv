@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
-# ZDOTDIR bootstrap, without root. The only hook that exists before ZDOTDIR
-# does, so the only way to point zsh at ~/.config/zsh without writing to /etc.
+# ZDOTDIR bootstrap. The only hook available WITHOUT root before ZDOTDIR
+# exists, so the only way to point zsh at ~/.config/zsh without writing to /etc.
 # Full startup chain: docs/architecture.md.
 
 export ZDOTDIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"

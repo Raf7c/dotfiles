@@ -1,16 +1,13 @@
 #!/usr/bin/env sh
-# Step extras: the four tools Fedora does not package. Checked one by one on
-# packages.fedoraproject.org: lazygit, sops and age-plugin-yubikey are absent,
-# and Fedora only carries the plain JetBrains Mono, not the Nerd-patched build.
-# Fedora only, brew carries all four on macOS.
-# Not replayed by `update`, see docs/installer.md.
+# Step extras: the four tools Fedora does not package, checked one by one
+# against packages.fedoraproject.org (docs/packages.md). Fedora only, brew
+# carries all four on macOS. Not replayed by `update`, see docs/installer.md.
 
 # PERISHABLE: bump deliberately. The download is checked against the checksums
 # file published with THAT release, so version and check move together.
-_ex_sops_version="3.13.1"
+_ex_sops_version="3.13.3"
 
-# packages and runtimes just put binaries on disk; forget what the shell
-# cached about which commands exist.
+# packages and runtimes just wrote binaries: drop the shell's command cache.
 hash -r 2>/dev/null || true
 
 # Guard on Fedora, not on "not macOS": on any other Linux the COPR commands
@@ -25,9 +22,8 @@ if ! is_fedora; then
 fi
 
 # --- lazygit -----------------------------------------------------------------
-# dejan/lazygit is the COPR lazygit's own README points at. It asks first: a
-# COPR is a package source outside Fedora, signed by whoever maintains it, and
-# adding one to a machine is a decision.
+# dejan/lazygit is the COPR lazygit's own README points at. It asks first
+# because a COPR is signed by its maintainer, not by Fedora.
 _ex_install_lazygit() {
   if command -v lazygit >/dev/null 2>&1; then
     log_ok "lazygit already present"
@@ -37,18 +33,35 @@ _ex_install_lazygit() {
     log_info "lazygit skipped, the recipe stays in docs/packages.md"
     return 0
   fi
+  # Since Fedora 41 `dnf` IS dnf5, and `copr` ships in dnf5-plugins. NOT
+  # dnf-plugins-core: it still exists but only gives `dnf-3 copr`, so writing
+  # that name here would be a silent no-op.
+  run_soft sudo dnf install -y dnf5-plugins
   run_soft sudo dnf copr enable -y dejan/lazygit
   run_soft sudo dnf install -y lazygit
 }
 
 # --- sops --------------------------------------------------------------------
-# Not in the Fedora repos. The release ships a checksums file, so nothing lands
-# on the PATH before it matches. ~/.local/bin, no sudo: same tier as mise and
-# starship in the packages step.
+# The release ships a checksums file, so nothing lands on the PATH before it
+# matches. ~/.local/bin, no sudo.
 _ex_install_sops() {
-  if command -v sops >/dev/null 2>&1 || [ -x "$HOME/.local/bin/sops" ]; then
-    log_ok "sops already present"
-    return 0
+  # Look at ~/.local/bin too, not just the PATH: this step installs there and
+  # the installer never touches PATH, so a shell started before that directory
+  # existed would reinstall on every run. Same fallback as mise and claude in
+  # the packages step.
+  # A pin only means something if it is enforced: a differing version is
+  # replaced, otherwise bumping it above would silently do nothing.
+  # SOPS_DISABLE_VERSION_CHECK keeps this off the network without relying on a
+  # flag an older binary might reject.
+  _ex_bin=$(command -v sops 2>/dev/null || printf '%s' "$HOME/.local/bin/sops")
+  if [ -x "$_ex_bin" ]; then
+    _ex_got=$(SOPS_DISABLE_VERSION_CHECK=1 "$_ex_bin" --version 2>/dev/null || printf '')
+    _ex_got=$(printf '%s\n' "$_ex_got" | awk 'NR == 1 { print $2 }')
+    if [ "$_ex_got" = "$_ex_sops_version" ]; then
+      log_ok "sops ${_ex_sops_version} already present"
+      return 0
+    fi
+    log_info "sops ${_ex_got:-unknown} installed, the pin says ${_ex_sops_version}"
   fi
   case "$(uname -m)" in
     x86_64) _ex_arch=amd64 ;;
@@ -74,10 +87,8 @@ _ex_install_sops() {
     log_warn "sops: checksums download failed, nothing installed"
     return 0
   fi
-  # Integrity, not authenticity: both files come from the same release, so this
-  # catches a truncated or altered download, not a compromised release. Real
-  # authenticity means cosign against the sigstore bundle published next to
-  # them, and cosign is not part of this stack.
+  # Integrity, not authenticity: same release, so a truncated or altered
+  # download is caught, a compromised release is not. See docs/installer.md.
   _ex_want=$(awk -v f="$_ex_asset" '$2 == f { print $1 }' "$_ex_tmp/sops.checksums")
   _ex_got=$(sha256sum "$_ex_tmp/$_ex_asset" | cut -d' ' -f1)
   if [ -z "$_ex_want" ]; then
@@ -94,10 +105,9 @@ _ex_install_sops() {
 }
 
 # --- age-plugin-yubikey ------------------------------------------------------
-# Packaged nowhere for Fedora, but rust is already here: runtimes ran just
-# before. --root puts the binary in ~/.local/bin, which env.sh already exports,
-# instead of the ~/.cargo/bin that nothing adds. Compiling needs the
-# pcsc-lite-devel headers (fedora.txt).
+# rust is already here: runtimes ran just before. --root puts the binary in
+# ~/.local/bin, which env.sh exports, instead of the ~/.cargo/bin that nothing
+# adds. Build headers: docs/packages.md.
 _ex_install_age_plugin() {
   if command -v age-plugin-yubikey >/dev/null 2>&1; then
     log_ok "age-plugin-yubikey already present"
@@ -121,10 +131,8 @@ _ex_install_age_plugin() {
 }
 
 # --- JetBrainsMono Nerd Font -------------------------------------------------
-# Required, not decorative: starship, `eza --icons` and the tmux status bar all
-# draw from its private glyph range, and Fedora only packages the plain family.
-# `latest` on purpose: a font carries no security surface, and the checksum file
-# comes from the same release, so the pair stays consistent.
+# `latest` on purpose: a font carries no security surface, and the checksum
+# file comes from the same release, so the pair stays consistent.
 _ex_install_font() {
   _ex_fontdir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts/JetBrainsMonoNerd"
   if [ -d "$_ex_fontdir" ]; then
@@ -172,10 +180,8 @@ _ex_install_sops
 _ex_install_age_plugin
 _ex_install_font
 
-# The GUI apps stay by hand on purpose: no checksum is published for the
-# JetBrains Toolbox or keymapp tarballs. Recipes in docs/packages.md.
 command -v flatpak >/dev/null 2>&1 ||
   log_info "flatpak missing -> the GUI recipes in docs/packages.md need it"
 
 [ "$DRY_RUN" = 1 ] || hash -r
-unset _ex_sops_version _ex_arch _ex_asset _ex_url _ex_tmp _ex_want _ex_got _ex_fontdir _ex_cargo
+unset _ex_sops_version _ex_arch _ex_asset _ex_url _ex_tmp _ex_want _ex_got _ex_fontdir _ex_cargo _ex_bin

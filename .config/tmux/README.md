@@ -8,7 +8,7 @@ panes numbered from 1 (renumbered on close), 100k lines of history per
 pane (scrollback is RAM), `escape-time 10` (the upstream default since
 3.5, and a documented cure for flaky `M-` bindings at 0),
 `focus-events` (nvim autoread),
-`allow-passthrough` (OSC/images through tmux), `detach-on-destroy off`
+`allow-passthrough` (OSC sequences through tmux), `detach-on-destroy off`
 (destroying the last session switches to another instead of detaching).
 
 ## Bindings

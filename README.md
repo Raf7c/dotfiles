@@ -18,10 +18,12 @@ takes a fresh machine (**macOS** or **Fedora**) to a ready workstation.
 
 ## Requirements
 
-- **macOS** or **Fedora**. The installer refuses an unknown OS.
+- **macOS** or **Fedora**. The installer refuses an unknown OS, and it reads
+  `ID` only: a RHEL derivative (Rocky, CentOS Stream, Nobara) is refused even
+  though it is Fedora-like, because `fedora.txt` does not transpose to EPEL.
 - `git`, `curl`, and an SSH key registered on GitHub (the clone uses `git@`).
-- `sudo` for three steps only (`prereqs`, `packages`, `shell`); everything
-  else stays in `$HOME`.
+- `sudo` for four steps (`prereqs`, `packages`, `shell`, and `extras` only
+  if you accept the COPR); everything else stays in `$HOME`.
 
 ## Stack
 
@@ -42,8 +44,9 @@ takes a fresh machine (**macOS** or **Fedora**) to a ready workstation.
   even legacy history files are migrated out on install.
 - **No root required for the shell.** `~/.zshenv` bootstraps `ZDOTDIR`
   entirely from `$HOME`, so the startup chain never depends on root.
-  Installing does ask for `sudo` three times: the initial Homebrew install
-  on macOS, `dnf` on Fedora, and the `/etc/shells` line.
+  Installing does ask for `sudo`: the initial Homebrew install on macOS,
+  `dnf` on Fedora, the `/etc/shells` line, and the COPR of the `extras`
+  step if you accept it.
 - **Degrades cleanly.** No network, no git, a missing tool: the shell still
   starts. Scripts stay silent; an interactive shell gets a single stderr
   line, never a blocked startup.
@@ -76,7 +79,7 @@ scripts/             manual scripts, on the PATH, never run by ./run
 docs/                architecture, installer, maintenance, usage, packages, tools, terminals
 .config/             everything linked into ~/.config (zsh, tmux, git, kitty…)
 .zshenv .bashrc .bash_profile    the three files zsh and bash need in $HOME
-.vimrc                           four options for the fallback vim: tabs, width 4
+.vimrc                           five options for the fallback vim: tabs, width 4
 .editorconfig .yamllint.yml      formatting authorities, read by the CI
 .github/             CI workflow + Dependabot
 ```
@@ -131,7 +134,7 @@ the keys from scratch: [git](.config/git/README.md).
 
 Options: `-n`/`--dry-run`, `-y`/`--yes`, `-h`/`--help`.
 Single steps: `./run install symlinks packages`.
-Root-free install (skips the three steps that need sudo):
+Root-free install (skips the four steps that can need sudo):
 `./run install submodules directories migrate symlinks gitsign runtimes plugins`.
 
 ## Documentation

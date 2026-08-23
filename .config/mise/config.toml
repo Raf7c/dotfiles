@@ -3,8 +3,8 @@
 # HERE, and `latest` only for low-risk plumbing. The pin list: docs/packages.md.
 [tools]
 neovim = "0.12"
-node = "22"            # LTS
-python = "3.13"
+node = "24"            # PERISHABLE: active LTS until 2026-10-20, then node 26
+python = "3.14"
 pipx = "latest"
 rust = "1"
 tree-sitter = "latest"

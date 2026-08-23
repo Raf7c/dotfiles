@@ -35,6 +35,7 @@ Legend: **brew** / **cask** = Brewfile · **dnf** = fedora.txt · **mise** =
 | gnupg | brew `gnupg` | dnf `gnupg2` |
 | ykman | brew `ykman` | dnf `yubikey-manager` |
 | chsh | built in | dnf `util-linux-user` |
+| PC/SC, the smart-card layer the YubiKey PIV applet talks to | built into macOS | dnf `pcsc-lite` (+ `pcsc-lite-devel`, needed to compile age-plugin-yubikey) |
 | wl-clipboard · xclip | pbcopy is built in | dnf |
 | containers | cask `docker-desktop` | dnf `podman` (rootless; `podman-docker` adds the `docker` command name) |
 | starship · mise | brew | **`./run`**, official script into `~/.local/bin` |
@@ -69,7 +70,7 @@ difference is deliberate:
 |---|---|
 | lazygit | `./run upgrade`, through `dnf upgrade`: a COPR is a repo like any other |
 | age-plugin-yubikey | `./run upgrade`, `cargo install --force` |
-| sops | **you**: bump the version in `setup/steps/extras.sh`, commit, rerun `./run install extras`. Same rule as a mise pin, a version change is a tracked edit |
+| sops | **you**: bump `_ex_sops_version` in `setup/steps/extras.sh`, commit, rerun `./run install extras`. The step compares the installed version to the pin and replaces it when they differ, so the bump is what triggers the change. Same rule as a mise pin: a version move is a tracked edit, never a side effect |
 | Nerd Font | nothing. An unpacked archive with no security surface; delete the directory and rerun the step to refresh it |
 
 Two details that bite. `cargo install age-plugin-yubikey` will not compile
@@ -108,8 +109,8 @@ machines and the CI run the same thing.
 | Tool | Pin |
 |---|---|
 | neovim | `0.12` |
-| node | `22` |
-| python | `3.13` |
+| node | `24` |
+| python | `3.14` |
 | rust | `1` |
 | shellcheck | `0.11` |
 | shfmt | `3.13` |
@@ -194,8 +195,8 @@ here, and the code points back at this page rather than repeating them.
 
 | Tool | Floor | What it closes | Enforced by |
 |---|---|---|---|
-| mise | **2026.7.14** | the July advisory on shell arguments taken from an untrusted local config (High), the incomplete-fix follow-up to it, and the June batch (GHSA-436v-8fw5-4mj8 and friends) | `setup/steps/packages.sh` warns below it |
-| tmux | **3.6b** | CVE-2026-11623, a Sixel use-after-free. `allow-passthrough on` is precisely what lets those sequences reach the terminal | nothing automatic, check `tmux -V` |
+| mise | **2026.8.9** | the June batch (GHSA-436v-8fw5-4mj8 and friends, closed in 2026.6.4), the July advisory on shell arguments read from an untrusted local config (GHSA-g74g-rg72-j2p3, the incomplete-fix follow-up to CVE-2026-55448, closed in 2026.7.14), and the August GitLab/Forgejo token leak (GHSA-w8pw-h853-frw2, closed in 2026.8.9) | `setup/steps/packages.sh` warns below it |
+| tmux | **3.6b** | CVE-2026-11623, a Sixel use-after-free. The floor is the only thing that closes it: `allow-passthrough` does not gate Sixel, upstream parses the image before reading that option | nothing automatic, `tmux -V`, and `tmux display -p '#{sixel_support}'` for whether the build carries Sixel at all |
 
 > [!IMPORTANT]
 > Revise this table whenever you touch either check. A floor that is never

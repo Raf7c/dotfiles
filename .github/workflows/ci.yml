@@ -27,7 +27,7 @@ jobs:
 
       # Same shellcheck/shfmt versions as every machine: mise reads the
       # repo's own config.toml, one version source for local and CI.
-      - uses: jdx/mise-action@e6a8b3978addb5a52f2b4cd9d91eafa7f0ab959d  # v4.2.0
+      - uses: jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518  # v4.2.5
         env:
           MISE_GLOBAL_CONFIG_FILE: ${{ github.workspace }}/.config/mise/config.toml
         with:
@@ -42,10 +42,14 @@ jobs:
           done
           bash -n .bashrc && bash -n .bash_profile
 
+      # .bashrc and .bash_profile sit at the root and carry no shebang worth
+      # following, hence -s bash and an explicit mention: the find below would
+      # not reach them.
       - name: shellcheck (warning and above)
         run: |
           find run setup scripts .config/shell \( -name '*.sh' -o -name run \) -not -path '*/plugins/*' \
             -exec shellcheck -S warning {} +
+          shellcheck -S warning -s bash .bashrc .bash_profile
 
       - name: shfmt (.editorconfig is the authority, -d must stay silent)
         # shfmt SKIPS hidden files when walking a directory and has no flag

@@ -6,17 +6,16 @@ detect_os() {
     Darwin) OS=macos ;;
     Linux)
       if [ -r /etc/os-release ]; then
-        # /etc/os-release defines ID and ID_LIKE
+        # /etc/os-release defines ID
         # shellcheck disable=SC1091
         . /etc/os-release
+        # ID only, never ID_LIKE: a Rocky or a CentOS Stream would pass the
+        # door and then receive fedora.txt, which does not transpose. eza is
+        # in no EPEL branch at all, just is missing from EPEL 9, and EPEL has
+        # to be enabled first. "Refuses an unknown OS" has to mean it.
         case "${ID:-}" in
           fedora) OS=fedora ;;
-          *)
-            case " ${ID_LIKE:-} " in
-              *fedora* | *rhel*) OS=fedora ;;
-              *) OS=unknown ;;
-            esac
-            ;;
+          *) OS=unknown ;;
         esac
       else
         OS=unknown

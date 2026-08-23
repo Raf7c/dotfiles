@@ -23,8 +23,8 @@ each one comes from on which OS: [packages.md](packages.md).
 ## Editors: nvim, and vim behind it
 
 nvim carries the real config, as a submodule
-([.config/nvim](https://github.com/Raf7c/nvimconf)). `vim` gets four lines
-in `.vimrc` so a file edited without nvim keeps the same indentation:
+([.config/nvim](https://github.com/Raf7c/nvim)). `vim` gets five lines in
+`.vimrc` so a file edited without nvim keeps the same indentation:
 **tabs, never spaces, four columns wide**.
 
 `~/.vimrc` and not the XDG path on purpose: vim only reads
