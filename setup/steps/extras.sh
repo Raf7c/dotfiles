@@ -8,7 +8,7 @@
 _ex_sops_version="3.13.3"
 
 # packages and runtimes just wrote binaries: drop the shell's command cache.
-hash -r 2>/dev/null || true
+hash -r
 
 # Guard on Fedora, not on "not macOS": on any other Linux the COPR commands
 # below would simply not exist.
@@ -39,6 +39,38 @@ _ex_install_lazygit() {
   run_soft sudo dnf install -y dnf5-plugins
   run_soft sudo dnf copr enable -y dejan/lazygit
   run_soft sudo dnf install -y lazygit
+}
+
+# --- shared: download an asset and check it against the release checksums -----
+# Integrity, not authenticity: the checksums file comes from the SAME release,
+# so a truncated or altered transfer is caught, a compromised release is not.
+# See docs/installer.md. Leaves the verified asset in $_ex_tmp on success.
+#   $1 base URL · $2 asset · $3 checksums file · $4 label for the logs
+_ex_fetch_verified() {
+  _fv_asset=$2 _fv_sums=$3 _fv_label=$4
+  if ! curl -fsSL -o "$_ex_tmp/$_fv_asset" -- "$1/$_fv_asset"; then
+    log_warn "$_fv_label: download failed"
+    return 1
+  fi
+  if ! curl -fsSL -o "$_ex_tmp/$_fv_sums" -- "$1/$_fv_sums"; then
+    log_warn "$_fv_label: checksums download failed, nothing installed"
+    return 1
+  fi
+  # Accept the bare name OR any path ending in /<name>: a release that starts
+  # prefixing its paths must not silently stop matching. String comparison, not
+  # a regex, so a dot in the asset name cannot act as a wildcard.
+  _ex_want=$(awk -v f="$_fv_asset" \
+    '$2 == f || substr($2, length($2) - length(f)) == "/" f { print $1 }' \
+    "$_ex_tmp/$_fv_sums")
+  _ex_got=$(sha256sum "$_ex_tmp/$_fv_asset" | cut -d' ' -f1)
+  if [ -z "$_ex_want" ]; then
+    log_error "$_fv_label: $_fv_asset absent from $_fv_sums, nothing installed"
+    return 1
+  fi
+  if [ "$_ex_want" != "$_ex_got" ]; then
+    log_error "$_fv_label: checksum mismatch, nothing installed"
+    return 1
+  fi
 }
 
 # --- sops --------------------------------------------------------------------
@@ -79,26 +111,8 @@ _ex_install_sops() {
   fi
   _ex_tmp="${_log_dir:?log.sh not sourced}"
   log_info "installing sops ${_ex_sops_version}…"
-  if ! curl -fsSL -o "$_ex_tmp/$_ex_asset" -- "$_ex_url/$_ex_asset"; then
-    log_warn "sops: download failed"
-    return 0
-  fi
-  if ! curl -fsSL -o "$_ex_tmp/sops.checksums" -- "$_ex_url/sops-v${_ex_sops_version}.checksums.txt"; then
-    log_warn "sops: checksums download failed, nothing installed"
-    return 0
-  fi
-  # Integrity, not authenticity: same release, so a truncated or altered
-  # download is caught, a compromised release is not. See docs/installer.md.
-  _ex_want=$(awk -v f="$_ex_asset" '$2 == f { print $1 }' "$_ex_tmp/sops.checksums")
-  _ex_got=$(sha256sum "$_ex_tmp/$_ex_asset" | cut -d' ' -f1)
-  if [ -z "$_ex_want" ]; then
-    log_error "sops: $_ex_asset absent from the checksums file, nothing installed"
-    return 0
-  fi
-  if [ "$_ex_want" != "$_ex_got" ]; then
-    log_error "sops: checksum mismatch, nothing installed"
-    return 0
-  fi
+  _ex_fetch_verified "$_ex_url" "$_ex_asset" \
+    "sops-v${_ex_sops_version}.checksums.txt" sops || return 0
   mkdir -p -- "$HOME/.local/bin"
   install -m 0755 -- "$_ex_tmp/$_ex_asset" "$HOME/.local/bin/sops"
   log_ok "sops ${_ex_sops_version} installed (checksum verified)"
@@ -109,7 +123,12 @@ _ex_install_sops() {
 # ~/.local/bin, which env.sh exports, instead of the ~/.cargo/bin that nothing
 # adds. Build headers: docs/packages.md.
 _ex_install_age_plugin() {
-  if command -v age-plugin-yubikey >/dev/null 2>&1; then
+  # ~/.local/bin too, not just the PATH: --root writes the binary there and
+  # cargo never touches PATH, so a shell started before that directory existed
+  # would rebuild on every run. Same fallback as mise, starship, claude and
+  # sops — and the most expensive one to get wrong, this one compiles Rust.
+  if command -v age-plugin-yubikey >/dev/null 2>&1 ||
+    [ -x "$HOME/.local/bin/age-plugin-yubikey" ]; then
     log_ok "age-plugin-yubikey already present"
     return 0
   fi
@@ -146,24 +165,8 @@ _ex_install_font() {
   _ex_tmp="${_log_dir:?log.sh not sourced}"
   _ex_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download"
   log_info "installing the JetBrainsMono Nerd Font…"
-  if ! curl -fsSL -o "$_ex_tmp/JetBrainsMono.tar.xz" -- "$_ex_url/JetBrainsMono.tar.xz"; then
-    log_warn "Nerd Font: download failed"
+  _ex_fetch_verified "$_ex_url" JetBrainsMono.tar.xz SHA-256.txt "Nerd Font" ||
     return 0
-  fi
-  if ! curl -fsSL -o "$_ex_tmp/SHA-256.txt" -- "$_ex_url/SHA-256.txt"; then
-    log_warn "Nerd Font: checksums download failed, nothing installed"
-    return 0
-  fi
-  _ex_want=$(awk '$2 ~ /JetBrainsMono\.tar\.xz$/ { print $1 }' "$_ex_tmp/SHA-256.txt")
-  _ex_got=$(sha256sum "$_ex_tmp/JetBrainsMono.tar.xz" | cut -d' ' -f1)
-  if [ -z "$_ex_want" ]; then
-    log_error "Nerd Font: no line for JetBrainsMono.tar.xz in SHA-256.txt, nothing installed"
-    return 0
-  fi
-  if [ "$_ex_want" != "$_ex_got" ]; then
-    log_error "Nerd Font: checksum mismatch, nothing installed"
-    return 0
-  fi
   mkdir -p -- "$_ex_fontdir"
   if tar -xJf "$_ex_tmp/JetBrainsMono.tar.xz" -C "$_ex_fontdir"; then
     run_soft fc-cache -f "${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
@@ -183,5 +186,6 @@ _ex_install_font
 command -v flatpak >/dev/null 2>&1 ||
   log_info "flatpak missing -> the GUI recipes in docs/packages.md need it"
 
-[ "$DRY_RUN" = 1 ] || hash -r
+hash -r
 unset _ex_sops_version _ex_arch _ex_asset _ex_url _ex_tmp _ex_want _ex_got _ex_fontdir _ex_cargo _ex_bin
+unset _fv_asset _fv_sums _fv_label

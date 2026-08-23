@@ -12,6 +12,10 @@ if is_macos; then
       log_info "[dry-run] install Homebrew (curl … install.sh | bash)"
     else
       log_info "installing Homebrew…"
+      # Exported for the WHOLE run, not just this installer: steps are sourced
+      # in the same shell and nothing unsets it, so the `brew bundle` of the
+      # packages step sees it too. That is intended — `-y` means "ask me
+      # nothing" for the entire command, not for one download.
       [ "$ASSUME_YES" = 1 ] && export NONINTERACTIVE=1
       # Download THEN execute: a failed curl must not expand to an empty
       # string silently executed by `bash -c`.
@@ -35,12 +39,14 @@ if is_macos; then
   # only: gitsign.sh is the one that has to cover intel too.
   if [ "$DRY_RUN" != 1 ]; then
     [ -x /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
-    hash -r
   fi
+  # Outside the guard, like every other hash -r here: it clears the shell's
+  # command cache, never $HOME nor the system, so dry-run has nothing to hide.
+  hash -r
 else
   # ------------------ Linux: git + curl ------------------
   pkg_install git curl
-  [ "$DRY_RUN" != 1 ] && hash -r
+  hash -r
 fi
 
 # Non-blocking: the install may have been declined.

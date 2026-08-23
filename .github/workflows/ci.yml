@@ -35,7 +35,7 @@ jobs:
 
       - name: syntax (dash / bash / zsh -n)
         run: |
-          find run setup scripts .config/shell \( -name '*.sh' -o -name run \) -not -path '*/plugins/*' \
+          find run setup scripts .config/shell \( -name '*.sh' -o -name run \) \
             -exec dash -n {} +
           for f in .zshenv $(find .config/zsh -name '.z*' -o -name '*.zsh' 2>/dev/null); do
             zsh -n "$f"
@@ -47,7 +47,7 @@ jobs:
       # not reach them.
       - name: shellcheck (warning and above)
         run: |
-          find run setup scripts .config/shell \( -name '*.sh' -o -name run \) -not -path '*/plugins/*' \
+          find run setup scripts .config/shell \( -name '*.sh' -o -name run \) \
             -exec shellcheck -S warning {} +
           shellcheck -S warning -s bash .bashrc .bash_profile
 
@@ -62,4 +62,4 @@ jobs:
 
       # yamllint is a pinned authority tool: unused, the pin is a lie.
       - name: yamllint (workflows, dependabot)
-        run: yamllint .github
+        run: yamllint .github .yamllint.yml

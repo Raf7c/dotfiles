@@ -17,11 +17,13 @@ there is.
 on every push to `main`/`dev` and on every pull request:
 
 - **syntax**: `dash -n` over the POSIX scripts, `bash -n`, and `zsh -n`
-  over every zsh file, each **listed explicitly**.
+  over every zsh file, found by `find` (see the caution below).
 - **shellcheck**, warning level and above.
-- **shfmt** against `.editorconfig`, where `-d` must stay silent.
-- **yamllint** on `.github`, with `.yamllint.yml` stating which of its
-  defaults bend and why (a SHA-pinned `uses:` line cannot fit 80 columns).
+- **shfmt** against `.editorconfig`, where `-d` must stay silent. This is the
+  step whose files are **listed explicitly**.
+- **yamllint** on `.github` **and on `.yamllint.yml` itself**, that file
+  stating which of its defaults bend and why (a SHA-pinned `uses:` line
+  cannot fit 80 columns).
 
 > [!CAUTION]
 > Handed a **directory**, shfmt silently skips dotfiles and has no flag to

@@ -23,3 +23,4 @@ if command -v tmux >/dev/null 2>&1 && [ -x "$_tpm_dir/bin/install_plugins" ]; th
 fi
 
 log_info "zinit: no action (self-installs on first zsh)"
+unset _tpm_dir

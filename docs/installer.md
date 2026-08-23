@@ -27,14 +27,13 @@ written down: the step files themselves say what they do, not how they behave.
 ## Anatomy
 
 ```text
-run                     CLI: arguments, $0 resolved through symlinks,
-                        set -f, dispatch
+run                     CLI: arguments, step-name validation, set -f, dispatch
 setup/manifest.sh       single source of truth: links, dirs, migrations
 setup/lib/log.sh        coloured logs, warning/error counters (mktemp + traps)
 setup/lib/os.sh         OS detection (macos / fedora), dnf wrapper
 setup/lib/util.sh       run, run_soft, run_steps, backup/migration/links
 setup/steps/<name>.sh   one responsibility each; sourced in $STEPS order
-setup/commands/*.sh     the update / upgrade flows
+setup/commands/*.sh     one per command: install / update / upgrade
 ```
 
 ## The steps
@@ -44,10 +43,10 @@ setup/commands/*.sh     the update / upgrade flows
 
 | # | Step | What it does | sudo | network | needs |
 |---|---|---|---|---|---|
-| 1 | `prereqs` | package manager + base tools (Homebrew on macOS, `git`/`curl` on Fedora) | Fedora | yes | nothing |
+| 1 | `prereqs` | package manager + base tools (Homebrew on macOS, `git`/`curl` on Fedora) | yes | yes | nothing |
 | 2 | `submodules` | init/sync the submodules, then attach each to its branch | no | yes | git, and access to the submodule remote |
 | 3 | `directories` | create the XDG directories the shells need before first start | no | no | nothing |
-| 4 | `migrate` | move legacy history files (`~/.bash_history`, `~/.lesshst`…) to XDG | no | no | `directories` |
+| 4 | `migrate` | move legacy history files (`~/.bash_history`, `~/.lesshst`…) to XDG | no | no | nothing (`migrate_file` creates its own target directory) |
 | 5 | `symlinks` | apply `manifest.sh`, backing up anything real it replaces | no | no | `submodules`, so the submodule is populated when linked |
 | 6 | `packages` | `brew bundle` / `dnf`, then the no-sudo recipes (mise, starship, claude) | Fedora | yes | `prereqs` |
 | 7 | `gitsign` | generate `config.local` from the keys this machine has | no | no | nothing |
@@ -60,10 +59,12 @@ The order in `STEPS` is that dependency chain, nothing more. A missing
 dependency is a clean skip with a log line, never a crash: **runtimes**
 without mise, **plugins** without network, **shell** without zsh.
 
-Four deserve a note: **migrate** runs once per machine and never returns;
-**gitsign** never overwrites a hand-written `config.local`; **shell** is the
-only step that needs sudo on macOS too; **extras** is a clean no-op on macOS,
-where brew carries all four.
+Five deserve a note: **migrate** runs once per machine and never returns;
+**gitsign** never overwrites a hand-written `config.local`; **prereqs** and
+**shell** are the two that need sudo on macOS as well, the first because the
+Homebrew installer calls `have_sudo_access` and aborts without it, the second
+for `/etc/shells`; **extras** is a clean no-op on macOS, where brew carries all
+four.
 
 ## What each command replays
 
@@ -71,7 +72,8 @@ where brew carries all four.
 |---|---|---|---|
 | prereqs, migrate, gitsign, extras, shell | ✓ | | |
 | submodules, directories, symlinks, packages, runtimes, plugins | ✓ | ✓ | |
-| version bumps (brew/dnf, mise, zinit, TPM, age-plugin-yubikey, submodules to latest) | | | ✓ |
+| `git pull --ff-only` (before any step) | | ✓ | |
+| version bumps (brew/dnf, mise, claude code, age-plugin-yubikey, zinit, TPM, submodules to latest) | | | ✓ |
 
 The line between the two groups is not "what is risky", it is **where the
 truth lives**. The six replayed steps read the repo: `manifest.sh`,
@@ -100,7 +102,12 @@ the update list at all.
 1. Create `setup/steps/<name>.sh`, sourced under `set -eu`. It must follow
    the contract above (`run` / `run_soft` for anything that can fail).
 2. Add `<name>` to `STEPS` in `run`, at the right position.
-3. `./run install <name> -n`, then twice for real: the second run must be
+3. Decide whether `update` must replay it, and if so add it to the list in
+   `setup/commands/update.sh`. The rule is the one above: replay it only if
+   its input lives in the repo. That list is hand-written on purpose, so
+   nothing joins `update` behind your back — which also means nothing
+   reminds you.
+4. `./run install <name> -n`, then twice for real: the second run must be
    a no-op.
 
 The libs are already sourced, so use them rather than reinventing:
@@ -114,8 +121,9 @@ The libs are already sourced, so use them rather than reinventing:
 | `confirm "question?"` | asks on `/dev/tty`; yes under `-y` and `--dry-run` |
 | `link_with_backup <src> <dst>` | inode-compared link, backup and restore-on-failure included |
 | `backup_file` / `migrate_file` | move into this run's backup directory / relocate a legacy file |
-| `pkg_install <pkgs…>` | the OS's package manager, `run_soft`-wrapped |
+| `pkg_install <pkgs…>` | `dnf install`, `run_soft`-wrapped. Fedora only: macOS goes through `brew bundle` |
 | `is_macos` / `is_fedora` / `require_cmd <bin>` | branch on the platform, or fail loudly on a missing tool |
+| `$_log_dir` | the run's private `mktemp -d`, removed by trap on every exit path. Where a step builds a scratch file. Read it as `"${_log_dir:?log.sh not sourced}"` |
 
 Never call `exit` in a step: it kills `run` itself and the summary with
 it. Use `return 1`: `run_steps` catches it and `log_summary` owns the exit

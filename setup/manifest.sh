@@ -29,8 +29,14 @@ scripts                .config/scripts
 EOF
 }
 
-# Directories to create, one per line. Without them zsh silently drops history
-# and compinit caching: nothing auto-creates the state and cache dirs.
+# Directories to create, one per line. The two shells DO create their own
+# history and cache dirs (.bashrc:23,64 · .zshrc:9,98 · zinit.zsh:12); the ones
+# that really need this step are the others: less and python drop their history
+# silently when the directory is missing, ghc/glc clone into ~/lab without
+# creating it, and ~/.local/bin has to exist BEFORE a shell starts or
+# env_path_prepend skips it (env.sh:44) and every tool installed there falls
+# off the PATH. The shell dirs stay listed as a belt: this step runs before any
+# first shell, it cannot depend on a .zshrc having been read.
 dotfiles_dirs() {
   cat <<EOF
 ${XDG_CONFIG_HOME:-$HOME/.config}

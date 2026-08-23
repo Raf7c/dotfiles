@@ -22,3 +22,5 @@ elif confirm "Make zsh ($_zsh) the login shell (chsh)?"; then
 else
   log_warn "login shell unchanged"
 fi
+
+unset _zsh

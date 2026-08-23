@@ -2,8 +2,6 @@
 # lib/util.sh: general helpers (POSIX). Depends on log.sh (already sourced).
 # The DRY_RUN / ASSUME_YES flags and DOTFILES_DIR are set by run.
 
-: "${DRY_RUN:=0}"
-: "${ASSUME_YES:=0}"
 : "${DOTFILES_DIR:?DOTFILES_DIR must be set}"
 
 # Simple commands only: for a pipe or a redirection, test $DRY_RUN by hand.
@@ -48,6 +46,15 @@ require_cmd() {
 # by run). Each step is SOURCED, so it shares the libs and run's environment.
 run_steps() {
   : "${STEPS:?STEPS must be set (step order, set by run)}"
+  # A filter name matching no step is silently dropped by the loop below. `run`
+  # validates the names YOU type; nothing validated the hand-written list of
+  # setup/commands/update.sh, so a typo there skipped a step without a word.
+  for _flt in "$@"; do
+    _known=0
+    for _s in $STEPS; do [ "$_s" = "$_flt" ] && _known=1; done
+    [ "$_known" = 1 ] ||
+      log_error "run_steps: unknown step '$_flt' (typo in a command's list?)"
+  done
   for _short in $STEPS; do
     _f="$DOTFILES_DIR/setup/steps/$_short.sh"
     [ -e "$_f" ] || {
@@ -92,7 +99,9 @@ confirm() {
 # --- Centralized backups -----------------------------------------------------
 # Everything moved during a run lands in ONE directory, keeping its path
 # relative to $HOME. Created on demand: no backup, no directory.
-: "${RUN_TS:=$(date +%Y%m%d%H%M%S)}"
+# Assertion, not a default: an empty RUN_TS would drop every run's backups
+# straight into backups/, where successive runs would overwrite each other.
+: "${RUN_TS:?RUN_TS must be set (exported by run)}"
 BACKUP_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/backups/$RUN_TS"
 
 backup_file() {
@@ -141,6 +150,10 @@ link_with_backup() {
     return 0
   fi
   # Where backup_file will have moved it ($_dst is always under $HOME here).
+  # A pre-existing SYMLINK is backed up too, not deleted: it records where the
+  # old config lived, and the restore-on-failure path below needs it. The school
+  # repo deliberately does the opposite (it drops dead links instead) — the two
+  # repos are independent and each states its choice.
   _lbak=''
   if [ -e "$_dst" ] || [ -L "$_dst" ]; then
     backup_file "$_dst"

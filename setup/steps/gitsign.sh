@@ -67,16 +67,15 @@ _gs_tmp="${_log_dir:?log.sh not sourced}/gitsign"
 } >"$_gs_tmp"
 
 # --- write only when something actually changes -----------------------------
+# No `rm` on the branches that leave $_gs_tmp behind: it lives inside $_log_dir,
+# which log.sh removes by trap on EXIT, INT and TERM.
 if [ -e "$_gs_out" ] && ! head -n 1 -- "$_gs_out" | grep -qF -- "$_gs_mark"; then
   # Hand-written file: never clobber settings the user put there.
   log_info "gitsign: config.local is hand-written -> left untouched"
-  rm -f -- "$_gs_tmp"
 elif [ -e "$_gs_out" ] && cmp -s -- "$_gs_tmp" "$_gs_out"; then
   log_ok "gitsign: config.local already up to date"
-  rm -f -- "$_gs_tmp"
 elif [ "$DRY_RUN" = 1 ]; then
   log_info "[dry-run] write ${_gs_out#"$DOTFILES_DIR"/}"
-  rm -f -- "$_gs_tmp"
 elif mv -- "$_gs_tmp" "$_gs_out"; then
   if [ -r "$_gs_key" ]; then
     log_ok "gitsign: config.local generated (signing enabled)"
@@ -85,7 +84,6 @@ elif mv -- "$_gs_tmp" "$_gs_out"; then
   fi
 else
   log_error "gitsign: cannot write ${_gs_out#"$DOTFILES_DIR"/}"
-  rm -f -- "$_gs_tmp"
 fi
 
 unset _gs_key _gs_out _gs_mark _gs_program _gs_prefix _gs_cand _gs_tmp

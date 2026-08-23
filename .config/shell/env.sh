@@ -20,6 +20,11 @@ export GITUSER="raf7c"
 export REPOS="$HOME/lab"
 export GHREPOS="$REPOS/github"
 export GLREPOS="$REPOS/gitlab"
+# DOTFILES and ICLOUD are interactive comfort only (`cd $DOTFILES`): no script
+# in either repo reads them, unlike LESSHISTFILE or ANSIBLE_HOME below, which
+# external tools read. DOTFILES hard-codes the clone path the README's quick
+# start uses; `run` computes its own from $0, so a clone somewhere else makes
+# the two diverge. Kept in sync by hand, on purpose.
 export DOTFILES="$HOME/.dotfiles"
 if [ -d "$HOME/icloud" ]; then export ICLOUD="$HOME/icloud"; fi
 

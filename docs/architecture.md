@@ -53,8 +53,9 @@ touching the system.
 
 ## XDG layout
 
-`$HOME` holds only four entry files (`.zshenv`, `.bashrc`, `.bash_profile`,
-and the `~/.config` links). Everything else **this repo controls** lives
+`$HOME` holds only four entry files (`.zshenv`, `.vimrc`, `.bashrc`,
+`.bash_profile`) plus the `~/.config` links. Everything else **this repo
+controls** lives
 under XDG. Third-party tools that ignore the spec keep their own
 dotdirs, and `env.sh` redirects the few that accept it (`ANSIBLE_HOME`,
 `npm_config_cache`):

@@ -129,7 +129,7 @@ the keys from scratch: [git](.config/git/README.md).
 ```sh
 ./run install     # everything -> ready (idempotent)
 ./run update      # git pull + resync links, packages, runtimes, submodules
-./run upgrade     # bump versions (brew/dnf, mise, zinit, TPM, submodules)
+./run upgrade     # bump versions (brew/dnf, mise, claude, zinit, TPM, submodules…)
 ```
 
 Options: `-n`/`--dry-run`, `-y`/`--yes`, `-h`/`--help`.

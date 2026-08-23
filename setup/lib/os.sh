@@ -35,6 +35,9 @@ pkg_install() {
   case "${OS:-}" in
     # run_soft: an unreachable mirror must be reported, not abort the run.
     fedora) run_soft sudo dnf install -y "$@" ;;
+    # Unreachable today: run exits on OS=unknown and both callers sit in the
+    # `else` of an is_macos test. Kept as the failure mode of a documented
+    # public helper (docs/installer.md), for a future step calling it wrongly.
     *)
       log_warn "pkg_install: unsupported OS ($OS)"
       return 1

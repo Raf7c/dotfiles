@@ -3,7 +3,7 @@
 # ~/.config/mise/config.toml, linked by symlinks. Needs mise on the PATH,
 # put there by packages; missing mise is a clean skip, not an error.
 
-hash -r 2>/dev/null || true
+hash -r
 
 if ! command -v mise >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/mise" ]; then
   if [ "$DRY_RUN" = 1 ]; then
@@ -22,3 +22,4 @@ _mise=$(command -v mise 2>/dev/null || printf '%s' "$HOME/.local/bin/mise")
 run_soft "$_mise" trust -- "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml"
 run_soft "$_mise" install
 log_ok "runtimes (mise) installed from ~/.config/mise/config.toml"
+unset _mise

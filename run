@@ -3,33 +3,10 @@
 
 set -eu
 
-# Resolve $0 THROUGH the symlinks: `run` is reachable from a link in the PATH,
-# and dirname of a link points at the link, not at the repo. `readlink -f` is
-# GNU-only, so walk the chain by hand. CDPATH='' (not `CDPATH=`, SC1007)
-# keeps `cd` silent.
-_self=$0
-case "$_self" in
-  */*) ;;
-  *) _self=$(command -v -- "$_self") || {
-    printf 'run: cannot locate %s\n' "$0" >&2
-    exit 1
-  } ;;
-esac
-_hops=0
-while [ -L "$_self" ]; do
-  _hops=$((_hops + 1))
-  if [ "$_hops" -gt 40 ]; then
-    printf 'run: too many symlink levels for %s\n' "$0" >&2
-    exit 1
-  fi
-  _dir=$(CDPATH='' cd -- "$(dirname -- "$_self")" && pwd)
-  _target=$(readlink -- "$_self")
-  case "$_target" in
-    /*) _self=$_target ;;
-    *) _self="$_dir/$_target" ;;
-  esac
-done
-DOTFILES_DIR=$(CDPATH='' cd -- "$(dirname -- "$_self")" && pwd)
+# `run` is always invoked from the repo (./run, ~/.dotfiles/run, sh run), never
+# through a symlink: nothing here creates one, and manifest.sh links scripts/,
+# not this file. CDPATH='' (not `CDPATH=`, SC1007) keeps `cd` silent.
+DOTFILES_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 export DOTFILES_DIR
 
 # Single source of truth for the order. See docs/installer.md, adding a step.
@@ -60,7 +37,7 @@ Examples:
   ./run install                       # install everything
   ./run install -n                    # preview, run nothing
   ./run install symlinks packages     # only these steps
-  ./run update -y                     # resync without confirmation
+  ./run install -y                    # install without any confirmation prompt
   ./run upgrade -n                    # preview the updates
 
 Details: README.md

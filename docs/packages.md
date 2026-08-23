@@ -12,8 +12,10 @@ Two steps install software, and the package files stay bare lists: what is
    macOS, `dnf` (`fedora.txt`) on Fedora.
 2. **No-sudo recipes** (`packages`). starship, mise and claude-code are
    missing from the Fedora repos: official scripts into `~/.local/bin`,
-   idempotent (`command -v` first), downloaded **then** executed, which
-   guards against running a truncated download.
+   idempotent (`command -v`, **then** `~/.local/bin` directly: a shell started
+   before that directory existed does not carry it on its PATH, and
+   `command -v` alone would reinstall on every run), downloaded **then**
+   executed, which guards against running a truncated download.
 3. **What Fedora does not package** (`extras`, Fedora only). One COPR, asked
    before it is enabled, plus two downloads verified against the checksums
    published with the same release and one cargo build. macOS gets all four
@@ -29,7 +31,8 @@ Legend: **brew** / **cask** = Brewfile · **dnf** = fedora.txt · **mise** =
 
 | Tool | macOS | Fedora |
 |---|---|---|
-| git · tmux · zsh · bash · tree · eza · zoxide · fzf · bat · ripgrep · btop · jq · make · cmake · just · ansible · ansible-lint · age · kitty · firefox | brew | dnf |
+| git · tmux · zsh · bash · tree · eza · zoxide · fzf · bat · ripgrep · btop · jq · make · cmake · just · ansible · ansible-lint · age | brew | dnf |
+| kitty · firefox | cask | dnf |
 | bash-completion | brew `bash-completion@2` | dnf `bash-completion` |
 | fd | brew `fd` | dnf `fd-find` |
 | gnupg | brew `gnupg` | dnf `gnupg2` |
