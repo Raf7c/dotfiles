@@ -22,5 +22,5 @@ _mise=$(command -v mise 2>/dev/null || printf '%s' "$HOME/.local/bin/mise")
 # run_soft: one runtime that fails to build must be logged, not abort.
 run_soft "$_mise" trust -- "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml"
 run_soft "$_mise" install
-log_ok "runtimes (mise) installed from ~/.config/mise/config.toml"
+log_done "runtimes (mise) installed from ~/.config/mise/config.toml"
 unset _mise

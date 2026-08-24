@@ -2,7 +2,7 @@
 # Install norminette (42 school) + c_formatter_42.
 set -eu
 
-# Python 3.10+ for norminette, 3.8+ for c_formatter_42
+# Python 3.10+: norminette is what sets the floor (c_formatter_42 asks 3.7).
 command -v python3 >/dev/null 2>&1 || {
   printf 'Error: python3 required (3.10+ for norminette).\n' >&2
   exit 1

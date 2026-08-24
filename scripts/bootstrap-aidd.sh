@@ -39,7 +39,7 @@ clone_or_pull() { # <url> <dest>
 }
 
 check_prereqs
-mkdir -p "$CONF"
+mkdir -p -- "$CONF"
 clone_or_pull "$AIDD_URL" "$CONF/aidd"
 clone_or_pull "$LIB_URL" "$CONF/library"
 

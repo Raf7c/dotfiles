@@ -27,10 +27,10 @@ _install_script() {
   fi
   log_info "installing $_is_label…"
   mkdir -p -- "$HOME/.local/bin"
-  _tmp=$(mktemp) || {
-    log_warn "$_is_label: mktemp failed"
-    return 0
-  }
+  # Inside log.sh's private mktemp -d, like gitsign and extras: one trap
+  # cleans up every scratch file, interruption included. No mktemp here means
+  # no mktemp failure to grade.
+  _tmp="${_log_dir:?log.sh not sourced}/install-$_is_bin"
   if curl -fsSL -o "$_tmp" -- "$_is_url"; then
     "$_is_interp" "$_tmp" "$@" || log_error "$_is_label: installation failed"
   else

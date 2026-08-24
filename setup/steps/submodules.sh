@@ -7,7 +7,7 @@ if [ -f "$DOTFILES_DIR/.gitmodules" ]; then
   # Needs the submodule remote (network + ssh keys). The rest of the dotfiles
   # installs fine without the nvim config: report, do not abort.
   if run git -C "$DOTFILES_DIR" submodule update --init --recursive; then
-    log_ok "submodules synced (pinned commit)"
+    log_done "submodules synced (pinned commit)"
   else
     log_error "submodule update failed (network / SSH access?), step stopped"
     return 0

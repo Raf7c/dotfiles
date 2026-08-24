@@ -31,9 +31,9 @@ on every push to `main`/`dev` and on every pull request:
 > Handed a **directory**, shfmt silently skips dotfiles and has no flag to
 > include them. Every zsh file has to be named on the command line, or it
 > goes unchecked without a word: that is how `.zshrc` escaped the formatter
-> for a week. `find` does list them, which is why the syntax step can get
-> reaches them with `-name '.z*' -o -name '*.zsh'` — plus `.zshenv`, spelled
-> out in the loop, since that `find` walks `.config/zsh` only.
+> for a week. `find` does list them: the syntax step reaches them with
+> `-name '.z*' -o -name '*.zsh'` — plus `.zshenv`, spelled out in the loop,
+> since that `find` walks `.config/zsh` only.
 
 shellcheck, shfmt and yamllint are installed by `mise-action` reading this
 repo's own `.config/mise/config.toml`, so local and CI lint with the same

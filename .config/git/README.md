@@ -122,8 +122,9 @@ the old public key and those commits fall back to Unverified.
 > [!NOTE]
 > That is exactly what happened here, and it is a **deliberate** choice, not
 > an oversight. The July 2026 key was retired without a `valid-before` line,
-> so the 32 commits it signed (19 here, 13 in the school repo, up to
-> 2026-08-04) no longer verify, locally or on GitHub once the old public key
+> so the commits it signed between 2026-07-27 and 2026-08-04 — about twenty
+> here, about fifteen in the school repo — no longer verify, locally or on
+> GitHub once the old public key
 > is unregistered. Only one person ever wrote them, the current key is the
 > only one in use, and carrying a retired credential forward to rescue eight
 > days of history was judged not worth it. A branch ruleset requiring signed

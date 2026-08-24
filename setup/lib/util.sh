@@ -117,7 +117,7 @@ backup_file() {
     # Unreachable from the two callers here: both pass paths under $HOME.
     # Kept, like pkg_install's `*)`, as the behaviour of a documented public
     # helper for a future caller that does not.
-    *) _rel=$(basename "$_abs") ;;
+    *) _rel=$(basename -- "$_abs") ;;
   esac
   _bdest="$BACKUP_DIR/$_rel"
   run mkdir -p -- "$(dirname -- "$_bdest")"

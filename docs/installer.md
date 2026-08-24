@@ -57,8 +57,8 @@ setup/commands/*.sh     one per command: install / update / upgrade
 
 The order in `STEPS` is that dependency chain, nothing more. A missing
 dependency is a clean skip with a log line, never a crash: **runtimes**
-without mise, **plugins** without network or before **symlinks**, **shell**
-without zsh.
+without mise, **extras** without the cargo that `runtimes` provides,
+**plugins** without network or before **symlinks**, **shell** without zsh.
 
 Five deserve a note: **migrate** runs once per machine and never returns;
 **gitsign** never overwrites a hand-written `config.local`; **prereqs** and
@@ -100,8 +100,10 @@ the update list at all.
 
 ## Adding a step
 
-1. Create `setup/steps/<name>.sh`, sourced under `set -eu`. It must follow
-   the contract above (`run` / `run_soft` for anything that can fail).
+1. Create `setup/steps/<name>.sh`. `run_steps` sources it under `set -u` with
+   `-e` turned OFF, so a failing command does NOT stop the step and the step's
+   status is that of its LAST command. Check what can fail, by hand or through
+   `run` / `run_soft`, and end on a line that says what you mean.
 2. Add `<name>` to `STEPS` in `run`, at the right position.
 3. Decide whether `update` must replay it, and if so add it to the list in
    `setup/commands/update.sh`. The rule is the one above: replay it only if

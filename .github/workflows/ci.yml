@@ -58,8 +58,9 @@ jobs:
         run: |
           rc=0
           for f in setup/steps/*.sh; do
-            # Strip comments first: "log_summary owns the exit code" is prose.
-            if sed 's/#.*//' "$f" |
+            # Drop comment LINES; never truncate at a '#', or ${var#pattern}
+            # would hide everything after it on that line, `exit` included.
+            if grep -vE '^[[:space:]]*#' "$f" |
               grep -nE '(^|[;&|[:space:]])exit([[:space:]]|$)'; then
               echo "::error file=$f::a step must return, never exit"
               rc=1

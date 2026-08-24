@@ -65,7 +65,7 @@ dotdirs, and `env.sh` redirects the few that accept it (`ANSIBLE_HOME`,
 | `~/.config/*` | symlinks into this repo (see `setup/manifest.sh`) |
 | `~/.local/state` | shell histories, backups |
 | `~/.cache` | compinit dumps, completion caches |
-| `~/.local/share` | zinit, mise, python history, the Nerd Font, tmux sessions |
+| `~/.local/share` | zinit, mise, python history, the Nerd Font, tmux sessions, ansible |
 
 Every `XDG_*` read outside `env.sh` carries its `:-` default: each file
 must survive being loaded without the shared environment.

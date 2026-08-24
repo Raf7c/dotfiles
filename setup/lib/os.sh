@@ -10,9 +10,9 @@ detect_os() {
         # shellcheck disable=SC1091
         . /etc/os-release
         # ID only, never ID_LIKE: a Rocky or a CentOS Stream would pass the
-        # door and then receive fedora.txt, which does not transpose. eza is
-        # in no EPEL branch at all, just is missing from EPEL 9, and EPEL has
-        # to be enabled first. "Refuses an unknown OS" has to mean it.
+        # door and then receive fedora.txt, which does not transpose: eza is
+        # missing from the EPEL branch these ship, and EPEL has to be enabled
+        # first anyway. "Refuses an unknown OS" has to mean it.
         case "${ID:-}" in
           fedora) OS=fedora ;;
           *) OS=unknown ;;

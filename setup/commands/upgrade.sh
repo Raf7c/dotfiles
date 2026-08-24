@@ -18,6 +18,8 @@ else
   # A full system upgrade, kernel included: it asks first, like chsh does.
   if confirm "Upgrade every system package (sudo dnf upgrade)?"; then
     run sudo dnf upgrade --refresh -y || log_warn "dnf upgrade: failed"
+  else
+    log_info "system packages: declined -> skipped"
   fi
 fi
 

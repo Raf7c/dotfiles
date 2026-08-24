@@ -35,8 +35,11 @@ elif confirm "Make zsh ($_zsh) the login shell (chsh)?"; then
     { grep -qx "$_zsh" /etc/shells 2>/dev/null ||
       printf '%s\n' "$_zsh" | sudo tee -a /etc/shells >/dev/null; } ||
       log_warn "/etc/shells: write failed (sudo refused?)"
-    chsh -s "$_zsh" || log_warn "chsh failed (password?)"
-    log_ok "login shell -> zsh (takes effect next session)"
+    if chsh -s "$_zsh"; then
+      log_ok "login shell -> zsh (takes effect next session)"
+    else
+      log_warn "chsh failed (password?), login shell unchanged"
+    fi
   fi
 else
   log_warn "login shell unchanged"

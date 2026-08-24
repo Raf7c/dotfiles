@@ -86,7 +86,8 @@ while [ $# -gt 0 ]; do
 done
 
 # From here on step names are expanded unquoted ($STEPS_ARG). Disable globbing
-# so `./run install '*'` can never turn into a list of filenames.
+# so `./run install '*'` can never turn into a list of filenames. NEVER turned
+# back on: steps are sourced in this shell, so a step cannot rely on a glob.
 set -f
 
 # Steps only apply to install (update/upgrade have a fixed scope).
