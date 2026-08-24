@@ -17,7 +17,7 @@ Two steps install software, and the package files stay bare lists: what is
    before that directory existed does not carry it on its PATH, and
    `command -v` alone would reinstall on every run), downloaded **then**
    executed, which guards against running a truncated download.
-3. **What Fedora does not package** (`extras`, Fedora only). One COPR, asked
+3. **What Fedora does not package** (`extras_linux`, Fedora only). One COPR, asked
    before it is enabled, plus two downloads verified against the checksums
    published with the same release and one cargo build. macOS gets all four
    from brew, so the step is a no-op there.
@@ -29,7 +29,7 @@ Two steps install software, and the package files stay bare lists: what is
 `./run install` handles everything in this table, on both systems.
 Legend: **brew** / **cask** = Brewfile · **dnf** = fedora.txt · **mise** =
 `.config/mise/config.toml` · **`./run`** = a recipe in `packages.sh`, or in
-`extras.sh` where the row says `extras`.
+`extras_linux.sh` where the row says `extras_linux`.
 
 | Tool | macOS | Fedora |
 |---|---|---|
@@ -46,11 +46,11 @@ Legend: **brew** / **cask** = Brewfile · **dnf** = fedora.txt · **mise** =
 | starship · mise | brew | **`./run`**, official script into `~/.local/bin` |
 | claude-code | **`./run`** | **`./run`** |
 | runtimes and the pinned linters | mise | mise |
-| lazygit | brew | **`./run`** `extras`, COPR, asked first |
-| sops · Nerd Font | brew, cask | **`./run`** `extras`, download + checksum |
-| age-plugin-yubikey | brew | **`./run`** `extras`, `cargo install` |
+| lazygit | brew | **`./run`** `extras_linux`, COPR, asked first |
+| sops · Nerd Font | brew, cask | **`./run`** `extras_linux`, download + checksum |
+| age-plugin-yubikey | brew | **`./run`** `extras_linux`, `cargo install` |
 
-## What the `extras` step does on Fedora
+## What the `extras_linux` step does on Fedora
 
 Four tools, and none of them is a matter of taste: each was checked against
 `packages.fedoraproject.org` and is genuinely absent from the Fedora
@@ -75,7 +75,7 @@ difference is deliberate:
 |---|---|
 | lazygit | `./run upgrade`, through `dnf upgrade`: a COPR is a repo like any other |
 | age-plugin-yubikey | `./run upgrade`, `cargo install --force` |
-| sops | **you**: bump `_ex_sops_version` in `setup/steps/extras.sh`, commit, rerun `./run install extras`. The step compares the installed version to the pin and replaces it when they differ, so the bump is what triggers the change. Same rule as a mise pin: a version move is a tracked edit, never a side effect |
+| sops | **you**: bump `_ex_sops_version` in `setup/steps/extras.sh`, commit, rerun `./run install extras_linux`. The step compares the installed version to the pin and replaces it when they differ, so the bump is what triggers the change. Same rule as a mise pin: a version move is a tracked edit, never a side effect |
 | Nerd Font | nothing. An unpacked archive with no security surface; delete the directory and rerun the step to refresh it |
 
 Two details that bite. `cargo install age-plugin-yubikey` will not compile
@@ -137,7 +137,7 @@ nothing depends on version-wise: pipx, tree-sitter and usage.
 <details>
 <summary><b>Declined the COPR, or want it later</b></summary>
 
-The `extras` step offers it again on every `./run install extras`, and never
+The `extras_linux` step offers it again on every `./run install extras_linux`, and never
 during an update. To do it yourself, this is exactly what it would run:
 
 ```sh
@@ -185,7 +185,7 @@ sudo dnf install google-chrome-stable
 Secrets and YubiKey tooling on both platforms: age, sops,
 age-plugin-yubikey and ykman via the Brewfile on macOS; on Fedora, `age`,
 `yubikey-manager` and the `pcsc-lite` pair come from the base repos, while
-sops and age-plugin-yubikey are handled by the `extras` step.
+sops and age-plugin-yubikey are handled by the `extras_linux` step.
 
 Homebrew openssh + libfido2 exist only to fix a macOS gap: Apple's
 ssh-keygen cannot sign with FIDO2 `sk-*` keys. Side effect: the formula

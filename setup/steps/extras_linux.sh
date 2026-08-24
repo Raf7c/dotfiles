@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Step extras: the four tools Fedora does not package, checked one by one
+# Step extras_linux: the four tools Fedora does not package, checked one by one
 # against packages.fedoraproject.org (docs/packages.md). Fedora only, brew
 # carries all four on macOS. Not replayed by `update`, see docs/installer.md.
 
@@ -10,9 +10,9 @@ hash -r
 # below would simply not exist.
 if ! is_fedora; then
   if is_macos; then
-    log_ok "extras: brew already covers these on macOS"
+    log_ok "extras_linux: brew already covers these on macOS"
   else
-    log_info "extras: Fedora only, nothing to do on $OS"
+    log_info "extras_linux: Fedora only, nothing to do on $OS"
   fi
   return 0
 fi
@@ -31,7 +31,7 @@ _ex_install_lazygit() {
     log_ok "lazygit already present"
     return 0
   fi
-  if ! confirm "extras: enable the third-party COPR dejan/lazygit (sudo)?"; then
+  if ! confirm "extras_linux: enable the third-party COPR dejan/lazygit (sudo)?"; then
     log_info "lazygit skipped, the recipe stays in docs/packages.md"
     return 0
   fi

@@ -8,7 +8,7 @@ Config: `.config/ghostty/config`. The notable choices:
   matters: starship, eza and the tmux status bar print glyphs from its
   private range; plain "JetBrains Mono" renders them as tofu (empty
   boxes). Installed by `./run`: the `font-jetbrains-mono-nerd-font` cask on
-  macOS, the `extras` step on Fedora.
+  macOS, the `extras_linux` step on Fedora.
 - **Theme**: follows the OS appearance (Catppuccin Latte / Mocha).
 - `copy-on-select = clipboard`, `macos-option-as-alt = true`.
 - OSC 52 is on by default in Ghostty, which is what makes tmux copy work

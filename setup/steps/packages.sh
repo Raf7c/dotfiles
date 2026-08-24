@@ -27,7 +27,7 @@ _install_script() {
   fi
   log_info "installing $_is_label…"
   mkdir -p -- "$HOME/.local/bin"
-  # Inside log.sh's private mktemp -d, like gitsign and extras: one trap
+  # Inside log.sh's private mktemp -d, like gitsign and extras_linux: one trap
   # cleans up every scratch file, interruption included. No mktemp here means
   # no mktemp failure to grade.
   _tmp="${_log_dir:?log.sh not sourced}/install-$_is_bin"

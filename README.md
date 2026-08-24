@@ -22,7 +22,7 @@ takes a fresh machine (**macOS** or **Fedora**) to a ready workstation.
   `ID` only: a RHEL derivative (Rocky, CentOS Stream, Nobara) is refused even
   though it is Fedora-like, because `fedora.txt` does not transpose to EPEL.
 - `git`, `curl`, and an SSH key registered on GitHub (the clone uses `git@`).
-- `sudo` for four steps (`prereqs`, `packages`, `shell`, and `extras` only
+- `sudo` for four steps (`prereqs`, `packages`, `shell`, and `extras_linux` only
   if you accept the COPR); everything else stays in `$HOME`.
 
 ## Stack
@@ -45,7 +45,7 @@ takes a fresh machine (**macOS** or **Fedora**) to a ready workstation.
 - **No root required for the shell.** `~/.zshenv` bootstraps `ZDOTDIR`
   entirely from `$HOME`, so the startup chain never depends on root.
   Installing does ask for `sudo`: the initial Homebrew install on macOS,
-  `dnf` on Fedora, the `/etc/shells` line, and the COPR of the `extras`
+  `dnf` on Fedora, the `/etc/shells` line, and the COPR of the `extras_linux`
   step if you accept it.
 - **Degrades cleanly.** No network, no git, a missing tool: the shell still
   starts. Scripts stay silent; an interactive shell gets a single stderr
