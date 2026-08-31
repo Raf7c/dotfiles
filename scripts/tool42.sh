@@ -7,6 +7,13 @@ command -v python3 >/dev/null 2>&1 || {
   printf 'Error: python3 required (3.10+ for norminette).\n' >&2
   exit 1
 }
+# Checked, not merely announced: pipx would happily install norminette against
+# an older python, and the failure would surface far from here.
+python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' || {
+  printf 'Error: python3 %s is too old, norminette needs 3.10+.\n' \
+    "$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:3])))')" >&2
+  exit 1
+}
 
 printf 'Installing norminette (42school) and c_formatter_42...\n'
 

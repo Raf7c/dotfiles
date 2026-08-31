@@ -17,7 +17,7 @@ Two steps install software, and the package files stay bare lists: what is
    before that directory existed does not carry it on its PATH, and
    `command -v` alone would reinstall on every run), downloaded **then**
    executed, which guards against running a truncated download.
-3. **What Fedora does not package** (`extras_linux`, Fedora only). One COPR, asked
+3. **What Fedora does not package** (`extras_fedora`, Fedora only). One COPR, asked
    before it is enabled, plus two downloads verified against the checksums
    published with the same release and one cargo build. macOS gets all four
    from brew, so the step is a no-op there.
@@ -29,7 +29,7 @@ Two steps install software, and the package files stay bare lists: what is
 `./run install` handles everything in this table, on both systems.
 Legend: **brew** / **cask** = Brewfile · **dnf** = fedora.txt · **mise** =
 `.config/mise/config.toml` · **`./run`** = a recipe in `packages.sh`, or in
-`extras_linux.sh` where the row says `extras_linux`.
+`extras_fedora.sh` where the row says `extras_fedora`.
 
 | Tool | macOS | Fedora |
 |---|---|---|
@@ -46,11 +46,11 @@ Legend: **brew** / **cask** = Brewfile · **dnf** = fedora.txt · **mise** =
 | starship · mise | brew | **`./run`**, official script into `~/.local/bin` |
 | claude-code | **`./run`** | **`./run`** |
 | runtimes and the pinned linters | mise | mise |
-| lazygit | brew | **`./run`** `extras_linux`, COPR, asked first |
-| sops · Nerd Font | brew, cask | **`./run`** `extras_linux`, download + checksum |
-| age-plugin-yubikey | brew | **`./run`** `extras_linux`, `cargo install` |
+| lazygit | brew | **`./run`** `extras_fedora`, COPR, asked first |
+| sops · Nerd Font | brew, cask | **`./run`** `extras_fedora`, download + checksum |
+| age-plugin-yubikey | brew | **`./run`** `extras_fedora`, `cargo install` |
 
-## What the `extras_linux` step does on Fedora
+## What the `extras_fedora` step does on Fedora
 
 Four tools, and none of them is a matter of taste: each was checked against
 `packages.fedoraproject.org` and is genuinely absent from the Fedora
@@ -75,7 +75,7 @@ difference is deliberate:
 |---|---|
 | lazygit | `./run upgrade`, through `dnf upgrade`: a COPR is a repo like any other |
 | age-plugin-yubikey | `./run upgrade`, `cargo install --force` |
-| sops | **you**: bump `_ex_sops_version` in `setup/steps/extras.sh`, commit, rerun `./run install extras_linux`. The step compares the installed version to the pin and replaces it when they differ, so the bump is what triggers the change. Same rule as a mise pin: a version move is a tracked edit, never a side effect |
+| sops | **you**: bump `_ex_sops_version` in `setup/steps/extras_fedora.sh`, commit, rerun `./run install extras_fedora`. The step compares the installed version to the pin and replaces it when they differ, so the bump is what triggers the change. Same rule as a mise pin: a version move is a tracked edit, never a side effect |
 | Nerd Font | nothing. An unpacked archive with no security surface; delete the directory and rerun the step to refresh it |
 
 Two details that bite. `cargo install age-plugin-yubikey` will not compile
@@ -137,7 +137,7 @@ nothing depends on version-wise: pipx, tree-sitter and usage.
 <details>
 <summary><b>Declined the COPR, or want it later</b></summary>
 
-The `extras_linux` step offers it again on every `./run install extras_linux`, and never
+The `extras_fedora` step offers it again on every `./run install extras_fedora`, and never
 during an update. To do it yourself, this is exactly what it would run:
 
 ```sh
@@ -185,7 +185,7 @@ sudo dnf install google-chrome-stable
 Secrets and YubiKey tooling on both platforms: age, sops,
 age-plugin-yubikey and ykman via the Brewfile on macOS; on Fedora, `age`,
 `yubikey-manager` and the `pcsc-lite` pair come from the base repos, while
-sops and age-plugin-yubikey are handled by the `extras_linux` step.
+sops and age-plugin-yubikey are handled by the `extras_fedora` step.
 
 Homebrew openssh + libfido2 exist only to fix a macOS gap: Apple's
 ssh-keygen cannot sign with FIDO2 `sk-*` keys. Side effect: the formula
@@ -200,12 +200,18 @@ here, and the code points back at this page rather than repeating them.
 
 | Tool | Floor | What it closes | Enforced by |
 |---|---|---|---|
-| mise | **2026.6.5** | every advisory below was checked to exist before being written here. [GHSA-f94h-j2qg-fxw3](https://github.com/advisories/GHSA-f94h-j2qg-fxw3): a repo-controlled version escaped the install directory through a symlink, closed in 2026.6.1. [GHSA-436v-8fw5-4mj8](https://github.com/advisories/GHSA-436v-8fw5-4mj8) (CVE-2026-35533, High): local settings were loaded before the trust check, closed in 2026.6.4. Then 2026.6.5 made `github`/`gitlab`/`forgejo.credential_command` global-only ([#10356](https://github.com/jdx/mise/pull/10356)), so a local config can no longer point a credential helper at a third-party host — no GHSA was filed for it, which is why the floor sits here and not at 2026.6.4 | `setup/steps/packages.sh` warns below it |
+| mise | **2026.7.14** | Seven advisories, each opened at its own URL before being written here. Five are in the global database: [GHSA-fjj5-v948-whjj](https://github.com/advisories/GHSA-fjj5-v948-whjj) (CVE-2026-33646, **Critical**: arbitrary code execution through Tera templates in a `.tool-versions`, which no trust check covered, closed in 2026.3.10). [GHSA-f94h-j2qg-fxw3](https://github.com/advisories/GHSA-f94h-j2qg-fxw3) (CVE-2026-54557: a repo-controlled version escaped the install directory through a symlink, 2026.6.1). [GHSA-436v-8fw5-4mj8](https://github.com/advisories/GHSA-436v-8fw5-4mj8) (CVE-2026-35533, High: local settings were loaded before the trust check, 2026.6.4). [GHSA-77g9-363w-rccq](https://github.com/advisories/GHSA-77g9-363w-rccq) (CVE-2026-55441, High: task-include files bypassed the trust check in a config-less repo, so listing tasks was enough, 2026.6.4). [GHSA-29hf-rm4x-xxph](https://github.com/advisories/GHSA-29hf-rm4x-xxph) (CVE-2026-55448: a local `credential_command` ran from untrusted config, 2026.6.4). Two more are published by upstream and not yet mirrored globally, so these links point at the project: [GHSA-9mm4-fgvc-x7rp](https://github.com/jdx/mise/security/advisories/GHSA-9mm4-fgvc-x7rp) (file ownership when mise is installed by root, 2026.7.1) and [GHSA-g74g-rg72-j2p3](https://github.com/jdx/mise/security/advisories/GHSA-g74g-rg72-j2p3) (**High**: the shell-interpreter settings were left off the `global_only` denylist added for CVE-2026-55448, handing an untrusted `.mise.toml` arbitrary command execution again — closed in **2026.7.14**, which is what sets this floor) | `setup/steps/packages.sh` warns below it |
 | tmux | **3.6b** | CVE-2026-11623, a Sixel use-after-free. The floor is the only thing that closes it: `allow-passthrough` does not gate Sixel, upstream parses the image before reading that option | nothing automatic, `tmux -V`, and `tmux display -p '#{sixel_support}'` for whether the build carries Sixel at all |
 
 > [!IMPORTANT]
 > Revise this table whenever you touch either check. A floor that is never
 > revised stops being a floor and becomes folklore.
+>
+> And read an advisory at **both** addresses before judging it:
+> `github.com/advisories/<id>` is the global database, `github.com/<org>/<repo>/
+> security/advisories/<id>` is the project's own. The second is where an
+> advisory appears first, sometimes by weeks. A 404 on the global one proves
+> nothing at all — this floor sat two releases too low for exactly that reason.
 
 ---
 

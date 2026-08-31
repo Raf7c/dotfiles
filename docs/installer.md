@@ -51,27 +51,27 @@ setup/commands/*.sh     one per command: install / update / upgrade
 | 6 | `packages` | `brew bundle` / `dnf`, then the no-sudo recipes (mise, starship, claude) | Fedora | yes | `prereqs` |
 | 7 | `gitsign` | generate `config.local` from the keys this machine has | no | no | nothing |
 | 8 | `runtimes` | install what `mise` declares (node, python, rust, neovim, linters) | no | yes | `packages`, for mise on the PATH |
-| 9 | `extras_linux` | Fedora only: the four tools Fedora does not package (lazygit, sops, age-plugin-yubikey, the Nerd Font) | Fedora, for the COPR only | yes | `runtimes`, for cargo |
+| 9 | `extras_fedora` | Fedora only: the four tools Fedora does not package (lazygit, sops, age-plugin-yubikey, the Nerd Font) | Fedora, for the COPR only | yes | `runtimes`, for cargo |
 | 10 | `plugins` | clone TPM (zinit clones itself at first zsh start) | no | yes | `prereqs` for git, `symlinks` for `~/.config/tmux` |
 | 11 | `shell` | `chsh` to zsh, asking first, and appends to `/etc/shells` | yes | no | `packages`, `chsh` needs zsh installed |
 
 The order in `STEPS` is that dependency chain, nothing more. A missing
 dependency is a clean skip with a log line, never a crash: **runtimes**
-without mise, **extras_linux** without the cargo that `runtimes` provides,
+without mise, **extras_fedora** without the cargo that `runtimes` provides,
 **plugins** without network or before **symlinks**, **shell** without zsh.
 
 Five deserve a note: **migrate** runs once per machine and never returns;
 **gitsign** never overwrites a hand-written `config.local`; **prereqs** and
 **shell** are the two that need sudo on macOS as well, the first because the
 Homebrew installer calls `have_sudo_access` and aborts without it, the second
-for `/etc/shells`; **extras_linux** is a clean no-op on macOS, where brew carries all
+for `/etc/shells`; **extras_fedora** is a clean no-op on macOS, where brew carries all
 four.
 
 ## What each command replays
 
 | Step | `install` | `update` | `upgrade` |
 |---|---|---|---|
-| prereqs, migrate, gitsign, extras_linux, shell | ✓ | | |
+| prereqs, migrate, gitsign, extras_fedora, shell | ✓ | | |
 | submodules, directories, symlinks, packages, runtimes, plugins | ✓ | ✓ | |
 | `git pull --ff-only` (before any step) | | ✓ | |
 | version bumps (brew/dnf, mise, claude code, age-plugin-yubikey, zinit, TPM, submodules to latest) | | | ✓ |
@@ -80,13 +80,13 @@ The line between the two groups is not "what is risky", it is **where the
 truth lives**. The six replayed steps read the repo: `manifest.sh`,
 `fedora.txt`, `config.toml`, `.gitmodules`. Edit one of those, push, and the
 other machine needs `update` to catch up. `gitsign` reads `~/.ssh`, and
-`extras_linux` reads what is already installed plus your answer about a COPR. No
+`extras_fedora` reads what is already installed plus your answer about a COPR. No
 `git pull` can change either input, so replaying them after a pull would
 recompute the same answer from the same data.
 
 The practical consequence: a signing key added later needs
 `./run install gitsign`, and a COPR declined once is offered again by
-`./run install extras_linux`, never by an update. Which is also why `-y` cannot
+`./run install extras_fedora`, never by an update. Which is also why `-y` cannot
 enable a third-party repo behind your back: the step it lives in is not in
 the update list at all.
 
@@ -135,7 +135,7 @@ code.
 
 ## Third-party repos: asked, never assumed
 
-The `extras_linux` step has exactly one place where `./run` adds a package source it
+The `extras_fedora` step has exactly one place where `./run` adds a package source it
 does not control: the lazygit COPR. That is a decision, so it goes through
 `confirm`, the same helper `chsh` and the Homebrew bootstrap use. Declining is
 a logged skip, not a failure, and the by-hand recipe stays in

@@ -68,6 +68,37 @@ jobs:
           done
           exit "$rc"
 
+      # $STEPS in `run` and setup/steps/ must agree BOTH ways. A name with no
+      # file is a step silently skipped on every machine; a file with no name
+      # is a step nothing will ever run, and NO execution can reveal that one.
+      # Renaming a step is precisely where the two drift apart.
+      - name: STEPS and setup/steps/ agree
+        run: |
+          rc=0
+          steps=$(sed -n 's/^STEPS="\(.*\)"$/\1/p' run)
+          if [ -z "$steps" ]; then
+            echo "::error file=run::cannot read STEPS"
+            exit 1
+          fi
+          for s in $steps; do
+            [ -f "setup/steps/$s.sh" ] || {
+              echo "::error file=run::STEPS lists '$s', setup/steps/$s.sh is missing"
+              rc=1
+            }
+          done
+          for f in setup/steps/*.sh; do
+            b=${f##*/}
+            b=${b%.sh}
+            case " $steps " in
+              *" $b "*) ;;
+              *)
+                echo "::error file=$f::$b is in no STEPS entry, it will never run"
+                rc=1
+                ;;
+            esac
+          done
+          exit "$rc"
+
       - name: shfmt (.editorconfig is the authority, -d must stay silent)
         # shfmt SKIPS hidden files when walking a directory and has no flag
         # to include them: every zsh file must be listed EXPLICITLY or it

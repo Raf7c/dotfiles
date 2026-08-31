@@ -27,7 +27,7 @@ _install_script() {
   fi
   log_info "installing $_is_label…"
   mkdir -p -- "$HOME/.local/bin"
-  # Inside log.sh's private mktemp -d, like gitsign and extras_linux: one trap
+  # Inside log.sh's private mktemp -d, like gitsign and extras_fedora: one trap
   # cleans up every scratch file, interruption included. No mktemp here means
   # no mktemp failure to grade.
   _tmp="${_log_dir:?log.sh not sourced}/install-$_is_bin"
@@ -77,7 +77,7 @@ if is_macos; then
   _install_claude
 
   hash -r
-  log_ok "macOS packages (brew bundle) ok"
+  log_done "macOS packages (brew bundle) ok"
 else
   # Fedora: repo packages (dnf)
   # fedora.txt, not "$OS.txt": run exits on an unknown OS and is_macos took the
@@ -99,15 +99,15 @@ else
   _install_claude
 
   hash -r
-  log_ok "Fedora packages ok"
+  log_done "Fedora packages ok"
 fi
 
 # Security floor. PERISHABLE: the version and what it closes are documented in
 # docs/packages.md, revise both together.
 if command -v mise >/dev/null 2>&1; then
   _mv=$(mise --version 2>/dev/null | awk '{print $1}')
-  if [ -n "$_mv" ] && [ "$(printf '%s\n' 2026.6.5 "$_mv" | sort -V | head -n1)" != "2026.6.5" ]; then
-    log_warn "mise $_mv < 2026.6.5 (published advisories) -> upgrade it"
+  if [ -n "$_mv" ] && [ "$(printf '%s\n' 2026.7.14 "$_mv" | sort -V | head -n1)" != "2026.7.14" ]; then
+    log_warn "mise $_mv < 2026.7.14 (published advisories) -> upgrade it"
   fi
   unset _mv
 fi

@@ -62,7 +62,15 @@ else
   zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color=always $realpath 2>/dev/null'
 fi
 
-zstyle ':fzf-tab:complete:*:*' fzf-preview 'less ${(Q)realpath} 2>/dev/null'
+# `less` in a preview is a cat in disguise: fzf hands it a pipe, and less
+# falls back to plain output there. bat is what actually colours and numbers
+# it, and --line-range keeps a huge file from being read whole on every TAB.
+if command -v bat >/dev/null 2>&1; then
+  zstyle ':fzf-tab:complete:*:*' fzf-preview \
+    'bat --color=always --style=numbers --line-range=:500 ${(Q)realpath} 2>/dev/null'
+else
+  zstyle ':fzf-tab:complete:*:*' fzf-preview 'cat ${(Q)realpath} 2>/dev/null'
+fi
 
 zstyle ':fzf-tab:*' fzf-min-height 20
 zstyle ':fzf-tab:*' switch-group '<' '>'

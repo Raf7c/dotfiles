@@ -10,7 +10,7 @@ DOTFILES_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 export DOTFILES_DIR
 
 # Single source of truth for the order. See docs/installer.md, adding a step.
-STEPS="prereqs submodules directories migrate symlinks packages gitsign runtimes extras_linux plugins shell"
+STEPS="prereqs submodules directories migrate symlinks packages gitsign runtimes extras_fedora plugins shell"
 export STEPS
 
 usage() {

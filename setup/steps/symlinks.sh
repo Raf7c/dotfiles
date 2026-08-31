@@ -20,4 +20,4 @@ done
 # status is that of its last command, and without this it would be the status
 # of whichever link happened to come last. Every failure already went through
 # log_error, and log_summary owns the exit code.
-log_ok "symlinks applied"
+log_done "symlinks applied"

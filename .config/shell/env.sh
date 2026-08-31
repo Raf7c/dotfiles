@@ -66,3 +66,7 @@ env_path_append() {
 env_path_append "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 
 export PATH
+
+# Sourced by EVERY shell: leave nothing behind. These two exist to build PATH
+# just above, and nothing calls them afterwards.
+unset -f env_path_prepend env_path_append

@@ -8,9 +8,13 @@ Config: `.config/ghostty/config`. The notable choices:
   matters: starship, eza and the tmux status bar print glyphs from its
   private range; plain "JetBrains Mono" renders them as tofu (empty
   boxes). Installed by `./run`: the `font-jetbrains-mono-nerd-font` cask on
-  macOS, the `extras_linux` step on Fedora.
+  macOS, the `extras_fedora` step on Fedora.
 - **Theme**: follows the OS appearance (Catppuccin Latte / Mocha).
 - `copy-on-select = clipboard`, `macos-option-as-alt = true`.
+- `cursor-style = block` **and** `shell-integration-features = no-cursor`:
+  the second is what makes the first true. Ghostty's shell integration sets
+  a bar at the prompt *"regardless of this configuration"*, so the block
+  would survive everywhere except where you actually look at it.
 - OSC 52 is on by default in Ghostty, which is what makes tmux copy work
   across SSH with zero remote-side binary.
 
@@ -32,7 +36,9 @@ Config: `.config/kitty/kitty.conf`. The notable choices:
   (MIT, upstream in the header). Static colours, no executed code: outside
   the plugin policy's scope.
 - `shell_integration no-cursor`: without it, kitty's shell integration
-  forces a beam cursor at the prompt where ghostty keeps the block.
+  forces a beam cursor at the prompt. Ghostty does exactly the same thing
+  and is disarmed the same way, one line above in its own config: both
+  terminals keep the block only because they are told to.
 
 ## tmux
 

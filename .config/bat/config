@@ -1,3 +1,2 @@
 --style="numbers,changes,header"
---pager="less -FR"
 --paging="auto"

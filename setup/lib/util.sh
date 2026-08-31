@@ -56,16 +56,20 @@ run_steps() {
       log_error "run_steps: unknown step '$_flt' (typo in a command's list?)"
   done
   for _short in $STEPS; do
-    _f="$DOTFILES_DIR/setup/steps/$_short.sh"
-    [ -e "$_f" ] || {
-      log_warn "step not found: $_short.sh"
-      continue
-    }
     if [ "$#" -gt 0 ]; then
       _ok=0
       for _flt in "$@"; do [ "$_short" = "$_flt" ] && _ok=1; done
       [ "$_ok" = 1 ] || continue
     fi
+    # Tested AFTER the filter: a step you did not ask for must not make noise.
+    # And an error, not a warning: $STEPS disagreeing with setup/steps/ is a repo
+    # bug, always a botched rename, and exit 0 is exactly how the last one went
+    # unnoticed. The CI checks the same pairing both ways, before it ships.
+    _f="$DOTFILES_DIR/setup/steps/$_short.sh"
+    [ -e "$_f" ] || {
+      log_error "step file missing: setup/steps/$_short.sh (STEPS and setup/steps/ disagree)"
+      continue
+    }
     log_step "step: $_short"
     # set -e would kill run on any uncaught failure inside a sourced step.
     # Capture the status instead; log_summary owns the final exit code.

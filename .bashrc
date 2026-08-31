@@ -20,7 +20,7 @@ case $- in *i*) ;; *) return ;; esac
 
 # ------------------ History ------------------
 export HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/bash/history"
-mkdir -p -- "${HISTFILE%/*}"
+[[ -d "${HISTFILE%/*}" ]] || mkdir -p -- "${HISTFILE%/*}"
 HISTSIZE=100000
 HISTFILESIZE=100000
 HISTCONTROL=ignoreboth:erasedups

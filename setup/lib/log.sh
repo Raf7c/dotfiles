@@ -36,9 +36,11 @@ log_cleanup() { rm -rf -- "$_log_dir"; }
 trap 'log_cleanup' EXIT
 trap 'log_cleanup; exit 130' INT
 trap 'log_cleanup; exit 143' TERM
-# HUP too: closing the terminal mid-run leaks $_log_dir in dash, which is the
-# shell `run` uses. Verified: dash keeps the directory on HUP, cleans on TERM.
+# HUP and QUIT too: without a trap of their own, dash dies from the signal
+# without running the EXIT trap and leaves $_log_dir behind. Measured with the
+# traps in place: INT 130, TERM 143, HUP 129 and QUIT 131 all clean up.
 trap 'log_cleanup; exit 129' HUP
+trap 'log_cleanup; exit 131' QUIT
 
 log_step() { printf '%b==>%b %s\n' "${_c_blue}${_c_bold}" "$_c_reset" "$*"; }
 log_info() { printf '    %s\n' "$*"; }

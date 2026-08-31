@@ -52,9 +52,23 @@ else
 fi
 
 # Non-blocking: the install may have been declined.
+_pr_ready=1
 if [ "$DRY_RUN" != 1 ]; then
-  command -v git >/dev/null 2>&1 || log_warn "git not found after prereqs"
-  command -v curl >/dev/null 2>&1 || log_warn "curl not found after prereqs"
+  command -v git >/dev/null 2>&1 || {
+    log_warn "git not found after prereqs"
+    _pr_ready=0
+  }
+  command -v curl >/dev/null 2>&1 || {
+    log_warn "curl not found after prereqs"
+    _pr_ready=0
+  }
 fi
 
-log_ok "prerequisites ready"
+# The ✓ used to print right under those two warnings, contradicting them.
+# log_info rather than a third log_warn: the warnings above are already counted.
+if [ "$_pr_ready" = 1 ]; then
+  log_done "prerequisites ready"
+else
+  log_info "prerequisites incomplete (see the warnings above)"
+fi
+unset _pr_ready

@@ -10,4 +10,4 @@ dotfiles_dirs | while IFS= read -r _dir; do
   run mkdir -p -- "$_dir"
 done
 
-log_ok "XDG directories ready"
+log_done "XDG directories ready"

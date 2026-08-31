@@ -1,5 +1,8 @@
-# Global excludes: OS / editor junk ONLY.
-# (Repo-specific patterns belong in each repo's .gitignore.)
+# Global excludes: what my TOOLING drops into any repo it touches -- OS,
+# editors, agents. The test is "written everywhere, wanted nowhere", not the
+# name of the tool: an agent's machine-local settings qualify exactly as
+# .DS_Store does, and cannot go in the .gitignore of a repo I do not own.
+# (Patterns specific to ONE project belong in that project's .gitignore.)
 .DS_Store
 .idea/
 .vscode/
