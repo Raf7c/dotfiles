@@ -114,6 +114,16 @@ _ex_install_sops() {
     log_ok "sops ${_ex_sops_version} already present (latest)"
     return 0
   fi
+  # They differ. Refuse a DOWNGRADE: `latest` is a redirect, and a yanked
+  # release -- or a tampered answer -- would otherwise install an older sops
+  # over a newer one, with a perfectly valid checksum since it IS a genuine
+  # older release. Warn and stop: this is the one thing the dropped pin bought
+  # beyond reproducibility, and it is worth four lines.
+  if [ -n "$_ex_got" ] && [ "$(printf '%s\n' "$_ex_got" "$_ex_sops_version" |
+    sort -V | head -n1)" = "$_ex_sops_version" ]; then
+    log_warn "sops: latest resolves to $_ex_sops_version, older than the installed $_ex_got -> nothing installed"
+    return 0
+  fi
   [ -n "$_ex_got" ] &&
     log_info "sops ${_ex_got} installed, latest is ${_ex_sops_version}"
   case "$(uname -m)" in

@@ -105,10 +105,12 @@ fi
 # No mise version floor here, on purpose. It was a number maintained by hand,
 # and a floor nobody revises is folklore (docs/packages.md said so before it
 # became the example): it sat two releases too low for two months and stayed
-# silent on the range it was meant to cover. What replaces it: `./run upgrade`
-# moves mise itself, and mise prints its own "version available" notice. What
-# no number can do is tell you whether being behind is DANGEROUS -- that needs
-# reading the advisories, at both addresses. docs/packages.md says where.
+# silent on the range it was meant to cover. What replaces it is ONE thing:
+# `./run upgrade` moves mise itself. Not mise's own "version available" notice
+# -- it only shows on `mise --version`, `version` and `doctor`, once a day at
+# most, and nothing here calls them: this very check was the last caller. And
+# no number ever answered the real question, whether being behind is
+# DANGEROUS. That needs reading the advisories. docs/packages.md says how.
 
 # Steps are sourced in the same shell: leave nothing behind for the next one.
 unset _tmp _list _pkgs _is_bin _is_label _is_url _is_interp _is_msg

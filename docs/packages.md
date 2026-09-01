@@ -75,7 +75,7 @@ difference is deliberate:
 |---|---|
 | lazygit | `./run upgrade`, through `dnf upgrade`: a COPR is a repo like any other |
 | age-plugin-yubikey | `./run upgrade`, `cargo install --force` |
-| sops | `./run install extras_fedora`. The step resolves the latest release (a plain redirect on `releases/latest`, no API), compares it to what is installed and replaces it when they differ. **Nothing to edit in the repo**: the pin was dropped because integrity does not depend on it — the checksums file ships with the release it checks — so a pin bought reproducibility only, at the price of a commit every time sops moved. It is not carried by `./run upgrade`, on purpose: `extras_fedora` is the step that asks about the COPR, and replaying it under `-y` would enable a third-party repo without asking |
+| sops | `./run install extras_fedora`. The step resolves the latest release (a plain redirect on `releases/latest`, no API), compares it to what is installed and replaces it when they differ. **Nothing to edit in the repo**: the pin was dropped because integrity does not depend on it — the checksums file ships with the release it checks. A pin also refused a *downgrade*, which `latest` cannot see (a yanked release is a genuine release, with a genuine checksum), so the step compares versions and refuses to install an older sops over a newer one. What is left of the pin is reproducibility, and it cost a commit every time sops moved. It is not carried by `./run upgrade`, on purpose: `extras_fedora` is the step that asks about the COPR, and replaying it under `-y` would enable a third-party repo without asking |
 | Nerd Font | nothing. An unpacked archive with no security surface; delete the directory and rerun the step to refresh it |
 
 Two details that bite. `cargo install age-plugin-yubikey` will not compile
@@ -203,17 +203,21 @@ removed deliberately. A floor is a number maintained by hand, and this one
 proved the rule written below it: it sat two releases too low for two months,
 silent over the whole range it existed to cover, because an advisory was
 published by the project weeks before the global database mirrored it. What
-covers mise instead: `./run upgrade` moves the binary itself, and mise prints
-its own *"version available"* notice at every run. Neither answers whether
-being behind is *dangerous* — that question needs a human reading the
-advisories, which is what this page is for.
+covers mise instead is exactly one thing: **`./run upgrade`**, which moves the
+binary. Not mise's own *"version available"* notice — it appears on `mise
+--version`, `mise version` and `mise doctor`, at most once a day, and nothing
+in this repo calls any of them; the removed check was the last caller. And no
+number ever answered the real question, whether being behind is *dangerous*.
+That needs a human reading the advisories, which is what this page is for.
 
 | Tool | Floor | What it closes | Enforced by |
 |---|---|---|---|
-| tmux | **3.6b** | CVE-2026-11623, a Sixel use-after-free. The floor is the only thing that closes it: `allow-passthrough` does not gate Sixel, upstream parses the image before reading that option. 3.7, 3.7a and 3.7b exist since and are announced as bug-fix releases, no CVE mentioned: the *security* floor stays 3.6b | nothing automatic, `tmux -V`, and `tmux display -p '#{sixel_support}'` for whether the build carries Sixel at all |
+| tmux | **3.6b** | CVE-2026-11623, a Sixel use-after-free. The floor is the only thing that closes it: `allow-passthrough` does not gate Sixel, upstream parses the image before reading that option. 3.7 exists since, with 3.7a, 3.7b and **3.7c** after it — verified against `git ls-remote`, not a releases page. The *security* floor stays **3.6b** because that is where the fix landed for the 3.6 line: [GHSA-4cw9-jpqf-99x8](https://github.com/advisories/GHSA-4cw9-jpqf-99x8) names patch `fc6d94a9` and "3.7-rc", backported to 3.6b. 3.6b or anything 3.7 and above is safe; 3.6a and below is not | nothing automatic, `tmux -V`, and `tmux display -p '#{sixel_support}'` for whether the build carries Sixel at all |
 
-Checked at both addresses on **2026-08-31**. That date is the point: silence
-here means *"not looked at since"*, never *"nothing to find"*.
+Checked on **2026-09-01**. That date is the point: silence here means *"not
+looked at since"*, never *"nothing to find"*. The first version of this note
+claimed 2026-08-31 and already listed one tmux release too few — a date only
+helps if what sits under it was actually re-read.
 
 > [!IMPORTANT]
 > Revise this table, and its date, whenever you look. A floor that is never
@@ -222,9 +226,15 @@ here means *"not looked at since"*, never *"nothing to find"*.
 >
 > And read an advisory at **both** addresses before judging it:
 > `github.com/advisories/<id>` is the global database, `github.com/<org>/<repo>/
-> security/advisories/<id>` is the project's own. The second is where an
-> advisory appears first, sometimes by weeks. A 404 on the global one proves
-> nothing at all — this floor sat two releases too low for exactly that reason.
+> security/advisories/<id>` is the project's own. Either can be the only one
+> that has it: the mise floor sat two releases too low because a 404 on the
+> global one was read as proof of absence, and CVE-2026-11623 below exists
+> **only** globally, with zero advisories on tmux's project page.
+>
+> Stronger still: a **listing page proves nothing either**. Measured twice —
+> mise's own advisory list rendered 7 entries, then 8 for the same URL, and
+> getsops' list has never shown GHSA-jgf3-f6rg-8x3h although its direct URL
+> answers in full. Only the direct URL of a given identifier is evidence.
 
 ---
 
