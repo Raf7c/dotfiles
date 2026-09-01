@@ -49,7 +49,7 @@ setup/commands/*.sh     one per command: install / update / upgrade
 | 4 | `migrate` | move legacy history files (`~/.bash_history`, `~/.lesshst`…) to XDG | no | no | nothing (`migrate_file` creates its own target directory) |
 | 5 | `symlinks` | apply `manifest.sh`, backing up anything real it replaces | no | no | `submodules`, so the submodule is populated when linked |
 | 6 | `packages` | `brew bundle` / `dnf`, then the no-sudo recipes (mise, starship, claude) | Fedora | yes | `prereqs` |
-| 7 | `gitsign` | generate `config.local` from the keys this machine has | no | no | nothing |
+| 7 | `gitsign` | generate `config.local` from the keys this machine has, and append any missing signer to `allowed_signers` | no | no | nothing |
 | 8 | `runtimes` | install what `mise` declares (node, python, rust, neovim, linters) | no | yes | `packages`, for mise on the PATH |
 | 9 | `extras_fedora` | Fedora only: the four tools Fedora does not package (lazygit, sops, age-plugin-yubikey, the Nerd Font) | Fedora, for the COPR only | yes | `runtimes`, for cargo |
 | 10 | `plugins` | clone TPM (zinit clones itself at first zsh start) | no | yes | `prereqs` for git, `symlinks` for `~/.config/tmux` |
@@ -79,10 +79,19 @@ four.
 The line between the two groups is not "what is risky", it is **where the
 truth lives**. The six replayed steps read the repo: `manifest.sh`,
 `fedora.txt`, `config.toml`, `.gitmodules`. Edit one of those, push, and the
-other machine needs `update` to catch up. `gitsign` reads `~/.ssh`, and
-`extras_fedora` reads what is already installed plus your answer about a COPR. No
-`git pull` can change either input, so replaying them after a pull would
-recompute the same answer from the same data.
+other machine needs `update` to catch up. `extras_fedora` reads what is already
+installed plus your answer about a COPR: no `git pull` can change that input, so
+replaying it after a pull would recompute the same answer from the same data.
+
+`gitsign` sits just on the other side of that line, and it is worth saying why
+it stays out of `update` anyway. Its inputs are **mixed**: the keys in `~/.ssh`
+(machine) and the identities in `config` / `config.gitlab` (repo). By the rule
+above, the repo half would argue for replaying it. It does not need to: what a
+pull brings is the identity **and** the signer lines the other machine already
+wrote for the shared YubiKey, so there is nothing left to compute. The gap is
+narrow — a new identity pushed from one machine while another holds a signing
+key the first has never seen — and `./run install gitsign` closes it on demand,
+which is exactly how a key added later is registered.
 
 The practical consequence: a signing key added later needs
 `./run install gitsign`, and a COPR declined once is offered again by

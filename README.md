@@ -106,19 +106,23 @@ install that brings the openssh able to talk to a FIDO2 key (Apple's
 cannot; Fedora's stock one already can). With the YubiKey plugged in:
 
 ```sh
-cd ~/.ssh && ssh-keygen -K                       # pulls BOTH resident credentials
-mv id_ed25519_sk_rk_github      github_sk        # push / authentication
+cd ~/.ssh && ssh-keygen -K                       # pulls ALL THREE resident credentials
+mv id_ed25519_sk_rk_github      github_sk        # GitHub push / authentication
 mv id_ed25519_sk_rk_github.pub  github_sk.pub
-mv id_ed25519_sk_rk_signing     id_signing_sk    # commit signing
+mv id_ed25519_sk_rk_gitlab      gitlab_sk        # GitLab push / authentication
+mv id_ed25519_sk_rk_gitlab.pub  gitlab_sk.pub
+mv id_ed25519_sk_rk_signing     id_signing_sk    # commit signing, BOTH forges
 mv id_ed25519_sk_rk_signing.pub id_signing_sk.pub
-chmod 600 github_sk id_signing_sk && chmod 644 github_sk.pub id_signing_sk.pub
+chmod 600 github_sk gitlab_sk id_signing_sk
+chmod 644 github_sk.pub gitlab_sk.pub id_signing_sk.pub
 
 cd ~/.dotfiles && ./run install gitsign          # signing enabled from now on
 ```
 
-`github_sk` is not a default key name: `~/.ssh/config` has to point at it
-(that file lives in a separate private repo). `id_signing_sk` needs no
-wiring, being exactly the file `gitsign` looks for.
+Neither `github_sk` nor `gitlab_sk` is a default key name: `~/.ssh/config` has
+to point at each (that file lives in a separate private repo). `id_signing_sk`
+needs no wiring, being exactly the file `gitsign` looks for — and one signing
+key covers both forges, since a signature is not an access.
 
 No YubiKey on this machine? Skip that second block: `gitsign` leaves
 signing disabled when it finds no key, and nothing else changes. Creating

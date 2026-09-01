@@ -44,6 +44,9 @@ if command -v git >/dev/null 2>&1; then
   alias gbra='git branch -a'
 fi
 
-# ghc / glc <repo>: clone $GITUSER/<repo> into $GHREPOS / $GLREPOS, then cd.
+# ghc / glc <repo>: clone into $GHREPOS / $GLREPOS, then cd. Each forge has its
+# own username variable. These are shortcuts for TIDINESS, not a requirement:
+# git picks the right identity from the remote URL, so a plain `git clone`
+# anywhere works just as well (.config/git/README.md).
 ghc() { git clone -- "git@github.com:${GITUSER}/$1.git" "${GHREPOS}/$1" && cd -- "${GHREPOS}/$1" || return 1; }
-glc() { git clone -- "git@gitlab.com:${GITUSER}/$1.git" "${GLREPOS}/$1" && cd -- "${GLREPOS}/$1" || return 1; }
+glc() { git clone -- "git@gitlab.com:${GLUSER}/$1.git" "${GLREPOS}/$1" && cd -- "${GLREPOS}/$1" || return 1; }

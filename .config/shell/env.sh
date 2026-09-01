@@ -16,7 +16,10 @@ export VISUAL="$EDITOR"
 export LANG="en_US.UTF-8"
 
 # ------------------ Repos / personal paths ------------------
+# Two forges, two usernames. A single variable would make `glc` build a URL
+# that does not exist: the GitLab account is not named like the GitHub one.
 export GITUSER="raf7c"
+export GLUSER="racongiu"
 export REPOS="$HOME/lab"
 export GHREPOS="$REPOS/github"
 export GLREPOS="$REPOS/gitlab"

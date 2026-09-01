@@ -86,4 +86,74 @@ else
   log_error "gitsign: cannot write ${_gs_out#"$DOTFILES_DIR"/}"
 fi
 
+# --- allowed_signers: one principal per identity, per signing key -----------
+# This step already declares WHICH key signs. Declaring that the same key is
+# ALLOWED to sign is the same statement, and leaving the two apart is how you
+# end up signing with a key your own config does not trust.
+#
+# APPEND ONLY. An existing line is never rewritten: a `valid-before` added by
+# hand during a rotation has to survive every replay. Re-running the step when
+# nothing is new writes nothing, like the rest of the installer.
+#
+# Unlike config.local, allowed_signers is TRACKED. So this is the one place
+# where `./run install` can dirty the repo -- on purpose, and only when a key
+# is genuinely new. It says so, and you commit it.
+_gs_signers="$DOTFILES_DIR/.config/git/allowed_signers"
+_gs_added=0
+
+# The identities this repo declares, NAMED one by one: `config` and
+# `config.gitlab`. Not a glob -- `run` sets `set -f` for the whole run -- so a
+# third forge file would be ignored in silence: add it here too, and the line
+# you add is the reminder that allowed_signers needs its principal as well.
+# `git config --file` rather than a grep: git parses its own format.
+_gs_emails=$(
+  for _gs_f in "$DOTFILES_DIR"/.config/git/config "$DOTFILES_DIR"/.config/git/config.gitlab; do
+    [ -r "$_gs_f" ] && git config --file "$_gs_f" --get user.email 2>/dev/null
+  done
+)
+
+# ONE signing key, for both forges: a signature is not an access, so it needs
+# no per-forge split the way the push keys do (.config/git/README.md). One blob
+# to register, once per identity.
+_gs_blob=''
+[ -r "$_gs_key" ] && _gs_blob=$(cut -d' ' -f2 -- "$_gs_key")
+if [ -n "$_gs_blob" ]; then
+  # Hoisted OUT of the loop, which is what its comment claimed and the code
+  # did not: computed per line, a run straddling midnight gave two principals
+  # two different dates. Measured with a fake `date`.
+  _gs_day=$(date +%Y%m%d)
+  for _gs_mail in $_gs_emails; do
+    # Already there? The pair (principal, key) is what counts, not the line.
+    # awk PRINTS its answer instead of exiting with it, for two reasons. An
+    # `exit` inside the match block would be overridden by the END block on the
+    # way out -- measured, the first version appended the same lines on every
+    # replay. And the CI's "no exit in a sourced step" check greps for the word
+    # `exit`; it cannot tell an awk program from shell, so an awk `exit` here
+    # turns the whole workflow red. No `exit`, no ambiguity, same answer.
+    if [ -r "$_gs_signers" ] && [ "$(awk -v m="$_gs_mail" -v b="$_gs_blob" \
+      '$1 == m { for (i = 2; i <= NF; i++) if ($i == b) f = 1 } END { print f + 0 }' \
+      "$_gs_signers")" != 0 ]; then
+      continue
+    fi
+    if [ "$DRY_RUN" = 1 ]; then
+      log_info "[dry-run] allowed_signers += $_gs_mail (${_gs_key##*/})"
+      continue
+    fi
+    # valid-after is TODAY, which is right for a key registered today and wrong
+    # for one that signed before this line existed. The date is printed for
+    # that reason: a commit older than it will not verify, and only you know
+    # whether that key is older than its registration.
+    if printf '%s namespaces="git",valid-after="%s" %s\n' \
+      "$_gs_mail" "$_gs_day" "$(cat -- "$_gs_key")" >>"$_gs_signers"; then
+      log_done "allowed_signers += $_gs_mail (${_gs_key##*/}, valid-after $_gs_day)"
+      _gs_added=$((_gs_added + 1))
+    else
+      log_error "allowed_signers: cannot append to ${_gs_signers#"$DOTFILES_DIR"/}"
+    fi
+  done
+fi
+[ "$_gs_added" -gt 0 ] &&
+  log_info "allowed_signers is TRACKED: commit the $_gs_added new line(s)"
+
 unset _gs_key _gs_out _gs_mark _gs_program _gs_prefix _gs_cand _gs_tmp
+unset _gs_signers _gs_added _gs_emails _gs_f _gs_blob _gs_mail _gs_day

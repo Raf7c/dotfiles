@@ -42,12 +42,18 @@ clipboard, plugins.
 | `path` | `$PATH`, one directory per line | nothing |
 | `g` / `gst` / `gd` / `gck` / `gcm` / `gcma` / `gbr` / `gbra` | git / status / diff / checkout / commit / commit -a / branch / branch -a | git |
 | `ghc <repo>` | clones `github.com:$GITUSER/<repo>` into `$GHREPOS`, then cd | nothing |
-| `glc <repo>` | same for GitLab into `$GLREPOS` | nothing |
+| `glc <repo>` | clones `gitlab.com:$GLUSER/<repo>` into `$GLREPOS`, then cd | nothing |
 
-`GITUSER`, `REPOS` (`~/lab`), `GHREPOS` (`$REPOS/github`) and `GLREPOS`
-(`$REPOS/gitlab`) are set in `shell/env.sh`, which is where you change
-them. The
-directories are created by `./run install` (directories step).
+`GITUSER` (GitHub), `GLUSER` (GitLab), `REPOS` (`~/lab`), `GHREPOS`
+(`$REPOS/github`) and `GLREPOS` (`$REPOS/gitlab`) are set in
+`shell/env.sh`, which is where you change them. Two username variables
+because the two accounts are not named the same. The directories are created
+by `./run install` (directories step).
+
+These two are **shortcuts for tidiness, not a layout you owe git anything
+for**: the identity a repo uses is decided by its remote URL, so a plain
+`git clone` into any directory picks the right one on its own
+([.config/git/README.md](../.config/git/README.md)).
 
 These are **shell** aliases, not git aliases: `gst`, not `git st`. What
 that costs is written where they live (`shell/aliases.sh`): outside an
