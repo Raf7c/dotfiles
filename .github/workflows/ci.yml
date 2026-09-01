@@ -29,9 +29,11 @@ jobs:
       # the repo's own config.toml, one version source for local and CI.
       # python and pipx are in the list although nothing lints them: yamllint
       # has no binary, it comes from the pipx backend, and the chain is
-      # yamllint -> pipx -> python. Both are pinned in config.toml, and mise
-      # 2026.8.16 stopped falling back to the runner's copies -- rightly, that
+      # yamllint -> pipx -> python. Both are DECLARED in config.toml (pipx is
+      # "latest", not a pin), and that is enough: mise stopped falling back to
+      # the runner's copies for anything the config names -- rightly, that
       # fallback was the CI silently linting with tools the repo never chose.
+      # Observed with mise 2026.8.16; which release changed it is unverified.
       # Pin a tool here and its whole dependency chain has to be named too.
       - uses: jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518  # v4.2.5
         env:

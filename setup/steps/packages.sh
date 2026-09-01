@@ -102,15 +102,13 @@ else
   log_done "Fedora packages ok"
 fi
 
-# Security floor. PERISHABLE: the version and what it closes are documented in
-# docs/packages.md, revise both together.
-if command -v mise >/dev/null 2>&1; then
-  _mv=$(mise --version 2>/dev/null | awk '{print $1}')
-  if [ -n "$_mv" ] && [ "$(printf '%s\n' 2026.7.14 "$_mv" | sort -V | head -n1)" != "2026.7.14" ]; then
-    log_warn "mise $_mv < 2026.7.14 (published advisories) -> upgrade it"
-  fi
-  unset _mv
-fi
+# No mise version floor here, on purpose. It was a number maintained by hand,
+# and a floor nobody revises is folklore (docs/packages.md said so before it
+# became the example): it sat two releases too low for two months and stayed
+# silent on the range it was meant to cover. What replaces it: `./run upgrade`
+# moves mise itself, and mise prints its own "version available" notice. What
+# no number can do is tell you whether being behind is DANGEROUS -- that needs
+# reading the advisories, at both addresses. docs/packages.md says where.
 
 # Steps are sourced in the same shell: leave nothing behind for the next one.
 unset _tmp _list _pkgs _is_bin _is_label _is_url _is_interp _is_msg

@@ -33,7 +33,14 @@ if command -v mise >/dev/null 2>&1; then
   run rm -f -- "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/mise-completion.zsh" \
     "${XDG_CACHE_HOME:-$HOME/.cache}/bash/mise-completion.bash"
 else
-  log_warn "mise missing -> runtime update skipped"
+  # log_info under --dry-run: a preview must not report a warning about the
+  # machine it previews on. Same contract as install -n, which stopped
+  # printing ✓ for actions it had not performed.
+  if [ "$DRY_RUN" = 1 ]; then
+    log_info "[dry-run] mise missing here -> the runtime block would be skipped"
+  else
+    log_warn "mise missing -> runtime update skipped"
+  fi
 fi
 
 # --- age-plugin-yubikey: cargo never re-installs on its own ---

@@ -31,6 +31,14 @@ if [ -d "$HOME/icloud" ]; then export ICLOUD="$HOME/icloud"; fi
 # ------------------ Pager / Browser ------------------
 export PAGER="less"
 export LESS="-R --quit-if-one-screen"
+
+# GHSA-jgf3-f6rg-8x3h (High): decrypting an UNTRUSTED sops file whose metadata
+# names a vault_address makes sops send the local Vault token to that host. The
+# advisory has NO fixed version -- 3.13.0+ plus this variable IS the fix, and
+# its default is "all", i.e. no restriction. "none" states the truth here: this
+# machine never talks to Vault or OpenBao. Set it to a comma-separated list of
+# URL prefixes the day that changes.
+export SOPS_HC_VAULT_ALLOWLIST="none"
 # Only when firefox is actually on the PATH (macOS: fall back to `open`).
 if command -v firefox >/dev/null 2>&1; then export BROWSER="firefox"; fi
 

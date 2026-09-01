@@ -60,7 +60,7 @@ same font: the patched build carries the glyphs, the plain one does not.
 | Tool | In Fedora? | Source used | Checked how |
 |---|---|---|---|
 | lazygit | no | COPR `dejan/lazygit`, from lazygit's README | dnf, COPR signature |
-| sops | no | the `linux.<arch>` binary of a pinned release | SHA-256 against `sops-v<version>.checksums.txt` |
+| sops | no | the `linux.<arch>` binary of the **latest** release | SHA-256 against `sops-v<version>.checksums.txt`, published with that same release |
 | Nerd Font | plain family only | `JetBrainsMono.tar.xz`, latest release | SHA-256 against `SHA-256.txt` |
 | age-plugin-yubikey | no | `cargo install`, rust comes from mise | crates.io |
 
@@ -75,7 +75,7 @@ difference is deliberate:
 |---|---|
 | lazygit | `./run upgrade`, through `dnf upgrade`: a COPR is a repo like any other |
 | age-plugin-yubikey | `./run upgrade`, `cargo install --force` |
-| sops | **you**: bump `_ex_sops_version` in `setup/steps/extras_fedora.sh`, commit, rerun `./run install extras_fedora`. The step compares the installed version to the pin and replaces it when they differ, so the bump is what triggers the change. Same rule as a mise pin: a version move is a tracked edit, never a side effect |
+| sops | `./run install extras_fedora`. The step resolves the latest release (a plain redirect on `releases/latest`, no API), compares it to what is installed and replaces it when they differ. **Nothing to edit in the repo**: the pin was dropped because integrity does not depend on it — the checksums file ships with the release it checks — so a pin bought reproducibility only, at the price of a commit every time sops moved. It is not carried by `./run upgrade`, on purpose: `extras_fedora` is the step that asks about the COPR, and replaying it under `-y` would enable a third-party repo without asking |
 | Nerd Font | nothing. An unpacked archive with no security surface; delete the directory and rerun the step to refresh it |
 
 Two details that bite. `cargo install age-plugin-yubikey` will not compile
@@ -195,17 +195,30 @@ Fedora needs neither, its stock openssh shipping with FIDO2 support,
 which is why the gitsign step writes no `program` override there
 (`setup/steps/gitsign.sh`).
 
-Two version floors are enforced, and both are **perishable data**: they live
-here, and the code points back at this page rather than repeating them.
+**One** version floor is left, and it is **perishable data**: it lives here,
+and nothing in the code repeats it.
+
+There used to be a second one, on mise, checked by `packages.sh`. It was
+removed deliberately. A floor is a number maintained by hand, and this one
+proved the rule written below it: it sat two releases too low for two months,
+silent over the whole range it existed to cover, because an advisory was
+published by the project weeks before the global database mirrored it. What
+covers mise instead: `./run upgrade` moves the binary itself, and mise prints
+its own *"version available"* notice at every run. Neither answers whether
+being behind is *dangerous* — that question needs a human reading the
+advisories, which is what this page is for.
 
 | Tool | Floor | What it closes | Enforced by |
 |---|---|---|---|
-| mise | **2026.7.14** | Seven advisories, each opened at its own URL before being written here. Five are in the global database: [GHSA-fjj5-v948-whjj](https://github.com/advisories/GHSA-fjj5-v948-whjj) (CVE-2026-33646, **Critical**: arbitrary code execution through Tera templates in a `.tool-versions`, which no trust check covered, closed in 2026.3.10). [GHSA-f94h-j2qg-fxw3](https://github.com/advisories/GHSA-f94h-j2qg-fxw3) (CVE-2026-54557: a repo-controlled version escaped the install directory through a symlink, 2026.6.1). [GHSA-436v-8fw5-4mj8](https://github.com/advisories/GHSA-436v-8fw5-4mj8) (CVE-2026-35533, High: local settings were loaded before the trust check, 2026.6.4). [GHSA-77g9-363w-rccq](https://github.com/advisories/GHSA-77g9-363w-rccq) (CVE-2026-55441, High: task-include files bypassed the trust check in a config-less repo, so listing tasks was enough, 2026.6.4). [GHSA-29hf-rm4x-xxph](https://github.com/advisories/GHSA-29hf-rm4x-xxph) (CVE-2026-55448: a local `credential_command` ran from untrusted config, 2026.6.4). Two more are published by upstream and not yet mirrored globally, so these links point at the project: [GHSA-9mm4-fgvc-x7rp](https://github.com/jdx/mise/security/advisories/GHSA-9mm4-fgvc-x7rp) (file ownership when mise is installed by root, 2026.7.1) and [GHSA-g74g-rg72-j2p3](https://github.com/jdx/mise/security/advisories/GHSA-g74g-rg72-j2p3) (**High**: the shell-interpreter settings were left off the `global_only` denylist added for CVE-2026-55448, handing an untrusted `.mise.toml` arbitrary command execution again — closed in **2026.7.14**, which is what sets this floor) | `setup/steps/packages.sh` warns below it |
-| tmux | **3.6b** | CVE-2026-11623, a Sixel use-after-free. The floor is the only thing that closes it: `allow-passthrough` does not gate Sixel, upstream parses the image before reading that option | nothing automatic, `tmux -V`, and `tmux display -p '#{sixel_support}'` for whether the build carries Sixel at all |
+| tmux | **3.6b** | CVE-2026-11623, a Sixel use-after-free. The floor is the only thing that closes it: `allow-passthrough` does not gate Sixel, upstream parses the image before reading that option. 3.7, 3.7a and 3.7b exist since and are announced as bug-fix releases, no CVE mentioned: the *security* floor stays 3.6b | nothing automatic, `tmux -V`, and `tmux display -p '#{sixel_support}'` for whether the build carries Sixel at all |
+
+Checked at both addresses on **2026-08-31**. That date is the point: silence
+here means *"not looked at since"*, never *"nothing to find"*.
 
 > [!IMPORTANT]
-> Revise this table whenever you touch either check. A floor that is never
-> revised stops being a floor and becomes folklore.
+> Revise this table, and its date, whenever you look. A floor that is never
+> revised stops being a floor and becomes folklore — the mise one did exactly
+> that, which is why it is gone rather than wrong.
 >
 > And read an advisory at **both** addresses before judging it:
 > `github.com/advisories/<id>` is the global database, `github.com/<org>/<repo>/

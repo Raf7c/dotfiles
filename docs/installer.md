@@ -94,9 +94,10 @@ the update list at all.
 > The **step** and the **tools it installed** are two different things.
 > `upgrade` runs no step, yet it does maintain two of the four: lazygit rides
 > the `dnf upgrade` it already performs, and age-plugin-yubikey has its own
-> `cargo install --force` line in `upgrade.sh`. sops moves only when its pin
-> is bumped in the repo, the font not at all
-> ([packages.md](packages.md)).
+> `cargo install --force` line in `upgrade.sh`. sops and the font move only
+> when the step is rerun — `./run install extras_fedora` picks up the latest
+> release of each, with no repo edit ([packages.md](packages.md)). The step is
+> kept out of `upgrade` because it is the one that asks about the COPR.
 
 ## Adding a step
 
@@ -104,7 +105,10 @@ the update list at all.
    `-e` turned OFF, so a failing command does NOT stop the step and the step's
    status is that of its LAST command. Check what can fail, by hand or through
    `run` / `run_soft`, and end on a line that says what you mean.
-2. Add `<name>` to `STEPS` in `run`, at the right position.
+2. Add `<name>` to `STEPS` in `run`, at the right position. Forgetting either
+   half is caught before it ships: the CI checks the two directions, a name in
+   `STEPS` with no file **and** a file that no `STEPS` entry names — the second
+   being the one no execution could ever reveal.
 3. Decide whether `update` must replay it, and if so add it to the list in
    `setup/commands/update.sh`. The rule is the one above: replay it only if
    its input lives in the repo. That list is hand-written on purpose, so

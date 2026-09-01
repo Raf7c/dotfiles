@@ -124,8 +124,17 @@ backup_file() {
     *) _rel=$(basename -- "$_abs") ;;
   esac
   _bdest="$BACKUP_DIR/$_rel"
-  run mkdir -p -- "$(dirname -- "$_bdest")"
-  run mv -- "$_abs" "$_bdest"
+  # Both TESTED, and the failure returned: the caller replaces the original
+  # right after. A ✓ printed over a backup that did not happen turned a full
+  # disk into silent data loss -- the file was gone and nothing had a copy.
+  run mkdir -p -- "$(dirname -- "$_bdest")" || {
+    log_error "backup: cannot create the directory for ${BACKUP_DIR#"$HOME"/}/$_rel"
+    return 1
+  }
+  run mv -- "$_abs" "$_bdest" || {
+    log_error "backup FAILED: ${_abs#"$HOME"/} (nothing was moved)"
+    return 1
+  }
   log_done "backup: ${_abs#"$HOME"/} -> ${BACKUP_DIR#"$HOME"/}/$_rel"
 }
 
@@ -138,11 +147,20 @@ migrate_file() {
   { [ -e "$_ms" ] && [ ! -L "$_ms" ]; } || return 0
   if [ -e "$_md" ]; then
     log_info "migration: ${_md#"$HOME"/} already exists -> backing up old ${_ms#"$HOME"/}"
-    backup_file "$_ms"
+    backup_file "$_ms" || return 1
     return 0
   fi
-  run mkdir -p -- "$(dirname -- "$_md")"
-  run mv -- "$_ms" "$_md"
+  # Tested like backup_file, and for a sharper reason: migrate runs ONCE per
+  # machine (docs/installer.md). A migration that failed in green is never
+  # replayed, and the legacy file stays outside XDG for good.
+  run mkdir -p -- "$(dirname -- "$_md")" || {
+    log_error "migration: cannot create ${_md%/*}"
+    return 1
+  }
+  run mv -- "$_ms" "$_md" || {
+    log_error "migration FAILED: ${_ms#"$HOME"/} stays where it was"
+    return 1
+  }
   log_done "migrated: ${_ms#"$HOME"/} -> ${_md#"$HOME"/}"
 }
 
@@ -173,7 +191,14 @@ link_with_backup() {
   # repos are independent and each states its choice.
   _lbak=''
   if [ -e "$_dst" ] || [ -L "$_dst" ]; then
-    backup_file "$_dst"
+    # The link is NOT applied if the backup failed. This is the whole promise
+    # of "restorable backups": replacing a file whose copy does not exist
+    # destroys it, and the restore path below could never fire either -- it
+    # looks for a backup that was never written.
+    backup_file "$_dst" || {
+      log_error "backup failed, link skipped to keep the original: $2"
+      return 1
+    }
     _lbak="$BACKUP_DIR/${_dst#"$HOME"/}"
   fi
   run mkdir -p -- "$(dirname -- "$_dst")"

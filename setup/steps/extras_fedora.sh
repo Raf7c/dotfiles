@@ -17,12 +17,6 @@ if ! is_fedora; then
   return 0
 fi
 
-# Set AFTER the OS guard: the macOS return above would skip the unset at the
-# bottom of this file and leak this into the next steps.
-# PERISHABLE: bump deliberately. The download is checked against the checksums
-# file published with THAT release, so version and check move together.
-_ex_sops_version="3.13.3"
-
 # --- lazygit -----------------------------------------------------------------
 # dejan/lazygit is the COPR lazygit's own README points at. It asks first
 # because a COPR is signed by its maintainer, not by Fedora.
@@ -78,25 +72,50 @@ _ex_fetch_verified() {
 # --- sops --------------------------------------------------------------------
 # The release ships a checksums file, so nothing lands on the PATH before it
 # matches. ~/.local/bin, no sudo.
+# `latest`, like the Nerd Font and for the same reason: the checksums file is
+# published WITH the release, so integrity holds without a pin. A pin buys
+# reproducibility only, and it costs a repo edit every time sops moves -- a
+# version written in git that nobody bumps stops describing anything.
 _ex_install_sops() {
   # Look at ~/.local/bin too, not just the PATH: this step installs there and
   # the installer never touches PATH, so a shell started before that directory
   # existed would reinstall on every run. Same fallback as mise and claude in
   # the packages step.
-  # A pin only means something if it is enforced: a differing version is
-  # replaced, otherwise bumping it above would silently do nothing.
   # SOPS_DISABLE_VERSION_CHECK keeps this off the network without relying on a
-  # flag an older binary might reject.
+  # flag an older binary might reject: sops phones home on --version otherwise,
+  # and this reading has to be local and instant.
   _ex_bin=$(command -v sops 2>/dev/null || printf '%s' "$HOME/.local/bin/sops")
+  _ex_got=''
   if [ -x "$_ex_bin" ]; then
     _ex_got=$(SOPS_DISABLE_VERSION_CHECK=1 "$_ex_bin" --version 2>/dev/null || printf '')
     _ex_got=$(printf '%s\n' "$_ex_got" | awk 'NR == 1 { print $2 }')
-    if [ "$_ex_got" = "$_ex_sops_version" ]; then
-      log_ok "sops ${_ex_sops_version} already present"
-      return 0
-    fi
-    log_info "sops ${_ex_got:-unknown} installed, the pin says ${_ex_sops_version}"
   fi
+  # Read the installed version BEFORE this, resolve the remote one AFTER: the
+  # preview stays offline and still says what it would compare.
+  if [ "$DRY_RUN" = 1 ]; then
+    log_info "[dry-run] sops: resolve the latest release, compare with ${_ex_got:-none installed}, download + verify if they differ"
+    return 0
+  fi
+  # The asset name carries the version, so releases/latest/download cannot be
+  # used blindly the way the font does: resolve the tag first. A plain HTTP
+  # redirect, no API and no token, therefore no rate limit to depend on.
+  _ex_sops_version=$(curl -fsSLI -o /dev/null -w '%{url_effective}' -- \
+    https://github.com/getsops/sops/releases/latest 2>/dev/null |
+    sed -n 's#.*/tag/v##p')
+  # Anything but digits and dots means the redirect changed shape or the
+  # network is down. Refuse rather than build a URL out of garbage.
+  case "${_ex_sops_version:-}" in
+    '' | *[!0-9.]*)
+      log_warn "sops: cannot resolve the latest release (network?), nothing installed"
+      return 0
+      ;;
+  esac
+  if [ -n "$_ex_got" ] && [ "$_ex_got" = "$_ex_sops_version" ]; then
+    log_ok "sops ${_ex_sops_version} already present (latest)"
+    return 0
+  fi
+  [ -n "$_ex_got" ] &&
+    log_info "sops ${_ex_got} installed, latest is ${_ex_sops_version}"
   case "$(uname -m)" in
     x86_64) _ex_arch=amd64 ;;
     aarch64 | arm64) _ex_arch=arm64 ;;
@@ -107,10 +126,6 @@ _ex_install_sops() {
   esac
   _ex_asset="sops-v${_ex_sops_version}.linux.${_ex_arch}"
   _ex_url="https://github.com/getsops/sops/releases/download/v${_ex_sops_version}"
-  if [ "$DRY_RUN" = 1 ]; then
-    log_info "[dry-run] sops ${_ex_sops_version}: download ${_ex_asset} + checksums, verify, -> ~/.local/bin"
-    return 0
-  fi
   _ex_tmp="${_log_dir:?log.sh not sourced}"
   log_info "installing sops ${_ex_sops_version}…"
   _ex_fetch_verified "$_ex_url" "$_ex_asset" \
