@@ -21,9 +21,12 @@ versioned file.
 person, several machines, one edit.
 
 > [!IMPORTANT]
-> They are coupled to `allowed_signers`, whose principals **are** those
-> emails — one line per forge, same key. Change one without the other and
-> verification stops matching, silently.
+> Changing `user.email` does **not** break local verification: `git
+> verify-commit` matches a signature by its **key**, never by the author's
+> address (measured — `allowed_signers` says how). What it does break is the
+> **forge** side: GitHub and GitLab attribute a commit, and mark it *Verified*,
+> by the address it carries. An address they do not know leaves the commit
+> unattributed and unverified there, whatever the signature proves here.
 
 ## Two forges, one machine
 
@@ -207,12 +210,14 @@ grep -cF "$(cut -d' ' -f2 ~/.ssh/id_signing_sk.pub)" ~/.config/git/allowed_signe
 ```
 
 Two: one principal per identity, GitHub and GitLab, for the one signing key.
+The count is what matters here, not which name git will print — that is the
+first matching line, in file order.
 
 A failure at step 3 is almost always one of three things: no
-`allowedSignersFile` (regenerate `config.local` with `./run install
-gitsign`), a principal that no longer matches the `user.email` of **that**
-repository — check step 1 first — or a commit older than the key's validity
-window (see below).
+`allowedSignersFile` (regenerate `config.local` with `./run install gitsign`),
+**the key** absent from `allowed_signers` — the address is not what is
+matched — or a commit dated before the `valid-after` of the line that does
+match (see below).
 
 ### Rotating the signing key
 

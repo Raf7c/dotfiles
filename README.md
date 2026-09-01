@@ -97,9 +97,10 @@ exec zsh               # new login shell, with the installed tools on PATH
 
 Identity first, before any commit: `user.name` and `user.email` live in
 `.config/git/config`, versioned on purpose: one person, several machines,
-one edit. Change them if you are not me, and keep the principal in
-`.config/git/allowed_signers` on that same email, or signature
-verification will not match.
+one edit. Change them if you are not me. The address is what the forges use
+to attribute a commit and mark it verified; local verification, itself, keys
+off `.config/git/allowed_signers` — which has to list your signing **key**,
+the principal being only the name git prints.
 
 Commit signing comes after the install, on purpose: on macOS it is the
 install that brings the openssh able to talk to a FIDO2 key (Apple's

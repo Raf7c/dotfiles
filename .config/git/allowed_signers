@@ -1,8 +1,20 @@
-# One KEY, two principals: the same YubiKey credential signs for both forges,
-# but ssh-keygen matches a signature by the committer EMAIL, and the two forges
-# hand out different ones. A commit made with the GitLab identity would verify
-# on gitlab.com and fail here without the second line.
-# Same valid-after on both: it is the same key, created once.
+# Which keys may sign, and under which names. Two mechanisms decide, and they
+# are NOT the same one -- getting them confused is the trap this file sets:
+#
+#   LOCALLY, `git verify-commit` matches by KEY. ssh-keygen returns the FIRST
+#   line whose key matches the signature; the committer's email plays no part
+#   at all. Measured: a commit authored with the GitLab address verifies
+#   against the GitHub principal, and swapping the two lines swaps the name git
+#   prints. What a line really contributes is its valid-after window, which IS
+#   applied, against the signature's date.
+#
+#   ON THE FORGE, the email is everything: GitHub and GitLab attribute a commit
+#   and grant it "Verified" by the address it carries, not by this file.
+#
+# So the second principal is inert today, and kept deliberately: it records
+# that both identities are mine, and it is the line that would carry a
+# per-forge signing key the day one exists. Same valid-after on both -- one
+# key, created once.
 #
 # Maintained by `./run install gitsign`, which appends what is missing and
 # never rewrites a line: a valid-before added by hand during a rotation stays.
