@@ -21,8 +21,8 @@ Two steps install software, and the package files stay bare lists: what is
    before it is enabled, plus two downloads verified against the checksums
    published with the same release and one cargo build. macOS gets all four
    from brew, so the step is a no-op there.
-4. **By hand.** The five GUI apps, because none of them publishes anything
-   worth verifying. Recipes below.
+4. **By hand.** Five GUI apps and cloudflared, because none of them publishes
+   anything this repo could verify. Recipes below.
 
 ## Installed for you
 
@@ -42,7 +42,8 @@ Legend: **brew** / **cask** = Brewfile · **dnf** = fedora.txt · **mise** =
 | chsh | built in | dnf `util-linux-user` |
 | PC/SC, the smart-card layer the YubiKey PIV applet talks to | built into macOS | dnf `pcsc-lite` (+ `pcsc-lite-devel`, needed to compile age-plugin-yubikey) |
 | wl-clipboard · xclip | pbcopy is built in | dnf |
-| containers | cask `docker-desktop` | dnf `podman` (rootless; add `podman-docker` by hand if you want the `docker` command name) |
+| podman — rootless, no daemon | brew `podman` + cask `podman-desktop` | dnf `podman` |
+| docker — daemon, runs as root | cask `docker-desktop` | dnf `moby-engine` + `docker-compose` + `docker-buildx` |
 | starship · mise | brew | **`./run`**, official script into `~/.local/bin` |
 | claude-code | **`./run`** | **`./run`** |
 | runtimes and the pinned linters | mise | mise |
@@ -84,17 +85,74 @@ YubiKey without `pcsc-lite` and its `pcscd` service: both are in
 `fedora.txt`. And cargo drops its own registry cache in `~/.cargo` whatever
 happens, only the binary is redirected to `~/.local/bin`.
 
+## Containers: both engines, on both machines
+
+They are not redundant, they are opposites — and having both is what lets the
+security question at the end of this section be answered with "no".
+
+- **podman** is *rootless* and *daemonless*: a container runs as you, and no
+  privileged process sits listening. The default for day-to-day work.
+- **docker** is a *daemon running as root*. The `docker` CLI does nothing by
+  itself: it talks to `dockerd` through `/var/run/docker.sock`, owned by
+  `root:docker`. Here for what only Docker does.
+
+On Fedora, docker comes from `moby-engine` — the same upstream engine as
+`docker-ce`, packaged by Fedora, in the **base repos**. Taking `docker-ce`
+instead would mean adding Docker's own repository, which in this repo is not a
+line but a decision: it would need a `confirm` and belong in `extras_fedora`,
+next to the COPR. The two are mutually exclusive, and Fedora's build is
+current, so the trade was not worth it.
+
+Two things `./run` does **not** do, once per machine:
+
+**macOS — give podman a VM.** `brew podman` installs the CLI only, and macOS
+has no Linux kernel to run containers on:
+
+```sh
+podman machine init      # downloads a VM image, several hundred MB
+podman machine start
+```
+
+The `podman-desktop` cask starts that machine at login afterwards. Nothing
+equivalent is needed for docker: `docker-desktop` ships its own VM.
+
+**Fedora — start the docker daemon**, then use it as `sudo docker …`:
+
+```sh
+sudo systemctl enable --now docker
+```
+
+> [!WARNING]
+> Do **not** run `sudo usermod -aG docker $USER`. The `docker` group is not
+> "slightly more access", it is root — permanently, and with no password
+> prompt or `sudo` trail. Anyone in it runs
+> `docker run -v /:/host --privileged …` and owns the machine.
+>
+> That is also why `./run` never offers it, not even behind a `confirm`:
+> `./run install -y` means "ask me nothing", so a confirmed `usermod` would
+> hand out root unattended — the very property the COPR question exists to
+> protect ([installer.md](installer.md)).
+>
+> And you do not need it. **podman is the rootless engine**, it is on both
+> machines, and it covers daily use. Reach for `sudo docker` only when you
+> specifically need Docker.
+
 ## Fedora: what stays in your hands
 
-The five GUI apps, and only them. None publishes a checksum worth the code
-it would take to verify, and two ship a tarball whose URL has to be
-discovered through an API.
+Six things, and the reason is the same for all of them: none publishes
+anything this repo could verify. Two ship a tarball whose URL has to be
+discovered through an API, and cloudflared publishes its SHA-256 sums **inside
+the text of its release notes**, with no checksums file — so
+`_ex_fetch_verified`, which matches an asset name inside a sums file, has
+nothing to match against. Downloading it unverified would break the rule in
+[installer.md](installer.md), so it stays a recipe.
 
 | Tool | macOS gets it from | On Fedora, you |
 |---|---|---|
 | obsidian · gitkraken | cask | `flatpak install` from flathub |
 | google-chrome | cask | enable Google's own repo |
 | jetbrains-toolbox · keymapp | cask | official tarball, unpacked by hand |
+| cloudflared | brew | the `.rpm` of a release, installed by hand (recipe below) |
 
 ## macOS only, on purpose
 
@@ -102,8 +160,8 @@ discovered through an API.
 |---|---|
 | openssh · libfido2 | Fedora's stock openssh already signs `sk-*` keys |
 | ghostty | its own docs call every Linux package a community build and say installing one means accepting a third party could have tampered with it. kitty comes from dnf and does the same job |
-| cloudflared | deliberately not installed there |
-| raycast · claude (desktop) | no Linux build exists |
+| raycast | no Linux build exists |
+| claude (desktop) | a Linux beta exists since July 2026, but it is Debian/Ubuntu only — its own docs say *"Fedora and RHEL: only Debian-based distributions are supported today"*. The CLI covers Fedora |
 
 ## What mise pins
 
@@ -154,6 +212,28 @@ refreshes the cache. What it cannot do is pick it for you: point the
 terminal at the family name `JetBrainsMono Nerd Font`. Without it the
 prompt is a row of empty boxes, since starship, `eza --icons` and the tmux
 status bar all draw from its private glyph range.
+
+</details>
+
+<details>
+<summary><b>cloudflared</b>, the .rpm of a release</summary>
+
+Neither Fedora nor Cloudflare packages it *for Fedora*: Cloudflare's own RPM
+repository lists Amazon Linux, RHEL generic and CentOS, not Fedora — and
+pointing a RHEL repository at Fedora is the mistake this repo refuses in the
+other direction ([README](../README.md), on RHEL derivatives). The release
+assets carry no checksums file either, so there is nothing for the installer
+to verify. Hence: by hand, from
+`github.com/cloudflare/cloudflared/releases/latest`, taking
+`cloudflared-linux-x86_64.rpm` (or `aarch64`):
+
+```sh
+sudo dnf install ./cloudflared-linux-x86_64.rpm
+```
+
+The SHA-256 of each asset is printed in the body of the release notes, not in
+a file: compare it by eye with `sha256sum` before installing if the download
+came over a network you do not trust.
 
 </details>
 

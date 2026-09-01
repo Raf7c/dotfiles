@@ -30,6 +30,12 @@ just
 ansible
 ansible-lint
 podman
+# Docker, from the BASE repos: moby-engine is the same upstream engine as
+# docker-ce, packaged by Fedora, so it needs no third-party repo and no
+# `confirm`. Never install podman-docker alongside it: both own /usr/bin/docker.
+moby-engine
+docker-compose
+docker-buildx
 
 # secrets / security
 gnupg2

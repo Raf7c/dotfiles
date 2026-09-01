@@ -34,6 +34,9 @@ brew "mise"
 # infra / automation
 brew "ansible"
 brew "ansible-lint"
+# The CLI only: on macOS podman needs a Linux VM, created once by hand with
+# `podman machine init` (docs/packages.md). The cask below starts it at login.
+brew "podman"
 
 # network
 brew "cloudflared"
@@ -58,6 +61,10 @@ cask "font-jetbrains-mono-nerd-font"
 cask "jetbrains-toolbox"
 cask "gitkraken"
 cask "docker-desktop"
+# The counterpart of docker-desktop, not a duplicate: docker-desktop ships its
+# own VM, daemon and CLI in one package, while `brew podman` is a bare CLI. This
+# cask is what creates and starts podman's VM.
+cask "podman-desktop"
 
 # productivity
 cask "raycast"
