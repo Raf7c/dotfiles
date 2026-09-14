@@ -1,135 +1,252 @@
-# The installer
+# L'installeur
 
-`./run` is a POSIX sh dispatcher: `install`, `update`, `upgrade`. No
-framework, no dependency beyond git and coreutils.
+`./run` en POSIX sh : `install`, `update`, `upgrade`. Aucun framework, aucune
+dépendance au-delà de git et de coreutils.
 
-## Design contract
+## L'essentiel
 
-Every step honours the same four rules:
-
-1. **Idempotent** — a second run performs zero action (links tested by
-   inode, `mkdir -p`, markers). Two consecutive `./run install` are the
-   test.
-2. **Faithful dry-run** — `-n` prints every command it would execute and
-   writes nothing, not even a temp file.
-3. **Loud failure, no abort** — network and package-manager commands go
-   through `run_soft`: a failure is logged and counted, the run continues,
-   `log_summary` returns 1 at the end. One dead mirror never kills an
-   install halfway.
-4. **Restorable backups** — everything replaced goes to
-   `~/.local/state/dotfiles/backups/<timestamp>/`, keeping its path
-   relative to `$HOME`. If a link fails after the backup, the original is
-   restored.
-
-## Anatomy
-
-```
-run                     CLI: arguments, $0 resolved through symlinks,
-                        set -f, dispatch
-setup/manifest.sh       single source of truth: links, dirs, migrations
-setup/lib/log.sh        coloured logs, warning/error counters (mktemp + traps)
-setup/lib/os.sh         OS detection (macos / fedora), dnf wrapper
-setup/lib/util.sh       run, run_soft, run_steps, backup/migration/links
-setup/steps/<name>.sh   one responsibility each; sourced in $STEPS order
-setup/commands/*.sh     the update / upgrade flows
-```
-
-Step order (see `STEPS` in `run`): prereqs → submodules → directories →
-migrate → symlinks → packages → gitsign → runtimes → plugins → shell.
-
-Notable steps:
-
-- **migrate** — once per machine: moves the legacy `~/.bash_history`,
-  `~/.zsh_history`, `~/.lesshst`, `~/.python_history` to their XDG paths.
-- **gitsign** — generates `~/.config/git/config.local` from what the
-  machine actually has: the Homebrew `ssh-keygen` on macOS (Apple's build
-  cannot sign with FIDO2 `sk-*` keys), `commit.gpgsign` only where the key
-  exists. Never overwrites a hand-written file.
-- **shell** — `chsh` to zsh (the only step that may ask for sudo, for
-  `/etc/shells`).
-
-## Adding a step
-
-1. Create `setup/steps/<name>.sh` — sourced under `set -eu`, must follow
-   the contract above (`run` / `run_soft` for anything that can fail).
-2. Add `<name>` to `STEPS` in `run`, at the right position.
-3. `./run install <name> -n`, then twice for real: the second run must be
-   a no-op.
-
-## Diagnostics — `scripts/doctor.sh`
-
-The shell degrades without blocking — so the silence gets verified, not
-assumed. `doctor.sh` follows the `brew doctor` / `:checkhealth` model:
-read-only, every check prints OK / WARN / FAIL with the suggested fix. Run
-it on macOS **and** Fedora — after a `./run install` or `upgrade`, and
-whenever something feels slow or broken.
-
-```sh
-doctor.sh                  # everything
-doctor.sh env aliases      # selected sections
-```
-
-### Principles
-
-- **Read-only** — no file is modified; only `/tmp/doctor.$$*` temp files
-  are created and removed.
-- **Asks real interactive shells** — env, PATH and aliases are read from an
-  actual `zsh -i` / `bash -i`, not recomputed from the files: it measures
-  what a shell receives, not what the config claims.
-- **Reuses the sources of truth** — links come from `setup/manifest.sh`,
-  never from a copied list.
-
-### Reading the result
-
-| Mark | Meaning |
+| Commande | Ce qu'elle fait |
 |---|---|
-| `OK` | conforming |
-| `WARN` | degraded or suspicious — investigate, nothing breaks |
-| `FAIL` | broken — the fix is in the message |
-| `---` | information (optional tool missing, known limit) |
+| `./run install` | les dix étapes, dans l'ordre |
+| `./run update` | `git pull`, puis rejoue les six étapes qui lisent le dépôt |
+| `./run upgrade` | aucune étape : monte les versions des outils déjà posés |
+| `./run install -n` | aperçu fidèle, n'écrit rien |
+| `./run install <étape>` | une seule étape |
 
-Exit codes: `0` healthy (WARNs may remain), `1` at least one FAIL, `2`
-unknown section.
+Quatre garanties, tenues par toutes les étapes :
 
-### Dependencies
+| Garantie | Ce que ça veut dire |
+|---|---|
+| **Idempotent** | une seconde exécution ne fait rien |
+| **Dry-run fidèle** | `-n` n'écrit rien, ni dans `$HOME` ni sur le système |
+| **Échec bruyant** | une étape qui échoue n'arrête pas le run, mais le code de sortie est 1 |
+| **Backups restaurables** | tout ce qui est remplacé part dans `~/.local/state/dotfiles/backups/<horodatage>/` |
 
-Required — already present on every targeted machine: POSIX sh, zsh, bash,
-coreutils (awk, sed, grep, sort, diff).
+<details>
+<summary>Les quatre garanties en détail</summary>
 
-Optional — probed, never demanded; without them the check degrades to a
-`---` line:
+**1. Idempotent.** Liens testés par inode, `mkdir -p`, marqueurs. Deux
+`./run install` consécutifs sont le test.
 
-| Tool | Role | Without it |
+**2. Dry-run fidèle.** `-n` imprime chaque commande qu'il exécuterait. Une
+étape peut construire un fichier de travail dans le répertoire mktemp privé du
+run pour calculer un diff, et c'est ce qui rend l'aperçu informatif.
+
+**3. Échec bruyant, pas d'abandon.** Les commandes réseau et de gestionnaire de
+paquets passent par `run_soft` : l'échec est journalisé et compté, le run
+continue, `log_summary` renvoie 1. Un miroir mort ne tue jamais une
+installation à mi-chemin.
+
+La ligne finale d'une étape est **conditionnelle** (`log_done_clean`). Son ✓
+veut dire « elle a réussi », pas « elle s'est exécutée ». Un avertissement ne
+le supprime pas : un saut délibéré n'est pas un échec, une erreur si.
+
+**4. Backups restaurables.** Le chemin relatif à `$HOME` est conservé. Si un
+lien échoue après le backup, l'original est restauré.
+
+</details>
+
+## Les dix étapes
+
+| # | Étape | Ce qu'elle fait | sudo | réseau |
+|---|---|---|---|---|
+| 1 | `prereqs` | Homebrew, et avec lui les Command Line Tools | oui | oui |
+| 2 | `submodules` | init/sync des submodules, rattache chacun à sa branche | non | oui |
+| 3 | `directories` | crée les répertoires XDG | non | non |
+| 4 | `migrate` | déplace les anciens historiques vers XDG | non | non |
+| 5 | `symlinks` | applique `manifest.sh`, avec backup | non | non |
+| 6 | `packages` | `brew bundle`, puis claude code | non | oui |
+| 7 | `gitsign` | génère `config.local`, complète `allowed_signers` | non | non |
+| 8 | `runtimes` | ce que `mise` déclare | non | oui |
+| 9 | `plugins` | clone TPM, puis les plugins de `tmux.conf` | non | oui |
+| 10 | `shell` | `chsh` vers zsh, après confirmation | oui | non |
+
+Une dépendance manquante donne un saut propre avec une ligne de journal, jamais
+un plantage.
+
+<details>
+<summary>L'ordre, les dépendances, et trois notes</summary>
+
+`STEPS` dans `run` fixe l'ordre, et cet ordre est la chaîne de dépendances,
+rien de plus.
+
+| Étape | Dépend de |
+|---|---|
+| `submodules` | git, et l'accès au remote du submodule |
+| `symlinks` | `submodules`, pour que le submodule soit peuplé au moment du lien |
+| `packages` | `prereqs` |
+| `runtimes` | `packages`, pour avoir mise sur le PATH |
+| `plugins` | `prereqs` pour git, `symlinks` pour `~/.config/tmux` |
+| `shell` | `packages` : `chsh` a besoin que zsh soit installé |
+
+Trois méritent une note :
+
+- **migrate** est rejoué à chaque `install` mais ne fait rien la deuxième fois.
+  `update` ne le rejoue pas du tout.
+- **gitsign** n'écrase jamais un `config.local` écrit à la main.
+- **prereqs** et **shell** sont les deux seules à demander sudo. La première
+  parce que l'installeur Homebrew appelle `have_sudo_access` et abandonne sans
+  lui, la seconde pour `/etc/shells`.
+
+</details>
+
+## Ce que chaque commande rejoue
+
+| Étape | `install` | `update` | `upgrade` |
+|---|---|---|---|
+| prereqs, migrate, gitsign, shell | ✓ | | |
+| submodules, directories, symlinks, packages, runtimes, plugins | ✓ | ✓ | |
+| `git pull --ff-only` (avant toute étape) | | ✓ | |
+| montées de version (brew, mise, claude code, zinit, TPM, submodules) | | | ✓ |
+
+<details>
+<summary>Pourquoi ce partage, et le cas particulier de gitsign</summary>
+
+La ligne de partage n'est pas « ce qui est risqué », c'est **où vit la
+vérité**. Les six étapes rejouées lisent le dépôt : `manifest.sh`, `Brewfile`,
+`config.toml`, `.gitmodules`. Modifier l'un d'eux et pousser veut dire que
+l'autre machine a besoin d'`update`.
+
+`gitsign` se tient juste de l'autre côté. Ses entrées sont mixtes : les clés
+dans `~/.ssh` viennent de la machine, les identités de `config` et
+`config.gitlab` viennent du dépôt. Un pull apporte l'identité **et** les lignes
+de signataire que l'autre machine a déjà écrites, donc il ne reste rien à
+calculer.
+
+L'angle mort est étroit : une clé de signature que cette machine n'a jamais
+vue. `./run install gitsign` le referme à la demande.
+
+</details>
+
+> [!IMPORTANT]
+> L'**étape** et les **outils qu'elle a installés** sont deux choses
+> différentes. `upgrade` n'exécute aucune étape et maintient pourtant tout ce
+> que `packages` a posé. Une clé de signature ajoutée plus tard, elle, demande
+> bien `./run install gitsign`.
+
+## Anatomie
+
+```text
+.
+├── run                   # CLI : arguments, validation des noms d'étape, set -f
+├── Brewfile              # liste brew/cask, lue par l'étape packages
+└── setup/
+    ├── manifest.sh       # source unique de vérité : liens, dossiers, migrations
+    ├── lib/
+    │   ├── log.sh        #   journaux colorés, compteurs (mktemp + traps)
+    │   └── util.sh       #   run, run_soft, run_steps, backup/migration/liens
+    ├── steps/
+    │   └── <nom>.sh      #   une responsabilité chacun, dans l'ordre de $STEPS
+    └── commands/
+        ├── install.sh    #   une commande par fichier
+        ├── update.sh
+        └── upgrade.sh
+```
+
+## Ce que `./run install` télécharge
+
+Six sources, et rien d'autre. Toute autre adresse est un défaut, pas une option.
+
+| Source | Étape | Ce qu'elle apporte |
 |---|---|---|
-| hyperfine | startup benchmark (warmup, outliers) | home-made ×10 median loop |
-| coreutils (macOS) | `gdate` for nanosecond precision | timing skipped |
-| shellcheck / shfmt | lint section | info line with the install command |
-| checkbashisms | catch bashisms in POSIX scripts | same |
+| installeur officiel **Homebrew** | `prereqs` | le gestionnaire de paquets + les Command Line Tools |
+| **`brew bundle`** | `packages` | tout le `Brewfile` |
+| installeur officiel **claude code** | `packages` | le CLI |
+| **`mise install`** | `runtimes` | runtimes et linters de `config.toml` |
+| **`git clone`** de **TPM** | `plugins` | tpm, puis les plugins de `tmux.conf` |
+| **`git submodule`** | `submodules` | [Raf7c/nvim](https://github.com/Raf7c/nvim) |
 
-### Sections
+`update` ajoute l'`origin` de ce dépôt. `upgrade` fait parler les outils déjà
+posés : `brew update/upgrade`, `mise upgrade`, `claude update`,
+`zinit self-update` puis `update --all`, TPM `update_plugins`, et
+`git submodule update --remote`.
 
-| Section | Checks |
+<details>
+<summary>Téléchargé puis exécuté, et ce que ça ne prouve pas</summary>
+
+« Source » se lit au sens de *qui décide où aller*. TPM compte pour une, et les
+adresses qu'il tire sont celles que `tmux.conf` liste, pas les siennes.
+
+Les deux qui exécutent un script, Homebrew et claude code, le **téléchargent
+puis l'exécutent**, jamais `curl | sh` : un téléchargement tronqué ne doit pas
+atteindre le shell.
+
+Ce que ça ne prouve pas : l'authenticité. Rien ici ne vérifie une signature
+amont. La confiance va à l'éditeur et au TLS, pas à une somme de contrôle.
+
+zinit n'est pas dans ce tableau : il se clone lui-même au premier démarrage de
+zsh, pas pendant `./run install`.
+
+</details>
+
+## Scripts manuels
+
+Dans `scripts/`, sur le `PATH`, jamais lancés par `./run`.
+
+| Script | Effet |
 |---|---|
-| shells | zsh + bash syntax, cold start (empty stderr), ×10 median time (WARN > 200 ms, hyperfine when present), zprof |
-| bootstrap | `~/.zshenv` points into the repo; WARN if the old `/etc/zshenv` block lingers |
-| env | EDITOR resolves, XDG/GITUSER/REPOS set in **both shells** + zsh/bash coherence (env.sh is the single source: divergence = FAIL), HISTFILE directory writable per shell, legacy history files back at the root |
-| path | mise shims first, duplicates, dead entries — read from a real interactive shell, zsh **and** bash |
-| links | every `manifest.sh` line exists and points into the repo |
-| aliases | every alias target resolves, zsh **and** bash — asked to the shell, not the file (the `command -v` guards are honoured) |
-| mise | present, declared runtimes installed, shims generated |
-| plugins | zinit cloned, orphan plugins on disk, compinit dump for the right host+version, TPM |
-| lint | shellcheck (bar: warning+), shfmt (`-d` must stay silent), checkbashisms |
+| `osx.sh` | ~15 `defaults` macOS, désactive le raccourci Spotlight, crée `~/Pictures/screenshots` et le lien `~/icloud` (lu par `env.sh` pour `$ICLOUD`), relance Dock, Finder et SystemUIServer. **À lire avant de le lancer** |
+| `tool42.sh` | norminette + c_formatter_42 : pipx s'il est là, pip sinon. Le script annonce lequel il utilise et où il pose les binaires |
+| `bootstrap-aidd.sh` | clone deux dépôts privés dans `~/.config/aiddconf` et déploie leurs liens |
 
-## Manual scripts (`scripts/`, on the PATH, never run by `./run`)
+## Ajouter une étape
 
-| Script | Effect |
+1. Créer `setup/steps/<nom>.sh`.
+2. Ajouter `<nom>` à `STEPS` dans `run`, à la bonne position.
+3. Décider si `update` doit le rejouer, et si oui l'ajouter à la liste dans
+   `setup/commands/update.sh`.
+4. `./run install <nom> -n`, puis deux fois pour de vrai. La seconde exécution
+   doit ne rien faire.
+
+> [!CAUTION]
+> **Ne jamais appeler `exit` dans une étape** : ça tue `run` et le résumé avec.
+> `return 1` : `run_steps` l'attrape, `log_summary` possède le code de sortie.
+
+<details>
+<summary>Les deux régimes de `set -e`, et ce que la CI attrape</summary>
+
+`run_steps` source les **étapes** sous `set -u` avec `-e` **désactivé**. Une
+commande en échec n'arrête pas l'étape, et le statut de l'étape est celui de sa
+dernière commande. Il faut donc vérifier ce qui peut échouer, à la main ou via
+`run` / `run_soft`, et terminer sur une ligne qui dit ce qu'elle veut dire.
+
+Les fichiers de `setup/commands/` sont l'**inverse** : `run` les source avec
+`set -e` **actif**. Une commande qui échoue là tue `run` avant `log_summary` :
+pas de résumé, pas de compte, juste un code de sortie. Toute commande faillible
+y porte son `|| log_warn …` ou son `|| true`.
+
+Pour le point 2, la CI vérifie les **deux sens** : un nom dans `STEPS` sans
+fichier, et un fichier qu'aucune entrée de `STEPS` ne nomme. Le second est
+celui qu'aucune exécution ne pourrait révéler.
+
+Pour le point 3, la règle est « ne le rejoue que si son entrée vit dans le
+dépôt ». Cette liste est écrite à la main volontairement, pour que rien ne
+rejoigne `update` sans décision explicite. Une *faute de frappe* y est attrapée,
+`run_steps` journalise une erreur. Un *oubli* ne l'est pas, et ne peut pas
+l'être.
+
+</details>
+
+<details>
+<summary>Les aides déjà sourcées</summary>
+
+| Aide | Usage |
 |---|---|
-| `doctor.sh` | full health check, read-only — see the Diagnostics section |
-| `osx.sh` | rewrites ~15 macOS `defaults` (Dock, Finder, screenshots) and disables the Spotlight shortcut — read before running |
-| `tool42.sh` | installs norminette + c_formatter_42 (needs python3) |
-| `bootstrap-aidd.sh` | clones two private repos into `~/.config/aiddconf` and deploys their links |
+| `run <cmd…>` | l'exécute, ou l'imprime sous `--dry-run`. Le défaut pour tout ce qui écrit |
+| `run_soft <cmd…>` | pareil, mais un échec est journalisé et compté au lieu d'arrêter le run |
+| `run_steps <noms…>` | exécute des étapes par nom. Un nom inconnu est une erreur, pas un saut silencieux |
+| `log_step/info/ok/warn/error` | le seul canal de sortie ; warn et error alimentent le résumé |
+| `log_done <msg>` | ligne de succès, préfixée `[dry-run]` quand rien n'a eu lieu |
+| `log_done_clean <ok> <ko>` | ligne **finale** : le ✓ seulement si l'étape n'a journalisé aucune erreur |
+| `confirm "question ?"` | demande sur `/dev/tty` ; oui sous `-y` et `--dry-run` |
+| `link_with_backup <src> <dst>` | lien comparé par inode, backup et restauration incluses |
+| `backup_file` / `migrate_file` | déplace vers le backup du run / relocalise un ancien fichier |
+| `require_cmd <bin>` | échouer bruyamment sur un outil manquant |
+| `$_log_dir` | le `mktemp -d` privé du run, supprimé par trap. À lire ainsi : `"${_log_dir:?log.sh not sourced}"` |
+
+</details>
 
 ---
 
-See also: [architecture.md](architecture.md) — what these steps set up ·
-[tools.md](tools.md) — what the packages step installs.
+Voir aussi : [architecture.md](architecture.md) pour ce que ces étapes mettent
+en place, et [outils.md](outils.md) pour l'origine de chaque paquet.

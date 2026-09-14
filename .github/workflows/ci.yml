@@ -1,5 +1,13 @@
-# Same bar as scripts/doctor.sh lint + shells sections, on a neutral runner.
+# The repo's quality bar on a neutral runner: zsh syntax, shellcheck
+# (warning and above), shfmt against .editorconfig.
+# Actions are pinned to full commit SHAs: a tag is mutable, the
+# tj-actions attack (CVE-2025-30066) repointed existing tags; a SHA
+# cannot be repointed. Dependabot proposes the bumps.
+---
 name: ci
+
+permissions:
+  contents: read
 
 on:
   push:
@@ -10,26 +18,190 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
 
-      - name: install toolchain
+      # zsh alone: it is the only shell the runner does not ship, and the only
+      # one still checked here.
+      - name: install zsh
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y -q shellcheck shfmt dash zsh
+          sudo apt-get install -y -q zsh
 
-      - name: syntax (dash / bash / zsh -n)
+      # Same shellcheck/shfmt/yamllint versions as every machine: mise reads
+      # the repo's own config.toml, one version source for local and CI.
+      # python and pipx are in the list although nothing lints them: yamllint
+      # has no binary, it comes from the pipx backend, and the chain is
+      # yamllint -> pipx -> python. Both are DECLARED in config.toml (pipx is
+      # "latest", not a pin), and that is enough: mise stopped falling back to
+      # the runner's copies for anything the config names -- rightly, that
+      # fallback was the CI silently linting with tools the repo never chose.
+      # Observed with mise 2026.8.16; which release changed it is unverified.
+      # Pin a tool here and its whole dependency chain has to be named too.
+      - uses: jdx/mise-action@3c2e0cf82a5b2e5249f0d3635a4d83d0ae861518  # v4.2.5
+        env:
+          MISE_GLOBAL_CONFIG_FILE: ${{ github.workspace }}/.config/mise/config.toml
+        with:
+          install_args: python pipx shellcheck shfmt yamllint
+
+      # zsh ONLY, and that is the whole point: shellcheck refuses zsh
+      # ("Unknown shell: zsh"), so these files have no other guard. The sh and
+      # bash files need no `-n` pass -- shellcheck rejects everything dash -n
+      # rejects and five constructs more ([[ ]], echo -e, local, source, +=),
+      # measured. shfmt is not a substitute either: it reads real zsh such as
+      # ${(f)...} as an error.
+      - name: syntax (zsh -n)
         run: |
-          find run setup scripts .config/shell \( -name '*.sh' -o -name run \) -not -path '*/plugins/*' \
-            -exec dash -n {} +
-          for f in $(find .config/zsh -name '.z*' -o -name '*.zsh' 2>/dev/null); do
+          for f in .zshenv $(find .config/zsh -name '.z*' -o -name '*.zsh' 2>/dev/null); do
             zsh -n "$f"
           done
-          bash -n .bashrc && bash -n .bash_profile
 
+      # .bashrc and .bash_profile sit at the root and carry no shebang worth
+      # following, hence -s bash and an explicit mention: the find below would
+      # not reach them.
       - name: shellcheck (warning and above)
         run: |
-          find run setup scripts .config/shell \( -name '*.sh' -o -name run \) -not -path '*/plugins/*' \
+          find run setup scripts .config/shell \( -name '*.sh' -o -name run \) \
             -exec shellcheck -S warning {} +
+          shellcheck -S warning -s bash .bashrc .bash_profile
+
+      # A step is SOURCED by run_steps: an `exit` there kills run itself and
+      # skips log_summary, silently. Neither shellcheck nor shfmt can see it,
+      # it is valid sh. See docs/installer.md, the step contract.
+      - name: no exit in a sourced step
+        run: |
+          rc=0
+          for f in setup/steps/*.sh; do
+            # Drop comment LINES; never truncate at a '#', or ${var#pattern}
+            # would hide everything after it on that line, `exit` included.
+            if grep -vE '^[[:space:]]*#' "$f" |
+              grep -nE '(^|[;&|[:space:]])exit([[:space:]]|$)'; then
+              echo "::error file=$f::a step must return, never exit"
+              rc=1
+            fi
+          done
+          exit "$rc"
+
+      # $STEPS in `run` and setup/steps/ must agree BOTH ways. A name with no
+      # file is a step silently skipped on every machine; a file with no name
+      # is a step nothing will ever run, and NO execution can reveal that one.
+      # Renaming a step is precisely where the two drift apart.
+      - name: STEPS and setup/steps/ agree
+        run: |
+          rc=0
+          steps=$(sed -n 's/^STEPS="\(.*\)"$/\1/p' run)
+          if [ -z "$steps" ]; then
+            echo "::error file=run::cannot read STEPS"
+            exit 1
+          fi
+          # zsh does NOT word-split an unquoted PARAMETER expansion; it DOES
+          # split a command substitution. Both measured in dash/bash/zsh. So
+          # `for s in $steps` ran ONCE under zsh, with the whole list as a
+          # single step name, and reported every step as missing -- a false
+          # alarm on a sane tree. GitHub runs bash, so the CI never saw it;
+          # docs/maintenance.md invites you to replay these, and this repo's
+          # login shell is zsh.
+          for s in $(printf '%s\n' "$steps" | tr ' ' '\n'); do
+            [ -f "setup/steps/$s.sh" ] || {
+              echo "::error file=run::STEPS lists '$s', setup/steps/$s.sh is missing"
+              rc=1
+            }
+          done
+          for f in setup/steps/*.sh; do
+            b=${f##*/}
+            b=${b%.sh}
+            case " $steps " in
+              *" $b "*) ;;
+              *)
+                echo "::error file=$f::$b is in no STEPS entry, it will never run"
+                rc=1
+                ;;
+            esac
+          done
+          exit "$rc"
+
+      # The doc carries claims no shell check can contradict: paths. Three
+      # mechanical checks, each one a defect that actually shipped -- a page
+      # pointing at a file that had moved, a merge that left five dead
+      # references in code comments.
+      # Narrow on purpose: only tokens whose first segment is a tracked
+      # top-level entry. Bare basenames (`env.sh`, read relative to their own
+      # page) and keybindings (`Ctrl-h/j/k/l`, `ls/ll/la/lt`) are not paths,
+      # and a check that flags them is a check that gets switched off.
+      - name: every repo path in backticks exists
+        run: |
+          rc=0
+          # Space-joined, and membership tested with the `case` idiom the STEPS
+          # check above already uses: `for r in $roots` skipped EVERY path
+          # under zsh (unquoted parameter expansion, no word splitting), so the
+          # check returned 0 whatever the doc said. Silent, which is worse than
+          # the false alarm it caused two steps up. Measured.
+          roots=$(git ls-files | awk -F/ 'NF>1 {print $1}' | sort -u | tr '\n' ' ')
+          for f in README.md docs/*.md .config/git/README.md .config/tmux/README.md; do
+            for tok in $(grep -o '`[^` ]*`' "$f" | tr -d '`'); do
+              case "$tok" in
+                # placeholders, globs, and the generated gitignored file
+                *'<'* | *'>'* | *'*'* | *'…'* | *config.local*) continue ;;
+                # An ABSOLUTE path is not a repo path (/etc/zshenv,
+                # /Applications/Claude.app). It matters here and not only as a
+                # scope note: ${tok%%/*} is EMPTY for those, and an empty
+                # $first matched the space-joined membership test below.
+                /*) continue ;;
+              esac
+              first=${tok%%/*}
+              [ "$first" = "$tok" ] && continue
+              case " $roots " in *" $first "*) ;; *) continue ;; esac
+              [ -e "$tok" ] || {
+                echo "::error file=$f::\`$tok\` does not exist"
+                rc=1
+              }
+            done
+          done
+          exit "$rc"
+
+      # The path check above only sees paths in BACKTICKS. The defect it was
+      # written for -- a page pointing at a file that had moved -- takes the
+      # other form: deleting a page orphans the markdown links to it, and none
+      # of them is in backticks. No count is written here: it would go stale on
+      # every page added.
+      - name: every internal markdown link resolves
+        run: |
+          rc=0
+          for f in README.md docs/*.md .config/git/README.md .config/tmux/README.md; do
+            d=${f%/*}
+            [ "$d" = "$f" ] && d=.
+            for l in $(grep -oE '\]\([^)]+\.md(#[^)]*)?\)' "$f" |
+              sed 's/^](//; s/)$//; s/#.*//'); do
+              case "$l" in http*) continue ;; esac
+              [ -e "$d/$l" ] || {
+                echo "::error file=$f::the markdown link to $l does not resolve"
+                rc=1
+              }
+            done
+          done
+          exit "$rc"
+
+      # The backtick check above only looks inside markdown. A doc page named
+      # from a CODE comment (`Brewfile`, `config.toml`, a step) is reached by
+      # nothing -- and merging two pages left five dead references exactly
+      # there. Narrow on purpose: only `docs/<name>.md`, which is decidable.
+      - name: every docs page named anywhere exists
+        run: |
+          missing=$(git ls-files -z | xargs -0 grep -ho 'docs/[a-z0-9_-]*\.md' 2>/dev/null |
+            sort -u | while read -r p; do [ -e "$p" ] || printf '%s ' "$p"; done)
+          [ -z "$missing" ] || {
+            echo "::error::doc pages referenced but missing: $missing"
+            exit 1
+          }
 
       - name: shfmt (.editorconfig is the authority, -d must stay silent)
-        run: shfmt -d run setup scripts .config/shell .bashrc .bash_profile
+        # shfmt SKIPS hidden files when walking a directory and has no flag
+        # to include them: every zsh file must be listed EXPLICITLY or it
+        # is silently unchecked.
+        run: >
+          shfmt -d run setup scripts .config/shell .bashrc .bash_profile
+          .zshenv .config/zsh/.zshenv .config/zsh/.zshrc
+          .config/zsh/.zprofile .config/zsh/fzf.zsh .config/zsh/zinit.zsh
+
+      # yamllint is a pinned authority tool: unused, the pin is a lie.
+      - name: yamllint (workflows, dependabot)
+        run: yamllint .github .yamllint.yml

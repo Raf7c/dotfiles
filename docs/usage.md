@@ -1,0 +1,95 @@
+# Usage
+
+Tout ce qu'on tape : les raccourcis que cette configuration ajoute ou change,
+et les alias qu'elle définit. Les valeurs par défaut d'origine ne sont pas
+listées.
+
+## zsh : édition de ligne (mode vi)
+
+`bindkey -v`, `KEYTIMEOUT=10` (100 ms pour sortir du mode insertion). bash le
+reproduit (`set -o vi` dans `.bashrc`), si bien que les réflexes se reportent
+sur le shell de fallback.
+
+| Touche | Action | Source |
+|---|---|---|
+| `Esc` | mode normal (vi) | `.zshrc` |
+| `Ctrl-R` | recherche floue dans l'historique (fzf) | `fzf --zsh` |
+| `Ctrl-T` | sélecteur de fichiers flou, aperçu bat | `fzf --zsh` |
+| `Alt-C` | cd flou dans un sous-répertoire | `fzf --zsh` |
+| `Ctrl-F` | sélecteur de fichiers **sans** les fichiers cachés | widget `fzf.zsh` |
+| `Tab` | menu de complétion fzf-tab (`<`/`>` changent de groupe, `Tab` descend) | fzf-tab |
+
+fzf utilise `fd` quand il est présent, `find` sinon ; les aperçus utilisent
+`bat`, puis `head` en fallback, si bien que chaque raccourci fonctionne sur une
+machine qui n'a aucun des trois.
+
+## tmux
+
+[.config/tmux/README.md](../.config/tmux/README.md).
+
+## Alias et fonctions de shell
+
+| Alias | Devient | A besoin de |
+|---|---|---|
+| `ll` / `la` | `eza -lh` / `eza -lah`, icônes et statut git | eza (fallback : `ls -lh` / `ls -lah`) |
+| `lt` | `eza --tree --icons=auto` | eza (fallback : `tree`) |
+| `ls` | `eza --icons=auto` | eza seulement : sans lui, `ls` reste le `ls` du système |
+| `cat` | `bat` | bat |
+| `diff` | `diff --color=auto` | GNU diff (sondé) |
+| `df` | `df -h` | rien |
+| `v` | `nvim` | rien |
+| `path` | `$PATH`, un répertoire par ligne | rien |
+| `g` / `gst` / `gd` / `gck` / `gcm` / `gcma` / `gbr` / `gbra` | git / status / diff / checkout / commit / commit -a / branch / branch -a | git |
+| `ghc <repo>` | clone `github.com:$GITUSER/<repo>` dans `$GHREPOS`, puis cd | git |
+| `glc <repo>` | clone `gitlab.com:$GLUSER/<repo>` dans `$GLREPOS`, puis cd | git |
+
+`GITUSER` (GitHub), `GLUSER` (GitLab), `REPOS` (`~/lab`), `GHREPOS`
+(`$REPOS/github`) et `GLREPOS` (`$REPOS/gitlab`) sont posés dans
+`shell/env.sh`, et c'est là qu'elles se changent. Deux variables de nom
+d'utilisateur parce que les deux comptes ne portent pas le même nom. Les
+répertoires sont créés par `./run install` (étape directories).
+
+`ghc` et `glc` sont des **raccourcis de rangement, pas une organisation que git
+exigerait** : l'identité qu'un dépôt utilise est décidée par l'URL de son
+remote, donc un simple `git clone` dans n'importe quel répertoire choisit la
+bonne tout seul.
+
+Et ce sont des alias de **shell**, pas des alias git : `gst`, pas `git st`.
+Hors d'un shell interactif, git ne répond qu'à git tel quel — le coût est écrit
+là où ils vivent, dans `shell/aliases.sh`. La config git elle-même :
+[.config/git/README.md](../.config/git/README.md).
+
+## Objets git : fzf-git.sh
+
+[fzf-git.sh](https://github.com/junegunn/fzf-git.sh), chargé par zinit quand
+fzf est présent. Chaque raccourci commence par `Ctrl-G` ; les mêmes fonctions
+sont aussi joignables comme de simples commandes `gf*`.
+
+| Raccourci | Alias | Objet |
+|---|---|---|
+| `Ctrl-G Ctrl-F` | `gff` | fichiers (suivis + non suivis, avec le statut) |
+| `Ctrl-G Ctrl-B` | `gfb` | branches |
+| `Ctrl-G Ctrl-T` | `gft` | tags |
+| `Ctrl-G Ctrl-R` | `gfr` | remotes |
+| `Ctrl-G Ctrl-H` | `gfh` | hachages de commits |
+| `Ctrl-G Ctrl-S` | `gfs` | stashes |
+| `Ctrl-G Ctrl-L` | `gfl` | reflogs |
+| `Ctrl-G Ctrl-W` | `gfw` | worktrees |
+| `Ctrl-G Ctrl-E` | `gfe` | chaque ref (`git for-each-ref`) |
+| `Ctrl-G ?` | `gfk` | la liste de ces raccourcis |
+
+Le raccourci **insère** la sélection dans la ligne de commande ; l'alias
+l'**affiche**, d'où `git switch $(gfb)`. Dans le sélecteur : `Ctrl-O` ouvre
+dans le navigateur, `Alt-E` dans `$EDITOR`, `Ctrl-/` fait défiler l'aperçu.
+
+## Terminaux
+
+Ni ghostty ni kitty ne porte de raccourci personnalisé. Les valeurs d'origine
+sur les deux, c'est ce qui garde la mémoire musculaire portable entre eux.
+Comportements notables : `copy-on-select`, `macos-option-as-alt`.
+Configuration : [outils.md](outils.md), section « Terminaux ».
+
+---
+
+Voir aussi : [outils.md](outils.md) pour les outils derrière ces raccourcis
+et l'origine de chacun.

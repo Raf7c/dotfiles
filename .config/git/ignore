@@ -1,4 +1,5 @@
-# Global excludes: OS / editor junk ONLY.
+# Global excludes: what my TOOLING drops into any repo it touches. The test is
+# "written everywhere, wanted nowhere", not the name of the tool.
 # (Repo-specific patterns belong in each repo's .gitignore.)
 .DS_Store
 .idea/

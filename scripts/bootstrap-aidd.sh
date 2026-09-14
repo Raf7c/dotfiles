@@ -1,10 +1,10 @@
 #!/usr/bin/env sh
-# bootstrap-aidd.sh — install my agent config on a fresh machine.
+# bootstrap-aidd.sh: install my agent config on a fresh machine.
 # Clones aidd + library into ~/.config/aiddconf, then deploys the symlinks.
 # Idempotent: safe to re-run (clone if missing, pull otherwise).
 set -eu
 
-readonly CONF="$HOME/.config/aiddconf"
+readonly CONF="${XDG_CONFIG_HOME:-$HOME/.config}/aiddconf"
 readonly AIDD_URL="git@github.com:Raf7c/aidd.git"
 readonly LIB_URL="git@github.com:Raf7c/aidd-library.git"
 
@@ -39,7 +39,7 @@ clone_or_pull() { # <url> <dest>
 }
 
 check_prereqs
-mkdir -p "$CONF"
+mkdir -p -- "$CONF"
 clone_or_pull "$AIDD_URL" "$CONF/aidd"
 clone_or_pull "$LIB_URL" "$CONF/library"
 

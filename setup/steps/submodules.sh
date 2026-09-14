@@ -1,33 +1,21 @@
 #!/usr/bin/env sh
-# Module: submodules — initialize/sync the repo's git submodules
-#
-# Contract:
-#   - idempotent: `submodule update --init` is a no-op if already up to date;
-#     branch attach is skipped when already on the right branch
-#   - OS: all; no sudo
-#   - depends on prereqs (git); runs BEFORE symlinks (so the submodule
-#     directory is populated when we link it)
-#   - reconcilable: replayed by `update` (resync to the repo's commit after pull)
-#   - requires access to the submodule remote (SSH/HTTPS configured)
-#   - dry-run: via run() for the sync; handled by hand for the branch attach
+# Step submodules: init/sync the git submodules (the nvim config), then attach
+# each to the branch declared in .gitmodules. Runs before symlinks so the
+# submodule directory is populated when we link it.
 
 if [ -f "$DOTFILES_DIR/.gitmodules" ]; then
-  # Needs the submodule remote (network + SSH keys). A failure here must be
-  # REPORTED, not abort the whole install through `set -e`: the rest of the
-  # dotfiles installs fine without the nvim config, and `./run update`
-  # replays this step.
+  # Needs the submodule remote (network + ssh keys). The rest of the dotfiles
+  # installs fine without the nvim config: report, do not abort.
   if run git -C "$DOTFILES_DIR" submodule update --init --recursive; then
-    log_ok "submodules synced (pinned commit)"
+    log_done "submodules synced (pinned commit)"
   else
-    log_error "submodule update failed (network / SSH access?) — step stopped"
+    log_error "submodule update failed (network / SSH access?), step stopped"
     return 0
   fi
 
-  # `submodule update` leaves a DETACHED HEAD: committing from inside the
-  # submodule (editing the nvim config) is then easy to get wrong. Re-attach
-  # each submodule to the branch declared in .gitmodules (`branch = …`):
-  #   - branch behind the pinned commit -> fast-forward to it
-  #   - branch ahead (local work)       -> left untouched, informative log
+  # `submodule update` leaves a DETACHED HEAD, which makes committing from
+  # inside the submodule easy to get wrong. Re-attach to the .gitmodules
+  # branch: behind the pinned commit it fast-forwards, ahead it is left alone.
   git -C "$DOTFILES_DIR" config -f "$DOTFILES_DIR/.gitmodules" \
     --get-regexp '^submodule\..*\.path$' 2>/dev/null |
     while read -r _key _path; do
@@ -58,5 +46,5 @@ if [ -f "$DOTFILES_DIR/.gitmodules" ]; then
       log_ok "submodule $_path -> branch $_branch"
     done
 else
-  log_info "no submodule (.gitmodules missing) — nothing to do"
+  log_info "no submodule (.gitmodules missing), nothing to do"
 fi

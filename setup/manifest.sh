@@ -1,7 +1,6 @@
 #!/usr/bin/env sh
-# setup/manifest.sh — symlink DATA (no logic here).
-# Format: "<source in the repo>  <target under $HOME>". One target per line.
-#
+# setup/manifest.sh: DATA only, no logic.
+# Format: "<source in the repo>  <target under $HOME>", one per line.
 # Adding a config = adding ONE line.
 
 dotfiles_links() {
@@ -20,16 +19,19 @@ dotfiles_links() {
 scripts                .config/scripts
 
 # --- startup files at the root of $HOME ---
-# .zshenv is the ZDOTDIR bootstrap: it is what lets zsh find .config/zsh
-# WITHOUT sudo (the /etc/zshenv route needs root — see steps/shell.sh).
+# .zshenv bootstraps ZDOTDIR (docs/architecture.md); .vimrc is the historic
+# path, the only one every vim reads.
 .zshenv                .zshenv
+.vimrc                 .vimrc
 .bashrc                .bashrc
 .bash_profile          .bash_profile
 EOF
 }
 
-# Directories to create (absolute paths, computed from XDG — unquoted heredoc).
-# One directory per line. This is what fixes C2 (missing zsh state/cache).
+# Directories to create, one per line. A belt: this step runs before any first
+# shell. Three exist ONLY here -- ~/.cache/less and ~/.local/share/python,
+# where less and python drop their history in silence when it is missing, and
+# ~/.local/bin, which env_path_prepend skips if it does not yet exist.
 dotfiles_dirs() {
   cat <<EOF
 ${XDG_CONFIG_HOME:-$HOME/.config}
@@ -46,9 +48,7 @@ EOF
 }
 
 # History migrations: "<old absolute path>  <new absolute location>".
-# Move legacy history files from the root to their XDG directory.
-# UNQUOTED heredoc (<<EOF): $HOME and the ${XDG_*:-default} are EXPANDED here,
-# so the targets automatically follow any XDG customization.
+# UNQUOTED heredoc: $HOME and ${XDG_*:-default} are expanded here.
 dotfiles_history_migrations() {
   cat <<EOF
 $HOME/.bash_history    ${XDG_STATE_HOME:-$HOME/.local/state}/bash/history

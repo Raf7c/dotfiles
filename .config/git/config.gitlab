@@ -1,0 +1,12 @@
+# The GitLab half of the identity, versioned exactly like the GitHub one in
+# `config`. Never read on its own: the two `includeIf` conditions in `config`
+# are what pull it in.
+#
+# This address has to be TWO things at once, or the setup half-works in a way
+# that is hard to diagnose:
+#   - a verified email on the GitLab account, or GitLab marks every commit
+#     unverified whatever the signature proves;
+#   - a principal in allowed_signers, or `git log --show-signature` fails
+#     locally while GitLab is perfectly happy.
+[user]
+    email = 24894647-racongiu@users.noreply.gitlab.com

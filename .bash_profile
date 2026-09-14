@@ -6,5 +6,5 @@ if [[ -x /opt/homebrew/bin/brew ]]; then
   export HOMEBREW_NO_ANALYTICS=1
 fi
 
-# All the common + interactive config:
+# shellcheck source=/dev/null  # ~ is not a literal for shellcheck
 [[ -r ~/.bashrc ]] && source ~/.bashrc

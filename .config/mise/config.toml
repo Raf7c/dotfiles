@@ -1,11 +1,16 @@
-# Majors PINNED on purpose: "latest" installs a different version depending
-# on the install date -> two machines diverge, "reproducible" becomes false.
-# Minor/patch updates still flow via `mise upgrade`; bump majors HERE.
+# Majors pinned on purpose: with "latest", two machines set up on different
+# days diverge. Minor and patch still flow through `mise upgrade`; bump majors
+# HERE, and `latest` only for low-risk plumbing. The pin list: docs/outils.md.
 [tools]
-neovim = "0.12"     # major.minor pin, like the others (a patch pin would
-                    # drift from the comment above at the next release)
-node = "22"        # LTS
-python = "3.13"
+neovim = "0.12"
+node = "24"            # PERISHABLE: active LTS until 2026-10-20, then node 26
+python = "3.14"
+pipx = "latest"
 rust = "1"
 tree-sitter = "latest"
-usage = "latest"   # required by `mise completion` (bash/zsh)
+usage = "latest"       # required by `mise completion` (bash/zsh)
+
+shellcheck = "0.11"
+shfmt = "3.13"  # zsh support; upstream calls it incomplete, so zsh diffs get
+                # READ, never applied blindly
+yamllint = "1"
