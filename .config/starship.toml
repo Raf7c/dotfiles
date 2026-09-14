@@ -10,13 +10,13 @@ format = "$directory$os$git_branch$git_status$nodejs$rust $character"
 disabled = false
 format = "[$symbol](blue) "
 
+# MERGED with starship's defaults, not substituted: an entry removed from here
+# falls back to starship's built-in EMOJI, it does not disappear. So only the
+# two systems this prompt actually runs on are named -- macOS, and Arch for
+# the Omarchy machine to come. Measured with starship 1.26.0.
 [os.symbols]
-Fedora  = "󰣛"
-Ubuntu  = "󰕈"
-Artix   = "󰣇"
-Arch    = "󰣇"
-CachyOS = "󰣇"
-Macos   = ""
+Macos = ""
+Arch = "󰣇"
 
 [directory]
 format            = "[$path](cyan) "

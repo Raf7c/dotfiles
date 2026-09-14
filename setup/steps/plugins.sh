@@ -9,9 +9,7 @@
 # dependency is documented (docs/installer.md, the steps table); enforce it.
 if [ ! -L "${XDG_CONFIG_HOME:-$HOME/.config}/tmux" ]; then
   if [ "$DRY_RUN" = 1 ]; then
-    # Faithful preview, same reasoning as runtimes.sh: in a real run symlinks
-    # has linked ~/.config/tmux four steps earlier, so do not report a blocker
-    # that only exists because the preview created nothing.
+    # Faithful preview (docs/installer.md, contrat n°2).
     log_info "[dry-run] plugins: assumes the FULL run, where symlinks links"
     log_info "          ~/.config/tmux first; alone and early, this step would skip"
     log_info "          then: git clone tpm -> .config/tmux/plugins/tpm"

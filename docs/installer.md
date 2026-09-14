@@ -1,176 +1,252 @@
-# The installer
+# L'installeur
 
-`./run` is a POSIX sh dispatcher: `install`, `update`, `upgrade`. No
-framework, no dependency beyond git and coreutils.
+`./run` en POSIX sh : `install`, `update`, `upgrade`. Aucun framework, aucune
+dépendance au-delà de git et de coreutils.
 
-## Design contract
+## L'essentiel
 
-Every step honours the same four rules, and this page is where they are
-written down: the step files themselves say what they do, not how they behave.
+| Commande | Ce qu'elle fait |
+|---|---|
+| `./run install` | les dix étapes, dans l'ordre |
+| `./run update` | `git pull`, puis rejoue les six étapes qui lisent le dépôt |
+| `./run upgrade` | aucune étape : monte les versions des outils déjà posés |
+| `./run install -n` | aperçu fidèle, n'écrit rien |
+| `./run install <étape>` | une seule étape |
 
-1. **Idempotent.** A second run performs zero action (links tested by
-   inode, `mkdir -p`, markers). Two consecutive `./run install` are the
-   test.
-2. **Faithful dry-run.** `-n` prints every command it would execute and
-   performs no observable change to `$HOME` or the system. Steps may build
-   a scratch file inside the run's private mktemp directory to compute a
-   diff, and that is what makes the preview informative.
-3. **Loud failure, no abort.** Network and package-manager commands go
-   through `run_soft`: a failure is logged and counted, the run continues,
-   `log_summary` returns 1 at the end. One dead mirror never kills an
-   install halfway.
-4. **Restorable backups.** Everything replaced goes to
-   `~/.local/state/dotfiles/backups/<timestamp>/`, keeping its path
-   relative to `$HOME`. If a link fails after the backup, the original is
-   restored.
+Quatre garanties, tenues par toutes les étapes :
 
-## Anatomy
+| Garantie | Ce que ça veut dire |
+|---|---|
+| **Idempotent** | une seconde exécution ne fait rien |
+| **Dry-run fidèle** | `-n` n'écrit rien, ni dans `$HOME` ni sur le système |
+| **Échec bruyant** | une étape qui échoue n'arrête pas le run, mais le code de sortie est 1 |
+| **Backups restaurables** | tout ce qui est remplacé part dans `~/.local/state/dotfiles/backups/<horodatage>/` |
 
-```text
-run                     CLI: arguments, step-name validation, set -f, dispatch
-setup/manifest.sh       single source of truth: links, dirs, migrations
-setup/lib/log.sh        coloured logs, warning/error counters (mktemp + traps)
-setup/lib/os.sh         OS detection (macos / fedora), dnf wrapper
-setup/lib/util.sh       run, run_soft, run_steps, backup/migration/links
-setup/steps/<name>.sh   one responsibility each; sourced in $STEPS order
-setup/commands/*.sh     one per command: install / update / upgrade
-```
+<details>
+<summary>Les quatre garanties en détail</summary>
 
-## The steps
+**1. Idempotent.** Liens testés par inode, `mkdir -p`, marqueurs. Deux
+`./run install` consécutifs sont le test.
 
-`STEPS` in `run` fixes the order; each step is one file in
-`setup/steps/`. What each does, and what it costs:
+**2. Dry-run fidèle.** `-n` imprime chaque commande qu'il exécuterait. Une
+étape peut construire un fichier de travail dans le répertoire mktemp privé du
+run pour calculer un diff, et c'est ce qui rend l'aperçu informatif.
 
-| # | Step | What it does | sudo | network | needs |
-|---|---|---|---|---|---|
-| 1 | `prereqs` | package manager + base tools (Homebrew on macOS, `git`/`curl` on Fedora) | yes | yes | nothing |
-| 2 | `submodules` | init/sync the submodules, then attach each to its branch | no | yes | git, and access to the submodule remote |
-| 3 | `directories` | create the XDG directories the shells need before first start | no | no | nothing |
-| 4 | `migrate` | move legacy history files (`~/.bash_history`, `~/.lesshst`…) to XDG | no | no | nothing (`migrate_file` creates its own target directory) |
-| 5 | `symlinks` | apply `manifest.sh`, backing up anything real it replaces | no | no | `submodules`, so the submodule is populated when linked |
-| 6 | `packages` | `brew bundle` / `dnf`, then the no-sudo recipes (mise, starship, claude) | Fedora | yes | `prereqs` |
-| 7 | `gitsign` | generate `config.local` from the keys this machine has, and append any missing signer to `allowed_signers` | no | no | nothing |
-| 8 | `runtimes` | install what `mise` declares (node, python, rust, neovim, linters) | no | yes | `packages`, for mise on the PATH |
-| 9 | `extras_fedora` | Fedora only: the four tools Fedora does not package (lazygit, sops, age-plugin-yubikey, the Nerd Font) | Fedora, for the COPR only | yes | `runtimes`, for cargo |
-| 10 | `plugins` | clone TPM (zinit clones itself at first zsh start) | no | yes | `prereqs` for git, `symlinks` for `~/.config/tmux` |
-| 11 | `shell` | `chsh` to zsh, asking first, and appends to `/etc/shells` | yes | no | `packages`, `chsh` needs zsh installed |
+**3. Échec bruyant, pas d'abandon.** Les commandes réseau et de gestionnaire de
+paquets passent par `run_soft` : l'échec est journalisé et compté, le run
+continue, `log_summary` renvoie 1. Un miroir mort ne tue jamais une
+installation à mi-chemin.
 
-The order in `STEPS` is that dependency chain, nothing more. A missing
-dependency is a clean skip with a log line, never a crash: **runtimes**
-without mise, **extras_fedora** without the cargo that `runtimes` provides,
-**plugins** without network or before **symlinks**, **shell** without zsh.
+La ligne finale d'une étape est **conditionnelle** (`log_done_clean`). Son ✓
+veut dire « elle a réussi », pas « elle s'est exécutée ». Un avertissement ne
+le supprime pas : un saut délibéré n'est pas un échec, une erreur si.
 
-Five deserve a note: **migrate** runs once per machine and never returns;
-**gitsign** never overwrites a hand-written `config.local`; **prereqs** and
-**shell** are the two that need sudo on macOS as well, the first because the
-Homebrew installer calls `have_sudo_access` and aborts without it, the second
-for `/etc/shells`; **extras_fedora** is a clean no-op on macOS, where brew carries all
-four.
+**4. Backups restaurables.** Le chemin relatif à `$HOME` est conservé. Si un
+lien échoue après le backup, l'original est restauré.
 
-## What each command replays
+</details>
 
-| Step | `install` | `update` | `upgrade` |
+## Les dix étapes
+
+| # | Étape | Ce qu'elle fait | sudo | réseau |
+|---|---|---|---|---|
+| 1 | `prereqs` | Homebrew, et avec lui les Command Line Tools | oui | oui |
+| 2 | `submodules` | init/sync des submodules, rattache chacun à sa branche | non | oui |
+| 3 | `directories` | crée les répertoires XDG | non | non |
+| 4 | `migrate` | déplace les anciens historiques vers XDG | non | non |
+| 5 | `symlinks` | applique `manifest.sh`, avec backup | non | non |
+| 6 | `packages` | `brew bundle`, puis claude code | non | oui |
+| 7 | `gitsign` | génère `config.local`, complète `allowed_signers` | non | non |
+| 8 | `runtimes` | ce que `mise` déclare | non | oui |
+| 9 | `plugins` | clone TPM, puis les plugins de `tmux.conf` | non | oui |
+| 10 | `shell` | `chsh` vers zsh, après confirmation | oui | non |
+
+Une dépendance manquante donne un saut propre avec une ligne de journal, jamais
+un plantage.
+
+<details>
+<summary>L'ordre, les dépendances, et trois notes</summary>
+
+`STEPS` dans `run` fixe l'ordre, et cet ordre est la chaîne de dépendances,
+rien de plus.
+
+| Étape | Dépend de |
+|---|---|
+| `submodules` | git, et l'accès au remote du submodule |
+| `symlinks` | `submodules`, pour que le submodule soit peuplé au moment du lien |
+| `packages` | `prereqs` |
+| `runtimes` | `packages`, pour avoir mise sur le PATH |
+| `plugins` | `prereqs` pour git, `symlinks` pour `~/.config/tmux` |
+| `shell` | `packages` : `chsh` a besoin que zsh soit installé |
+
+Trois méritent une note :
+
+- **migrate** est rejoué à chaque `install` mais ne fait rien la deuxième fois.
+  `update` ne le rejoue pas du tout.
+- **gitsign** n'écrase jamais un `config.local` écrit à la main.
+- **prereqs** et **shell** sont les deux seules à demander sudo. La première
+  parce que l'installeur Homebrew appelle `have_sudo_access` et abandonne sans
+  lui, la seconde pour `/etc/shells`.
+
+</details>
+
+## Ce que chaque commande rejoue
+
+| Étape | `install` | `update` | `upgrade` |
 |---|---|---|---|
-| prereqs, migrate, gitsign, extras_fedora, shell | ✓ | | |
+| prereqs, migrate, gitsign, shell | ✓ | | |
 | submodules, directories, symlinks, packages, runtimes, plugins | ✓ | ✓ | |
-| `git pull --ff-only` (before any step) | | ✓ | |
-| version bumps (brew/dnf, mise, claude code, age-plugin-yubikey, zinit, TPM, submodules to latest) | | | ✓ |
+| `git pull --ff-only` (avant toute étape) | | ✓ | |
+| montées de version (brew, mise, claude code, zinit, TPM, submodules) | | | ✓ |
 
-The line between the two groups is not "what is risky", it is **where the
-truth lives**. The six replayed steps read the repo: `manifest.sh`,
-`fedora.txt`, `config.toml`, `.gitmodules`. Edit one of those, push, and the
-other machine needs `update` to catch up. `extras_fedora` reads what is already
-installed plus your answer about a COPR: no `git pull` can change that input, so
-replaying it after a pull would recompute the same answer from the same data.
+<details>
+<summary>Pourquoi ce partage, et le cas particulier de gitsign</summary>
 
-`gitsign` sits just on the other side of that line, and it is worth saying why
-it stays out of `update` anyway. Its inputs are **mixed**: the keys in `~/.ssh`
-(machine) and the identities in `config` / `config.gitlab` (repo). By the rule
-above, the repo half would argue for replaying it. It does not need to: what a
-pull brings is the identity **and** the signer lines the other machine already
-wrote for the shared YubiKey, so there is nothing left to compute. The gap is
-narrow — a new identity pushed from one machine while another holds a signing
-key the first has never seen — and `./run install gitsign` closes it on demand,
-which is exactly how a key added later is registered.
+La ligne de partage n'est pas « ce qui est risqué », c'est **où vit la
+vérité**. Les six étapes rejouées lisent le dépôt : `manifest.sh`, `Brewfile`,
+`config.toml`, `.gitmodules`. Modifier l'un d'eux et pousser veut dire que
+l'autre machine a besoin d'`update`.
 
-The practical consequence: a signing key added later needs
-`./run install gitsign`, and a COPR declined once is offered again by
-`./run install extras_fedora`, never by an update. Which is also why `-y` cannot
-enable a third-party repo behind your back: the step it lives in is not in
-the update list at all.
+`gitsign` se tient juste de l'autre côté. Ses entrées sont mixtes : les clés
+dans `~/.ssh` viennent de la machine, les identités de `config` et
+`config.gitlab` viennent du dépôt. Un pull apporte l'identité **et** les lignes
+de signataire que l'autre machine a déjà écrites, donc il ne reste rien à
+calculer.
+
+L'angle mort est étroit : une clé de signature que cette machine n'a jamais
+vue. `./run install gitsign` le referme à la demande.
+
+</details>
 
 > [!IMPORTANT]
-> The **step** and the **tools it installed** are two different things.
-> `upgrade` runs no step, yet it does maintain two of the four: lazygit rides
-> the `dnf upgrade` it already performs, and age-plugin-yubikey has its own
-> `cargo install --force` line in `upgrade.sh`. sops and the font move only
-> when the step is rerun — `./run install extras_fedora` picks up the latest
-> release of each, with no repo edit ([packages.md](packages.md)). The step is
-> kept out of `upgrade` because it is the one that asks about the COPR.
+> L'**étape** et les **outils qu'elle a installés** sont deux choses
+> différentes. `upgrade` n'exécute aucune étape et maintient pourtant tout ce
+> que `packages` a posé. Une clé de signature ajoutée plus tard, elle, demande
+> bien `./run install gitsign`.
 
-## Adding a step
+## Anatomie
 
-1. Create `setup/steps/<name>.sh`. `run_steps` sources it under `set -u` with
-   `-e` turned OFF, so a failing command does NOT stop the step and the step's
-   status is that of its LAST command. Check what can fail, by hand or through
-   `run` / `run_soft`, and end on a line that says what you mean.
-2. Add `<name>` to `STEPS` in `run`, at the right position. Forgetting either
-   half is caught before it ships: the CI checks the two directions, a name in
-   `STEPS` with no file **and** a file that no `STEPS` entry names — the second
-   being the one no execution could ever reveal.
-3. Decide whether `update` must replay it, and if so add it to the list in
-   `setup/commands/update.sh`. The rule is the one above: replay it only if
-   its input lives in the repo. That list is hand-written on purpose, so
-   nothing joins `update` behind your back — which also means nothing
-   reminds you. A *typo* in that list is caught — `run_steps` logs an error and
-   the command exits 1 — but an *omission* is not, and cannot be.
-4. `./run install <name> -n`, then twice for real: the second run must be
-   a no-op.
+```text
+.
+├── run                   # CLI : arguments, validation des noms d'étape, set -f
+├── Brewfile              # liste brew/cask, lue par l'étape packages
+└── setup/
+    ├── manifest.sh       # source unique de vérité : liens, dossiers, migrations
+    ├── lib/
+    │   ├── log.sh        #   journaux colorés, compteurs (mktemp + traps)
+    │   └── util.sh       #   run, run_soft, run_steps, backup/migration/liens
+    ├── steps/
+    │   └── <nom>.sh      #   une responsabilité chacun, dans l'ordre de $STEPS
+    └── commands/
+        ├── install.sh    #   une commande par fichier
+        ├── update.sh
+        └── upgrade.sh
+```
 
-The libs are already sourced, so use them rather than reinventing:
+## Ce que `./run install` télécharge
 
-| Helper | Use |
+Six sources, et rien d'autre. Toute autre adresse est un défaut, pas une option.
+
+| Source | Étape | Ce qu'elle apporte |
+|---|---|---|
+| installeur officiel **Homebrew** | `prereqs` | le gestionnaire de paquets + les Command Line Tools |
+| **`brew bundle`** | `packages` | tout le `Brewfile` |
+| installeur officiel **claude code** | `packages` | le CLI |
+| **`mise install`** | `runtimes` | runtimes et linters de `config.toml` |
+| **`git clone`** de **TPM** | `plugins` | tpm, puis les plugins de `tmux.conf` |
+| **`git submodule`** | `submodules` | [Raf7c/nvim](https://github.com/Raf7c/nvim) |
+
+`update` ajoute l'`origin` de ce dépôt. `upgrade` fait parler les outils déjà
+posés : `brew update/upgrade`, `mise upgrade`, `claude update`,
+`zinit self-update` puis `update --all`, TPM `update_plugins`, et
+`git submodule update --remote`.
+
+<details>
+<summary>Téléchargé puis exécuté, et ce que ça ne prouve pas</summary>
+
+« Source » se lit au sens de *qui décide où aller*. TPM compte pour une, et les
+adresses qu'il tire sont celles que `tmux.conf` liste, pas les siennes.
+
+Les deux qui exécutent un script, Homebrew et claude code, le **téléchargent
+puis l'exécutent**, jamais `curl | sh` : un téléchargement tronqué ne doit pas
+atteindre le shell.
+
+Ce que ça ne prouve pas : l'authenticité. Rien ici ne vérifie une signature
+amont. La confiance va à l'éditeur et au TLS, pas à une somme de contrôle.
+
+zinit n'est pas dans ce tableau : il se clone lui-même au premier démarrage de
+zsh, pas pendant `./run install`.
+
+</details>
+
+## Scripts manuels
+
+Dans `scripts/`, sur le `PATH`, jamais lancés par `./run`.
+
+| Script | Effet |
 |---|---|
-| `run <cmd…>` | run it, or print it under `--dry-run`. The default for anything that writes |
-| `run_soft <cmd…>` | same, but a failure is logged and counted instead of stopping the run (network, package managers) |
-| `run_steps <names…>` | run steps by name, capturing each exit code. A name matching no step is an error, not a silent skip |
-| `log_step/info/ok/warn/error` | the only output channel; warn and error feed the final summary |
-| `confirm "question?"` | asks on `/dev/tty`; yes under `-y` and `--dry-run` |
-| `link_with_backup <src> <dst>` | inode-compared link, backup and restore-on-failure included |
-| `backup_file` / `migrate_file` | move into this run's backup directory / relocate a legacy file |
-| `pkg_install <pkgs…>` | `dnf install`, `run_soft`-wrapped. Fedora only: macOS goes through `brew bundle` |
-| `is_macos` / `is_fedora` / `require_cmd <bin>` | branch on the platform, or fail loudly on a missing tool |
-| `$_log_dir` | the run's private `mktemp -d`, removed by trap on every exit path. Where a step builds a scratch file. Read it as `"${_log_dir:?log.sh not sourced}"` |
+| `osx.sh` | ~15 `defaults` macOS, désactive le raccourci Spotlight, crée `~/Pictures/screenshots` et le lien `~/icloud` (lu par `env.sh` pour `$ICLOUD`), relance Dock, Finder et SystemUIServer. **À lire avant de le lancer** |
+| `tool42.sh` | norminette + c_formatter_42 : pipx s'il est là, pip sinon. Le script annonce lequel il utilise et où il pose les binaires |
+| `bootstrap-aidd.sh` | clone deux dépôts privés dans `~/.config/aiddconf` et déploie leurs liens |
 
-Never call `exit` in a step: it kills `run` itself and the summary with
-it. Use `return 1`: `run_steps` catches it and `log_summary` owns the exit
-code.
+## Ajouter une étape
 
-## Third-party repos: asked, never assumed
+1. Créer `setup/steps/<nom>.sh`.
+2. Ajouter `<nom>` à `STEPS` dans `run`, à la bonne position.
+3. Décider si `update` doit le rejouer, et si oui l'ajouter à la liste dans
+   `setup/commands/update.sh`.
+4. `./run install <nom> -n`, puis deux fois pour de vrai. La seconde exécution
+   doit ne rien faire.
 
-The `extras_fedora` step has exactly one place where `./run` adds a package source it
-does not control: the lazygit COPR. That is a decision, so it goes through
-`confirm`, the same helper `chsh` and the Homebrew bootstrap use. Declining is
-a logged skip, not a failure, and the by-hand recipe stays in
-[packages.md](packages.md).
+> [!CAUTION]
+> **Ne jamais appeler `exit` dans une étape** : ça tue `run` et le résumé avec.
+> `return 1` : `run_steps` l'attrape, `log_summary` possède le code de sortie.
 
-The other three need no sudo and no third-party repo: sops and
-the Nerd Font are downloaded, checked against the checksums file published
-with the same release, and only then installed; age-plugin-yubikey is built by
-the cargo that mise already provides. A checksum from the same origin as the
-download proves integrity, not authenticity: it catches a truncated or altered
-transfer, not a compromised release. Proving authenticity would mean verifying
-the sigstore bundle with cosign, which is not part of this stack.
+<details>
+<summary>Les deux régimes de `set -e`, et ce que la CI attrape</summary>
 
-## Manual scripts (`scripts/`, on the PATH, never run by `./run`)
+`run_steps` source les **étapes** sous `set -u` avec `-e` **désactivé**. Une
+commande en échec n'arrête pas l'étape, et le statut de l'étape est celui de sa
+dernière commande. Il faut donc vérifier ce qui peut échouer, à la main ou via
+`run` / `run_soft`, et terminer sur une ligne qui dit ce qu'elle veut dire.
 
-| Script | Effect |
+Les fichiers de `setup/commands/` sont l'**inverse** : `run` les source avec
+`set -e` **actif**. Une commande qui échoue là tue `run` avant `log_summary` :
+pas de résumé, pas de compte, juste un code de sortie. Toute commande faillible
+y porte son `|| log_warn …` ou son `|| true`.
+
+Pour le point 2, la CI vérifie les **deux sens** : un nom dans `STEPS` sans
+fichier, et un fichier qu'aucune entrée de `STEPS` ne nomme. Le second est
+celui qu'aucune exécution ne pourrait révéler.
+
+Pour le point 3, la règle est « ne le rejoue que si son entrée vit dans le
+dépôt ». Cette liste est écrite à la main volontairement, pour que rien ne
+rejoigne `update` sans décision explicite. Une *faute de frappe* y est attrapée,
+`run_steps` journalise une erreur. Un *oubli* ne l'est pas, et ne peut pas
+l'être.
+
+</details>
+
+<details>
+<summary>Les aides déjà sourcées</summary>
+
+| Aide | Usage |
 |---|---|
-| `osx.sh` | rewrites ~15 macOS `defaults` (Dock, Finder, screenshots) and disables the Spotlight shortcut. Read it before running |
-| `tool42.sh` | installs norminette + c_formatter_42 (needs pipx, installed by mise). Lives HERE because the school repo installs nothing by design |
-| `bootstrap-aidd.sh` | clones two private repos into `~/.config/aiddconf` and deploys their links |
+| `run <cmd…>` | l'exécute, ou l'imprime sous `--dry-run`. Le défaut pour tout ce qui écrit |
+| `run_soft <cmd…>` | pareil, mais un échec est journalisé et compté au lieu d'arrêter le run |
+| `run_steps <noms…>` | exécute des étapes par nom. Un nom inconnu est une erreur, pas un saut silencieux |
+| `log_step/info/ok/warn/error` | le seul canal de sortie ; warn et error alimentent le résumé |
+| `log_done <msg>` | ligne de succès, préfixée `[dry-run]` quand rien n'a eu lieu |
+| `log_done_clean <ok> <ko>` | ligne **finale** : le ✓ seulement si l'étape n'a journalisé aucune erreur |
+| `confirm "question ?"` | demande sur `/dev/tty` ; oui sous `-y` et `--dry-run` |
+| `link_with_backup <src> <dst>` | lien comparé par inode, backup et restauration incluses |
+| `backup_file` / `migrate_file` | déplace vers le backup du run / relocalise un ancien fichier |
+| `require_cmd <bin>` | échouer bruyamment sur un outil manquant |
+| `$_log_dir` | le `mktemp -d` privé du run, supprimé par trap. À lire ainsi : `"${_log_dir:?log.sh not sourced}"` |
+
+</details>
 
 ---
 
-See also: [architecture.md](architecture.md) for what these steps set up,
-and [packages.md](packages.md) for where each package comes from.
+Voir aussi : [architecture.md](architecture.md) pour ce que ces étapes mettent
+en place, et [outils.md](outils.md) pour l'origine de chaque paquet.

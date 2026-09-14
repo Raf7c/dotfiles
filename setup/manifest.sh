@@ -19,9 +19,8 @@ dotfiles_links() {
 scripts                .config/scripts
 
 # --- startup files at the root of $HOME ---
-# .zshenv is the ZDOTDIR bootstrap: what lets zsh find .config/zsh without
-# root. See docs/architecture.md.
-# .vimrc: the historic path, the only one every vim reads.
+# .zshenv bootstraps ZDOTDIR (docs/architecture.md); .vimrc is the historic
+# path, the only one every vim reads.
 .zshenv                .zshenv
 .vimrc                 .vimrc
 .bashrc                .bashrc
@@ -29,18 +28,10 @@ scripts                .config/scripts
 EOF
 }
 
-# Directories to create, one per line. The shells DO create their own state and
-# cache dirs: .bashrc and .zshrc each mkdir -p beside their HISTFILE and beside
-# the mise completion cache, zinit.zsh beside its compdump. (Names, not line
-# numbers, so this comment cannot rot.) They stay listed anyway as a belt: this
-# step runs before any first shell and cannot depend on a .zshrc having been
-# read. What only this step provides:
-#   - ~/.cache/less and ~/.local/share/python: less and python drop their
-#     history in silence when the directory is missing, and neither creates it.
-#   - ~/.local/bin: it must exist BEFORE a shell starts or env_path_prepend
-#     skips it (its `[ -d "$1" ]` guard) and every tool there falls off PATH.
-#   - ~/lab/github and ~/lab/gitlab: `git clone` would create them on demand,
-#     so this is only so `cd $GHREPOS` works before the first clone.
+# Directories to create, one per line. A belt: this step runs before any first
+# shell. Three exist ONLY here -- ~/.cache/less and ~/.local/share/python,
+# where less and python drop their history in silence when it is missing, and
+# ~/.local/bin, which env_path_prepend skips if it does not yet exist.
 dotfiles_dirs() {
   cat <<EOF
 ${XDG_CONFIG_HOME:-$HOME/.config}
@@ -57,8 +48,7 @@ EOF
 }
 
 # History migrations: "<old absolute path>  <new absolute location>".
-# UNQUOTED heredoc: $HOME and ${XDG_*:-default} are expanded here, so the
-# targets follow any XDG customization for free.
+# UNQUOTED heredoc: $HOME and ${XDG_*:-default} are expanded here.
 dotfiles_history_migrations() {
   cat <<EOF
 $HOME/.bash_history    ${XDG_STATE_HOME:-$HOME/.local/state}/bash/history

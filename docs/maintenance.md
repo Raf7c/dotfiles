@@ -1,68 +1,133 @@
 # Maintenance
 
-What keeps this repo honest, and what to do when a machine stops
-behaving. Nothing here changes a machine; for that, see
-[installer.md](installer.md).
+Ce qui garde ce dépôt honnête, et quoi faire quand une machine se tient mal.
+Rien ici ne change une machine ; pour ça, voir [installer.md](installer.md).
+
+## Quand quelque chose casse
+
+Aucun script de health-check. Les vérifications qui comptent tiennent en une
+commande chacune.
+
+| Symptôme | Premier geste |
+|---|---|
+| un fichier zsh modifié, le shell part en erreur | `zsh -n ~/.zshenv ~/.config/zsh/.zshrc` |
+| une config ignorée, un lien qui a l'air faux | `. setup/manifest.sh && dotfiles_links`, puis comparer avec `ls -l ~` |
+| une installation a fait quelque chose d'inattendu | `./run install -n` : affiche chaque commande, n'écrit rien |
+| des plugins manquent après un update | `./run upgrade`, puis `exec zsh` |
+| `compinit` râle au démarrage sur un fichier absent | un lien de complétion est orphelin : `zinit cclear`, puis `exec zsh` |
+| tmux ignore la config | `tmux kill-server` : les options sont lues une fois, au démarrage du serveur |
+| vim indente avec des espaces | `vim --version`, puis `:verbose set expandtab?` |
+| l'historique n'est pas enregistré | `ls -ld ~/.local/state/zsh ~/.local/state/bash` |
+| une signature refuse de se vérifier | [security.md](security.md), les quatre contrôles |
+| un fichier égaré dans `$HOME` | un outil ignore XDG : chercher une redirection dans `env.sh` ([outils.md](outils.md)) |
+
+Les backups de chaque exécution :
+`~/.local/state/dotfiles/backups/<horodatage>/`.
 
 ## Convention
 
-Documentation is fixed in the same commit as the code it describes. Every
-audit of this repo found the same failure mode, a correction landing in
-one place and not in its satellite, so the rule is the cheapest defence
-there is.
+**La documentation est corrigée dans le même commit que le code qu'elle
+décrit.** Chaque audit de ce dépôt a trouvé le même mode de défaillance : une
+correction qui atterrit à un endroit et pas dans son satellite.
 
-## CI
+## Ce que la CI vérifie
 
-`.github/workflows/ci.yml` runs the repo's own bar on a neutral runner,
-on every push to `main`/`dev` and on every pull request:
+`.github/workflows/ci.yml`, à chaque push sur `main`/`dev` et à chaque pull
+request.
 
-- **syntax**: `dash -n` over the POSIX scripts, `bash -n`, and `zsh -n`
-  over every zsh file, found by `find` (see the caution below).
-- **shellcheck**, warning level and above.
-- **shfmt** against `.editorconfig`, where `-d` must stay silent. It walks three
-  directories and then names every file a directory walk would SKIP — the
-  dotfiles — one by one; shellcheck names two of its own the same way
-  (`.bashrc`, `.bash_profile`), which its `find` cannot reach.
-- **yamllint** on `.github` **and on `.yamllint.yml` itself**, that file
-  stating which of its defaults bend and why (a SHA-pinned `uses:` line
-  cannot fit 80 columns).
+| Contrôle | Portée |
+|---|---|
+| syntaxe | `zsh -n`, sur les fichiers zsh seulement |
+| shellcheck | niveau warning et au-dessus |
+| shfmt | contre `.editorconfig`, `-d` doit rester muet |
+| yamllint | `.github` et `.yamllint.yml` lui-même |
+| 5 contrôles maison | 2 sur le code, 3 sur cette documentation |
+
+<details>
+<summary>Pourquoi la syntaxe ne couvre que zsh</summary>
+
+shellcheck refuse zsh — il répond `Unknown shell: zsh`. Les fichiers zsh
+n'ont donc pas d'autre filet, et shfmt n'en est pas un : il lit du zsh
+légitime comme `${(f)…}` comme une erreur.
+
+Les fichiers `sh` et `bash` n'ont plus de passe `-n` : shellcheck rejette tout
+ce que `dash -n` rejette, et cinq constructions de plus qu'il laissait passer
+(`[[ ]]`, `echo -e`, `local`, `source`, `+=`). Mesuré sur les deux sens.
+
+</details>
+
+Les cinq contrôles maison :
+
+| # | Ce qu'il attrape |
+|---|---|
+| 1 | un `exit` dans une étape sourcée |
+| 2 | `STEPS` ↔ `setup/steps/`, dans les **deux** sens |
+| 3 | un chemin du dépôt entre accents graves qui n'existe pas |
+| 4 | un lien markdown interne qui ne résout pas |
+| 5 | une page `docs/*.md` nommée depuis le **code** et qui n'existe pas |
 
 > [!CAUTION]
-> Handed a **directory**, shfmt silently skips dotfiles and has no flag to
-> include them. Every zsh file has to be named on the command line, or it
-> goes unchecked without a word: that is how `.zshrc` escaped the formatter
-> for a week. `find` does list them: the syntax step reaches them with
-> `-name '.z*' -o -name '*.zsh'` — plus `.zshenv`, spelled out in the loop,
-> since that `find` walks `.config/zsh` only.
+> **Rejouer ces contrôles avec `bash`, jamais avec `zsh`.** zsh ne découpe pas
+> une expansion de paramètre non quotée. Les contrôles 2 et 3 en dépendent :
+> écrits naïvement, le premier crie au loup sur un arbre sain et le second rend
+> 0 quoi que dise la doc, silencieusement.
+>
+> L'idiome qui marche partout : `case " $liste " in *" $item "*)`.
 
-shellcheck, shfmt and yamllint are installed by `mise-action` reading this
-repo's own `.config/mise/config.toml`, so local and CI lint with the same
-versions, which is the entire point of pinning them
-([tools.md](tools.md)).
+<details>
+<summary>Pourquoi une série de contrôles sur la doc</summary>
 
-Actions are pinned to full commit SHAs (a tag can be repointed at a
-malicious commit, a SHA cannot) and `permissions: contents: read` keeps
-the token to what a linter needs. Dependabot proposes the bumps weekly.
+La doc porte les seules affirmations qu'aucun test de shell ne peut
+contredire : des chemins. Chacun de ces trois contrôles ferme un défaut précis,
+déjà livré une fois : une page qui pointe vers un fichier déplacé, un chemin
+cité entre accents graves qui a été supprimé, une fusion de deux pages qui a
+laissé cinq références mortes dans des commentaires de code.
 
-## When something breaks
+</details>
 
-No health-check script: the checks that matter are one command each.
+<details>
+<summary>Deux formes de défaut restent hors de portée</summary>
 
-| Symptom | First move |
-|---|---|
-| a zsh file was edited, the shell errors | `zsh -n ~/.zshenv ~/.config/zsh/.zshrc` |
-| a config seems ignored, a link looks wrong | `. setup/manifest.sh && dotfiles_links`, the source of truth; compare with `ls -l ~` |
-| an install did something unexpected | replay it: `./run install -n` prints every command and writes nothing |
-| plugins missing after an update | `./run upgrade`, then `exec zsh` |
-| tmux ignores the config | `tmux kill-server`, since options are read once, at server start |
-| vim indents with spaces | `vim --version`, then `:verbose set expandtab?`: the line names the file that won |
-| history is not saved | the directory must exist and be writable: `ls -ld ~/.local/state/zsh ~/.local/state/bash` |
-| a signature will not verify | [git](../.config/git/README.md): checking, and the key's validity window |
-| a stray file appears in `$HOME` | some tool ignores XDG: check `env.sh` for a redirect, else delete it ([tools.md](tools.md)) |
+Un nom de fichier racine cité sans barre oblique (`` `Brewfile-ancien` ``)
+n'est pas décidable : la doc nomme légitimement des fichiers **absents**, par
+exemple `` `.sops.yaml` `` dont [security.md](security.md) dit précisément
+qu'il n'est pas ici.
 
-Every run's backups: `~/.local/state/dotfiles/backups/<timestamp>/`.
+Un chemin cité en prose sans accents graves n'est pas cherché du tout.
+
+Les yeux restent nécessaires. Les cinq contrôles ferment seulement les formes
+qui ont déjà mordu.
+
+</details>
+
+> [!CAUTION]
+> Quand on lui donne un **répertoire**, shfmt saute silencieusement les
+> dotfiles, et il n'a aucun drapeau pour les inclure. Chaque fichier zsh doit
+> être nommé sur la ligne de commande, sinon il passe non vérifié sans un mot.
+
+<details>
+<summary>Comment la CI contourne ce piège, et pourquoi les versions sont épinglées</summary>
+
+`find` liste les dotfiles, lui. L'étape syntaxe les atteint avec
+`-name '.z*' -o -name '*.zsh'`, plus `.zshenv` écrit en toutes lettres, puisque
+ce `find` ne parcourt que `.config/zsh`.
+
+shfmt parcourt trois répertoires puis nomme un par un chaque fichier qu'un
+parcours de répertoire sauterait. shellcheck en nomme deux des siens de la même
+façon, `.bashrc` et `.bash_profile`, que son `find` ne peut pas atteindre.
+
+shellcheck, shfmt et yamllint sont installés par `mise-action`, qui lit le
+`.config/mise/config.toml` de ce dépôt. Le local et la CI lintent donc avec les
+mêmes versions ([outils.md](outils.md)).
+
+Les Actions sont épinglées sur des SHA de commit complets : un tag peut être
+repointé vers un commit malveillant, un SHA non. `permissions: contents: read`
+limite le token à ce dont un linter a besoin. Dependabot propose les montées
+chaque semaine.
+
+</details>
 
 ---
 
-See also: [installer.md](installer.md) for what changes a machine, and
-[tools.md](tools.md) for why shellcheck and shfmt are authorities.
+Voir aussi : [installer.md](installer.md) pour ce qui change une machine, et
+[security.md](security.md) pour les clés et les planchers de version.

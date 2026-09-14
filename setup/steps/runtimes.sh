@@ -5,9 +5,9 @@
 
 hash -r
 
-if ! command -v mise >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/mise" ]; then
+if ! command -v mise >/dev/null 2>&1; then
   if [ "$DRY_RUN" = 1 ]; then
-    # Faithful preview: in a real run packages installs mise just before.
+    # Faithful preview (docs/installer.md, contrat n°2).
     log_info "[dry-run] mise trust + mise install — assumes the FULL run, where"
     log_info "          packages installs mise first; alone, this step would skip"
     return 0
@@ -16,11 +16,10 @@ if ! command -v mise >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/mise" ]; then
   return 0
 fi
 
-# mise may have just landed in ~/.local/bin without being hashed yet.
-_mise=$(command -v mise 2>/dev/null || printf '%s' "$HOME/.local/bin/mise")
-
-# run_soft: one runtime that fails to build must be logged, not abort.
-run_soft "$_mise" trust -- "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml"
-run_soft "$_mise" install
-log_done "runtimes (mise) installed from ~/.config/mise/config.toml"
-unset _mise
+# run_soft: one runtime that fails to build must be logged, not abort. Plain
+# `mise`, no path: brew is the only thing that installs it here, and the
+# `hash -r` above is what makes a brew-fresh mise visible to this shell.
+run_soft mise trust -- "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml"
+run_soft mise install
+log_done_clean "runtimes (mise) installed from ~/.config/mise/config.toml" \
+  "runtimes: mise reported a failure (see the ✗ above)"

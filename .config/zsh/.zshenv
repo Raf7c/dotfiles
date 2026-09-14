@@ -7,7 +7,7 @@ _env="${XDG_CONFIG_HOME:-$HOME/.config}/shell/env.sh"
 [[ -r "$_env" ]] && source "$_env"
 unset _env
 
-# ------------------ PATH ------------------
+# --- PATH ---
 # Re-asserts our order after env.sh, and again in .zprofile after
 # `brew shellenv`. -U dedups keeping the first occurrence, (N-/) drops
 # directories that do not exist. See docs/architecture.md, the PATH story.

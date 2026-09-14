@@ -1,6 +1,6 @@
 # Majors pinned on purpose: with "latest", two machines set up on different
 # days diverge. Minor and patch still flow through `mise upgrade`; bump majors
-# HERE, and `latest` only for low-risk plumbing. The pin list: docs/packages.md.
+# HERE, and `latest` only for low-risk plumbing. The pin list: docs/outils.md.
 [tools]
 neovim = "0.12"
 node = "24"            # PERISHABLE: active LTS until 2026-10-20, then node 26

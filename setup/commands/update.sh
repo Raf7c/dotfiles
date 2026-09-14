@@ -12,8 +12,8 @@ else
   log_warn "git pull --ff-only failed (local changes / divergence?), continuing with current state"
 fi
 
-# prereqs / migrate / shell are one-time. gitsign and extras_fedora stay out too: both
-# ask questions, and `update -y` would answer them for you (docs/installer.md).
+# prereqs / migrate / shell are one-time. gitsign stays out too: its inputs are
+# the keys on THIS machine, which no `git pull` can change (docs/installer.md).
 run_steps submodules directories symlinks packages runtimes plugins
 
 log_step "update done."

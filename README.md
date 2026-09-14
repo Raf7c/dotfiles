@@ -1,170 +1,172 @@
 # dotfiles
 
 ![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)
-![Fedora](https://img.shields.io/badge/Fedora-51A2DA?logo=fedora&logoColor=white)
 ![Shell](https://img.shields.io/badge/shell-zsh%20%C2%B7%20bash-1a1a1a?logo=gnubash&logoColor=white)
 ![Install](https://img.shields.io/badge/install-POSIX%20sh%20%C2%B7%20idempotent-2ea44f)
 [![CI](https://github.com/Raf7c/dotfiles/actions/workflows/ci.yml/badge.svg)](https://github.com/Raf7c/dotfiles/actions/workflows/ci.yml)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-My entire working environment, versioned and reproducible: one `./run install`
-takes a fresh machine (**macOS** or **Fedora**) to a ready workstation.
+Tout mon environnement de travail, versionné et reproductible : un seul
+`./run install` amène un **macOS** neuf à un poste de travail prêt à
+l'emploi.
 
-<!-- TODO: screenshot: starship prompt, tmux status bar, `ll` output.
-     Save as assets/preview.png, then: ![Terminal preview](assets/preview.png) -->
+<!-- TODO : capture d'écran : prompt starship, barre de statut tmux, sortie de `ll`.
+     À enregistrer sous assets/preview.png, puis : ![Aperçu du terminal](assets/preview.png) -->
 
 > [!WARNING]
-> These are my settings. Read before you run.
+> Ce sont mes réglages. Lis avant de lancer.
 
-## Requirements
+## Prérequis
 
-- **macOS** or **Fedora**. The installer refuses an unknown OS, and it reads
-  `ID` only: a RHEL derivative (Rocky, CentOS Stream, Nobara) is refused even
-  though it is Fedora-like, because `fedora.txt` does not transpose to EPEL.
-- `git`, `curl`, and an SSH key registered on GitHub (the clone uses `git@`).
-- `sudo` for four steps (`prereqs`, `packages`, `shell`, and `extras_fedora` only
-  if you accept the COPR); everything else stays in `$HOME`.
+| | |
+|---|---|
+| OS | **macOS** pour l'installeur ; les configs, elles, sont portables |
+| Outils | `git`, `curl` |
+| Accès | une clé SSH sur GitHub, le clone utilise `git@` |
+| `sudo` | deux étapes, et pas systématiquement |
+
+<details>
+<summary>Le détail de ces quatre lignes</summary>
+
+`./run` teste `uname -s` et sort en 1 sur tout autre système, avec un message
+qui le dit. Les configurations ne testent aucun OS : elles sondent ce qui est
+présent (`command -v`, `[ -d ]`) et restent portables ailleurs.
+
+`sudo` est demandé dans `prereqs`, parce que l'installeur Homebrew le réclame
+lui-même, et dans `shell`, uniquement si le zsh de Homebrew n'est pas déjà
+listé dans `/etc/shells` — `chsh` refuse un shell absent de ce fichier. Tout le
+reste demeure dans `$HOME`.
+
+</details>
 
 ## Stack
 
-- **Shell**: zsh (login shell) · bash
-- **Prompt**: starship
-- **Runtimes**: mise
-- **Theme**: Catppuccin, auto light/dark
-- **Terminals**: ghostty · kitty
-- **Multiplexer**: tmux
-- **Editors**: nvim · vim (fallback) · JetBrains
+- **Shell** : zsh (shell de connexion) · bash
+- **Prompt** : starship
+- **Runtimes** : mise
+- **Thème** : Catppuccin, clair/sombre automatique
+- **Terminaux** : ghostty · kitty
+- **Multiplexeur** : tmux
+- **Éditeurs** : nvim · vim (fallback) · JetBrains
 
-## Highlights
+## Garanties
 
-- **POSIX sh installer**, idempotent (a second run does nothing), with a
-  faithful `--dry-run`, timestamped restorable backups and honest exit
-  codes. No framework.
-- **Clean `$HOME`**: everything follows the [XDG Base Directory spec](https://specifications.freedesktop.org/basedir-spec/latest/);
-  even legacy history files are migrated out on install.
-- **No root required for the shell.** `~/.zshenv` bootstraps `ZDOTDIR`
-  entirely from `$HOME`, so the startup chain never depends on root.
-  Installing does ask for `sudo`: the initial Homebrew install on macOS,
-  `dnf` on Fedora, the `/etc/shells` line, and the COPR of the `extras_fedora`
-  step if you accept it.
-- **Degrades cleanly.** No network, no git, a missing tool: the shell still
-  starts. Scripts stay silent; an interactive shell gets a single stderr
-  line, never a blocked startup.
-- **Tooling as authority**: shellcheck and shfmt are version-pinned by the
-  repo and enforced by it (`.editorconfig`, CI).
+| Garantie | Ce que ça veut dire |
+|---|---|
+| Installeur en POSIX sh | idempotent, `--dry-run` fidèle, backups restaurables, codes de sortie honnêtes |
+| `$HOME` propre | tout suit [XDG](https://specifications.freedesktop.org/basedir-spec/latest/), migration des anciens historiques comprise |
+| Aucun root pour le shell | `~/.zshenv` fait tout depuis `$HOME` |
+| Dégradation propre | pas de réseau, pas de git, un outil manquant : le shell démarre quand même |
+| L'outillage fait autorité | shellcheck et shfmt épinglés par le dépôt, imposés par lui |
 
-## Non-goals
+**Non-objectifs** : aucun framework pour l'installeur, aucune installation
+système ou multi-utilisateur, aucun support Linux ou Windows. `./run` refuse
+plutôt que de deviner.
 
-No framework and no plugin manager for the installer: eleven steps of POSIX
-sh are easier to audit than a dependency. No system-wide or multi-user
-install: everything lives in `$HOME` except the package layer. No
-Windows, no WSL: untested, therefore unclaimed.
-
-## How it works
+## Comment ça marche
 
 ```mermaid
 flowchart LR
-    A["~/.zshenv"] --> B["ZDOTDIR<br/>~/.config/zsh"] --> C[".zshenv → env.sh<br/>XDG · EDITOR · PATH"] --> D[".zshrc<br/>interactive"] --> E["zinit → plugins"]
-    F["bash: .bash_profile → .bashrc"] --> C
+    A["~/.zshenv"] --> B["ZDOTDIR<br/>~/.config/zsh"] --> C[".zshenv → env.sh<br/>XDG · EDITOR · PATH"] --> D[".zshrc<br/>interactif"] --> E["zinit → plugins"]
+    F["bash : .bash_profile → .bashrc"] --> C
 ```
 
-Details, load order and design decisions: [docs/architecture.md](docs/architecture.md).
+Détails, ordre de chargement et décisions de conception :
+[docs/architecture.md](docs/architecture.md).
 
-## Repo layout
+## Organisation du dépôt
 
 ```text
-run                  the installer: arguments, step dispatch
-setup/               its guts: manifest (links, dirs, migrations), lib, steps
-scripts/             manual scripts, on the PATH, never run by ./run
-docs/                architecture, installer, maintenance, usage, packages, tools, terminals
-.config/             everything linked into ~/.config (zsh, tmux, git, kitty…)
-.zshenv .bashrc .bash_profile    the three files zsh and bash need in $HOME
-.vimrc                           five options for the fallback vim: tabs, width 4
-.editorconfig .yamllint.yml      formatting authorities, read by the CI
-.github/             CI workflow + Dependabot
+.
+├── run                  # l installeur
+├── Brewfile             # la liste brew/cask, lue par l'étape packages
+├── setup/               # ses entrailles
+│   ├── manifest.sh      #   liens, dossiers, migrations
+│   ├── lib/             #   log.sh, util.sh
+│   ├── steps/           #   une responsabilité par fichier
+│   └── commands/        #   install / update / upgrade
+├── .config/             # tout ce qui est lié dans ~/.config
+│   ├── zsh/ tmux/ git/  #   les trois qui portent le plus de mécanique
+│   ├── ghostty/ kitty/  #   terminaux
+│   └── nvim/            #   submodule Raf7c/nvim
+├── scripts/             # manuels, sur le PATH, jamais lancés par ./run
+├── docs/                # architecture · installeur · sécurité
+│                        # usage · outils · maintenance
+├── .github/             # workflow de CI + Dependabot
+├── .zshenv              # va dans $HOME : bootstrap de ZDOTDIR
+├── .bashrc              # va dans $HOME
+├── .bash_profile        # va dans $HOME
+├── .vimrc               # va dans $HOME : vim de fallback, cinq options
+├── .editorconfig        # autorité de formatage, lue par la CI
+├── .yamllint.yml        # idem, pour le YAML
+├── .gitignore           # exclusions du dépôt
+├── .gitmodules          # déclare le submodule nvim
+├── README.md            # ce fichier
+└── LICENSE              # MIT
 ```
 
-Inside `setup/`: [docs/installer.md](docs/installer.md).
+Dans `setup/` : [docs/installer.md](docs/installer.md).
 
-## Quick start
+## Démarrage rapide
 
 ```sh
 git clone --recurse-submodules git@github.com:Raf7c/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
-./run install          # idempotent; preview first with: ./run install -n
-exec zsh               # new login shell, with the installed tools on PATH
+./run install
+exec zsh
 ```
 
-Identity first, before any commit: `user.name` and `user.email` live in
-`.config/git/config`, versioned on purpose: one person, several machines,
-one edit. Change them if you are not me. The address is what the forges use
-to attribute a commit and mark it verified; local verification, itself, keys
-off `.config/git/allowed_signers` — which has to list your signing **key**,
-the principal being only the name git prints.
+`./run install` est idempotent. Prévisualiser d'abord : `./run install -n`.
 
-Commit signing comes after the install, on purpose: on macOS it is the
-install that brings the openssh able to talk to a FIDO2 key (Apple's
-cannot; Fedora's stock one already can). With the YubiKey plugged in:
+Ensuite, dans l'ordre :
+
+| Quoi | Où |
+|---|---|
+| changer l'identité git | `.config/git/config`, versionné — [pourquoi](.config/git/README.md) |
+| activer la signature | [docs/security.md](docs/security.md), après l'installation |
+
+Sans YubiKey sur cette machine, il n'y a rien à faire : `gitsign` laisse la
+signature désactivée et rien d'autre ne change.
+
+## Commandes
+
+| Commande | Effet |
+|---|---|
+| `./run install` | tout, jusqu'à prêt. Idempotent |
+| `./run update` | `git pull`, puis resynchronise liens, paquets, runtimes, plugins |
+| `./run upgrade` | monte les versions : brew, mise, claude code, zinit, TPM, submodules |
+
+Options : `-n`/`--dry-run`, `-y`/`--yes`, `-h`/`--help`.
+Étapes isolées : `./run install symlinks packages`.
+
+<details>
+<summary>Installer sans root</summary>
+
+Sauter les deux étapes qui demandent sudo :
 
 ```sh
-cd ~/.ssh && ssh-keygen -K                       # pulls ALL THREE resident credentials
-mv id_ed25519_sk_rk_github      github_sk        # GitHub push / authentication
-mv id_ed25519_sk_rk_github.pub  github_sk.pub
-mv id_ed25519_sk_rk_gitlab      gitlab_sk        # GitLab push / authentication
-mv id_ed25519_sk_rk_gitlab.pub  gitlab_sk.pub
-mv id_ed25519_sk_rk_signing     id_signing_sk    # commit signing, BOTH forges
-mv id_ed25519_sk_rk_signing.pub id_signing_sk.pub
-chmod 600 github_sk gitlab_sk id_signing_sk
-chmod 644 github_sk.pub gitlab_sk.pub id_signing_sk.pub
-
-cd ~/.dotfiles && ./run install gitsign          # signing enabled from now on
+./run install submodules directories migrate symlinks packages gitsign runtimes plugins
 ```
 
-Neither `github_sk` nor `gitlab_sk` is a default key name: `~/.ssh/config` has
-to point at each (that file lives in a separate private repo). `id_signing_sk`
-needs no wiring, being exactly the file `gitsign` looks for — and one signing
-key covers both forges, since a signature is not an access.
-
-No YubiKey on this machine? Skip that second block: `gitsign` leaves
-signing disabled when it finds no key, and nothing else changes. Creating
-the keys from scratch: [git](.config/git/README.md).
-
-## Commands
-
-```sh
-./run install     # everything -> ready (idempotent)
-./run update      # git pull + resync submodules, dirs, links, packages, runtimes, plugins
-./run upgrade     # bump versions (brew/dnf, mise, claude, zinit, TPM, submodules…)
-```
-
-Options: `-n`/`--dry-run`, `-y`/`--yes`, `-h`/`--help`.
-Single steps: `./run install symlinks packages`.
-Root-free install (skips the four steps that can need sudo):
-`./run install submodules directories migrate symlinks gitsign runtimes plugins`.
+</details>
 
 ## Documentation
 
-| Page | Contents |
+| Page | Contenu |
 |---|---|
-| [architecture.md](docs/architecture.md) | startup chains, XDG layout, bootstrap without root, plugin policy |
-| [installer.md](docs/installer.md) | how `run` works, step contract, backups |
-| [usage.md](docs/usage.md) | everything you type: zsh vi-mode, fzf, fzf-git, aliases |
-| [packages.md](docs/packages.md) | where each tool comes from on each OS, and what is left by hand |
-| [tools.md](docs/tools.md) | why each tool is here, and what it replaces |
-| [terminals.md](docs/terminals.md) | ghostty and kitty, fonts, themes |
-| [maintenance.md](docs/maintenance.md) | what the CI checks, and what to do when something breaks |
-| [tmux](.config/tmux/README.md) | everything tmux: bindings, theme, plugins (lives with its config) |
-| [git](.config/git/README.md) | config.local mechanics, FIDO2 signing, aliases, notable defaults |
+| [architecture.md](docs/architecture.md) | chaînes de démarrage, organisation XDG, bootstrap sans root, politique des plugins |
+| [installer.md](docs/installer.md) | comment `run` fonctionne, contrat des étapes, backups |
+| [usage.md](docs/usage.md) | tout ce qu'on tape : mode vi de zsh, fzf, fzf-git, alias |
+| [outils.md](docs/outils.md) | d'où vient chaque outil, pourquoi il est là, ce que mise épingle |
+| [maintenance.md](docs/maintenance.md) | ce que la CI vérifie, et quoi faire quand quelque chose casse |
+| [security.md](docs/security.md) | clés, signature, secrets, privilèges, planchers de version — toute la sécurité, une page |
+| [tmux](.config/tmux/README.md) | tout tmux : raccourcis, thème, plugins (vit avec sa config) |
+| [git](.config/git/README.md) | mécanique de config.local, les deux identités, alias, valeurs par défaut notables |
 
-Two of these live **next to their config** rather than in `docs/`: tmux
-and git carry mechanics that are not obvious from reading the files, so
-the explanation sits where the files are. Everything a machine-wide
-concern goes to `docs/`.
+tmux et git sont documentés **à côté de leur config**, parce qu'ils portent une
+mécanique qui ne saute pas aux yeux à la lecture des fichiers. Tout ce qui
+relève de la machine entière va dans `docs/`.
 
-Maintenance convention: documentation is fixed in the same commit as the
-code it describes. The CI and the troubleshooting table live in
-[maintenance.md](docs/maintenance.md).
-
-## License
+## Licence
 
 [MIT](LICENSE).

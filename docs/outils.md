@@ -1,0 +1,213 @@
+# Outils et paquets
+
+D'où vient chaque outil, et pourquoi il est là.
+
+## L'essentiel
+
+| Question | Réponse |
+|---|---|
+| Qui installe quoi ? | `brew bundle` lit le `Brewfile` à la racine |
+| Les exceptions ? | claude code (installeur officiel) et les runtimes (mise) |
+| Ce qui reste à la main ? | donner sa VM à podman, une fois par machine |
+| Où sont épinglées les versions ? | `.config/mise/config.toml` |
+
+## Installé par `./run`
+
+Légende : **brew** / **cask** = Brewfile · **mise** = `config.toml` ·
+**`./run`** = la recette de `packages.sh`.
+
+| Outil | Vient de |
+|---|---|
+| git · tmux · zsh · bash · tree · eza · zoxide · fzf · bat · fd · ripgrep · btop · jq · make · cmake · just · lazygit · ansible · ansible-lint | brew |
+| bash-completion | brew `bash-completion@2` |
+| age · sops · age-plugin-yubikey · ykman | brew, voir « Ce qui sert un autre dépôt » |
+| openssh · libfido2 | brew, ils comblent un manque de macOS ([security.md](security.md)) |
+| cloudflared | brew, voir « Ce qui sert un autre dépôt » |
+| ghostty · kitty · Nerd Font JetBrains Mono | cask |
+| jetbrains-toolbox · gitkraken · raycast · keymapp · obsidian · claude (bureau) · firefox · google-chrome | cask |
+| podman · docker | brew `podman` + cask `podman-desktop` · cask `docker-desktop` |
+| starship · mise | brew |
+| claude code (le CLI) | **`./run`**, installeur officiel |
+| runtimes et linters épinglés | mise |
+
+`chsh` et `pbcopy` sont intégrés à macOS.
+
+<details>
+<summary>Trois précisions qui évitent une erreur</summary>
+
+Presque tout vient de `brew bundle`, qui lit le `Brewfile` **à la racine du
+dépôt**. Deux exceptions : **claude code**, dont la formule brew traîne
+derrière ses releases, et les **runtimes**, que `mise install` pose depuis
+`.config/mise/config.toml`.
+
+Le test d'idempotence de la recette claude regarde `command -v` **puis**
+`~/.local/bin` directement. Un shell démarré avant que ce répertoire existe ne
+le porte pas sur son PATH, et `command -v` seul réinstallerait à chaque
+exécution.
+
+Le `cask "claude"` et le CLI `claude code` sont **deux produits différents**.
+Le cask pose `/Applications/Claude.app` et ne déclare aucun binaire. Les deux
+ne se voient jamais.
+
+</details>
+
+## Ceux du quotidien
+
+| Outil | Remplace | Pourquoi |
+|---|---|---|
+| [eza](https://github.com/eza-community/eza) | ls | icônes, colonne git, vue en arbre ; câblé dans `ls/ll/la/lt` |
+| [bat](https://github.com/sharkdp/bat) | cat | coloration syntaxique ; aussi le moteur d'aperçu de fzf |
+| [fd](https://github.com/sharkdp/fd) | find | syntaxe plus saine, conscient du .gitignore ; alimente fzf |
+| [ripgrep](https://github.com/BurntSushi/ripgrep) | grep | recherche récursive rapide, consciente du .gitignore |
+| [fzf](https://github.com/junegunn/fzf) | rien | la couche floue : `^R`, `^T`, `^F`, `Alt-C`, menu Tab |
+| [zoxide](https://github.com/ajeetdsouza/zoxide) | cd | sauts par fréquence-récence : `z proj` |
+| [starship](https://starship.rs) | PS1 | une seule config de prompt pour zsh et bash |
+| [btop](https://github.com/aristocratos/btop) | top | vue lisible des ressources |
+| [lazygit](https://github.com/jesseduffield/lazygit) | rien | mettre des hunks en index bat `git add -p` |
+| [jq](https://github.com/jqlang/jq) | rien | du JSON en ligne de commande |
+| [just](https://github.com/casey/just) | rien | lanceur de commandes nommées, **pas** un remplaçant de make |
+
+`bat` : config `numbers,changes,header` ; l'aperçu fzf la remplace par
+`plain,numbers`. `just` contre `make` : make construit (C, cibles
+incrémentales), just lance les tâches d'un dépôt sans la cérémonie des
+`.PHONY`.
+
+## Ce qui sert un autre dépôt
+
+Cinq entrées du Brewfile n'ont aucun client **ici**. Ce n'est pas un oubli :
+elles servent des usages qui vivent ailleurs, et c'est ce dépôt-ci qui les
+installe.
+
+| Outil | Pourquoi |
+|---|---|
+| [cloudflared](https://github.com/cloudflare/cloudflared) | côté client d'un tunnel Cloudflare : sans ce binaire, la machine au bout est injoignable depuis ici |
+| sops + age + age-plugin-yubikey + ykman | chiffrement de mes secrets, adossé aux YubiKeys ([security.md](security.md)) |
+
+Les nommer ici est ce qui les empêche de devenir du folklore. Un paquet dont
+personne ne sait plus pourquoi il est là finit par être retiré, ou pire, gardé
+par superstition.
+
+## Ce que mise épingle
+
+| Outil | Épinglage |
+|---|---|
+| neovim | `0.12` |
+| node | `24` |
+| python | `3.14` |
+| rust | `1` |
+| shellcheck | `0.11` |
+| shfmt | `3.13` |
+| yamllint | `1` |
+| pipx · tree-sitter · usage | `latest` |
+
+<details>
+<summary>Pourquoi des majeures épinglées, et `latest` pour trois seulement</summary>
+
+`latest` installe ce qui existe le jour même. Deux installations montées à un
+mois d'écart divergeraient, et « reproductible » cesserait d'être vrai.
+
+Les mises à jour mineures et correctives passent par `./run upgrade`. Les
+majeures se montent dans le fichier, délibérément.
+
+`latest` est réservé à la plomberie sans enjeu, les trois entrées dont rien ne
+dépend au niveau version : pipx, tree-sitter et usage.
+
+**shellcheck et shfmt sont épinglés par mise, pas pris depuis brew**, parce que
+leur sortie définit la conformité. La machine et la CI doivent linter avec la
+même version ; shfmt peut changer son formatage sur une montée mineure.
+
+C'est aussi pour ça que **neovim n'est pas dans le Brewfile** : un seul
+installeur par outil, aucune copie masquée, les mêmes versions ici et en CI.
+
+</details>
+
+## Conteneurs
+
+podman et docker sont tous deux installés, et sur macOS ils tournent **dans une
+VM** : il n'y a pas de noyau Linux ici.
+
+Docker Desktop embarque la sienne. podman est sans démon, et le Brewfile n'en
+pose que le CLI. Sa VM se crée **une fois par machine**, avec
+`podman machine init`. Le cask `podman-desktop` la démarre ensuite à
+l'ouverture de session.
+
+## Éditeurs
+
+nvim porte la vraie config, en submodule
+([.config/nvim](https://github.com/Raf7c/nvim)).
+
+`.vimrc` reçoit cinq lignes pour qu'un fichier édité sans nvim garde la même
+indentation : **tabulations, jamais d'espaces, quatre colonnes**.
+
+`~/.vimrc` et pas le chemin XDG, à dessein : vim ne lit `~/.config/vim/vimrc`
+que depuis la 9.1.0327, donc la route XDG serait ignorée en silence sur un vim
+plus ancien.
+
+## Prompt
+
+`.config/starship.toml`, un seul fichier pour zsh et bash.
+
+<details>
+<summary>Les deux choix qui comptent</summary>
+
+Le `format` est **fermé** : il ne liste que les runtimes réellement installés
+(node, rust). Chaque module coûte une sonde à *chaque prompt*, même quand il
+n'affiche rien. Chemin tronqué à 4, coupé à la racine du dépôt. Glyphes : Nerd
+Font requise.
+
+`[os.symbols]` **fusionne** avec les défauts de starship au lieu de les
+remplacer. Un symbole retiré de la table retombe sur l'emoji intégré, il ne
+disparaît pas. Deux seulement y sont déclarés : macOS, et Arch.
+
+</details>
+
+## Terminaux
+
+Deux terminaux, une seule identité visuelle. tmux est documenté avec sa
+config : [.config/tmux/README.md](../.config/tmux/README.md).
+
+| | Ghostty (principal) | Kitty (le second) |
+|---|---|---|
+| Config | `.config/ghostty/config` | `.config/kitty/kitty.conf` |
+| Police | JetBrainsMono Nerd Font Mono | identique |
+| Thème | suit l'OS (Catppuccin) | suit l'OS via `*-theme.auto.conf` |
+| Curseur bloc | `shell-integration-features = no-cursor` | `shell_integration no-cursor` |
+
+> [!NOTE]
+> La variante **Nerd Font** a son importance. starship, eza et la barre tmux
+> affichent des glyphes de sa plage privée ; la simple « JetBrains Mono » les
+> rend en tofu.
+
+<details>
+<summary>Pourquoi kitty est gardé, et les détails de chaque config</summary>
+
+Kitty est maintenu à parité avec ghostty alors que rien ne l'exige
+aujourd'hui. La raison est en avant : ghostty ne publie de binaires officiels
+que pour macOS, de son propre aveu, et qualifie tout paquet Linux de build
+communautaire. Le jour où ce dépôt connaîtra un second OS, kitty sera le
+terminal déjà configuré.
+
+**Ghostty** : `copy-on-select = clipboard`, `macos-option-as-alt = true`. Le
+`no-cursor` est ce qui rend `cursor-style = block` vrai : l'intégration shell
+pose une barre au prompt « regardless of this configuration », si bien que le
+bloc survivrait partout sauf à l'endroit où on le regarde. L'OSC 52 est actif
+par défaut, et c'est lui qui fait marcher la copie tmux à travers SSH sans
+aucun binaire côté distant.
+
+**Kitty** : miroir de ghostty, même police, mêmes tailles, `copy_on_select`,
+même opacité. Les deux palettes Catppuccin vivent mot pour mot dans `themes/`
+(MIT, amont dans l'en-tête) : couleurs statiques, aucun code exécuté, donc hors
+du périmètre de la politique sur les plugins.
+
+</details>
+
+## Qualité du shell
+
+shellcheck et shfmt sont imposés par `.editorconfig` et par la CI. Les scripts
+du dépôt doivent passer les deux. **Le formateur est une autorité, pas une
+suggestion.**
+
+---
+
+Voir aussi : [installer.md](installer.md) pour l'étape `packages`, et
+[usage.md](usage.md) pour les raccourcis auxquels ces outils répondent.

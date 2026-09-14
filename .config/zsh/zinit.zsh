@@ -4,8 +4,8 @@
 # the dump (-C) the rest of the time. `find -mtime +0` gates on 24 h.
 _zsh_compinit() {
   autoload -Uz compinit
-  # Keyed by host and zsh version: a shared $HOME or a zsh upgrade must never
-  # reuse an incompatible dump.
+  # Keyed by host and zsh version: a $HOME shared between machines, or a zsh
+  # upgrade, must never reuse an incompatible dump.
   _zdump="${XDG_CACHE_HOME:-${HOME}/.cache}/zsh/zcompdump-${HOST}-${ZSH_VERSION}"
   # Without the directory compinit silently fails to write, and every startup
   # pays the full rescan.
@@ -19,17 +19,18 @@ _zsh_compinit() {
   unset _zdump
 }
 
-# ------------------ Bootstrap zinit ------------------
+# --- Bootstrap zinit ---
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
 # A machine without git or network must still get a working shell, degraded to
 # no plugins. Test the FILE we source, not the directory: an interrupted clone
 # leaves a directory that passes `-d` but has no zinit.zsh, and `git clone`
-# refuses a non-empty directory, so the bootstrap would never retry. Purge it.
+# refuses a non-empty directory. Purge it.
 if [[ ! -r "${ZINIT_HOME}/zinit.zsh" ]]; then
   [[ -d "${ZINIT_HOME}" ]] && rm -rf -- "${ZINIT_HOME}"
   if ((${+commands[git]})); then
     mkdir -p -- "${ZINIT_HOME:h}"
+    # Unpinned on purpose, argued in docs/architecture.md.
     git clone --depth 1 -- https://github.com/zdharma-continuum/zinit.git "${ZINIT_HOME}" ||
       print -u2 "zinit: clone failed (network?), plugins skipped this session"
   else
@@ -44,8 +45,7 @@ if [[ -r "${ZINIT_HOME}/zinit.zsh" ]]; then
   ZINIT[ZCOMPDUMP_PATH]="${XDG_CACHE_HOME:-${HOME}/.cache}/zsh/zcompdump-${HOST}-${ZSH_VERSION}"
   source "${ZINIT_HOME}/zinit.zsh"
 
-  # ------------------ Completions (BEFORE compinit) ------------------
-  # zsh-completions must be added to fpath before compinit
+  # --- Completions (BEFORE compinit) ---
   zinit light zsh-users/zsh-completions
 
   # `brew shellenv` does NOT touch FPATH, and the system zsh knows nothing of
@@ -53,12 +53,12 @@ if [[ -r "${ZINIT_HOME}/zinit.zsh" ]]; then
   [[ -d /opt/homebrew/share/zsh/site-functions ]] &&
     fpath+=(/opt/homebrew/share/zsh/site-functions)
 
-  # ------------------ compinit ------------------
+  # --- compinit ---
   _zsh_compinit
-  # Replays compdef calls registered by plugins loaded before compinit
+  # Replays compdef calls registered by plugins loaded before compinit.
   zinit cdreplay -q
 
-  # ------------------ Plugins ------------------
+  # --- Plugins ---
   zinit light Aloxaf/fzf-tab
 
   # Guarded on fzf: without it the widgets would exist and fail on use.

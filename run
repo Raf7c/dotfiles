@@ -3,19 +3,18 @@
 
 set -eu
 
-# `run` is always invoked from the repo (./run, ~/.dotfiles/run, sh run), never
-# through a symlink: nothing here creates one, and manifest.sh links scripts/,
-# not this file. CDPATH='' (not `CDPATH=`, SC1007) keeps `cd` silent.
+# Always invoked from the repo, never through a symlink: manifest.sh links
+# scripts/, not this file. CDPATH='' (not `CDPATH=`, SC1007) keeps `cd` silent.
 DOTFILES_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 export DOTFILES_DIR
 
 # Single source of truth for the order. See docs/installer.md, adding a step.
-STEPS="prereqs submodules directories migrate symlinks packages gitsign runtimes extras_fedora plugins shell"
+STEPS="prereqs submodules directories migrate symlinks packages gitsign runtimes plugins shell"
 export STEPS
 
 usage() {
   cat <<EOF
-run: dotfiles installer (macOS · Fedora)
+run: dotfiles installer (macOS)
 
 Usage:
   ./run <command> [options] [steps...]
@@ -85,9 +84,9 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-# From here on step names are expanded unquoted ($STEPS_ARG). Disable globbing
-# so `./run install '*'` can never turn into a list of filenames. NEVER turned
-# back on: steps are sourced in this shell, so a step cannot rely on a glob.
+# Step names are expanded unquoted below: no globbing, so `./run install '*'`
+# cannot become a list of filenames. NEVER turned back on -- steps are sourced
+# in this shell, so a step cannot rely on a glob.
 set -f
 
 # Steps only apply to install (update/upgrade have a fixed scope).
@@ -118,15 +117,23 @@ export DRY_RUN ASSUME_YES STEPS_ARG RUN_TS REPOS
 
 # Shared libraries
 . "$DOTFILES_DIR/setup/lib/log.sh"
-. "$DOTFILES_DIR/setup/lib/os.sh"
 . "$DOTFILES_DIR/setup/lib/util.sh"
 
-detect_os
-log_step "command: $cmd   |   OS: $OS"
-[ "$OS" = unknown ] && {
-  log_error "unsupported OS"
+# macOS only, and the message says so: there is no list of supported systems
+# this one failed to join. Straight uname, no lib: one test, one caller.
+[ "$(uname -s)" = Darwin ] || {
+  log_error "macOS only (uname: $(uname -s))"
   exit 1
 }
+# The manifest's second column is relative to $HOME, while dotfiles_dirs and
+# gitsign expand ${XDG_CONFIG_HOME:-...}. A relocated value makes the two
+# disagree in silence, every step still printing a ✓ over a shell with no
+# configuration at all. An assertion, not dead code.
+[ "${XDG_CONFIG_HOME:-$HOME/.config}" = "$HOME/.config" ] || {
+  log_error "XDG_CONFIG_HOME must be ~/.config (the link manifest assumes it)"
+  exit 1
+}
+log_step "command: $cmd   |   macOS"
 [ "$DRY_RUN" = 1 ] && log_warn "DRY-RUN: no action will be performed"
 
 # Preamble warnings (e.g. the DRY-RUN notice) must not count as failures.

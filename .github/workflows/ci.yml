@@ -1,5 +1,5 @@
-# The repo's quality bar on a neutral runner: three-shell syntax,
-# shellcheck (warning and above), shfmt against .editorconfig.
+# The repo's quality bar on a neutral runner: zsh syntax, shellcheck
+# (warning and above), shfmt against .editorconfig.
 # Actions are pinned to full commit SHAs: a tag is mutable, the
 # tj-actions attack (CVE-2025-30066) repointed existing tags; a SHA
 # cannot be repointed. Dependabot proposes the bumps.
@@ -20,10 +20,12 @@ jobs:
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
 
-      - name: install shells
+      # zsh alone: it is the only shell the runner does not ship, and the only
+      # one still checked here.
+      - name: install zsh
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y -q dash zsh
+          sudo apt-get install -y -q zsh
 
       # Same shellcheck/shfmt/yamllint versions as every machine: mise reads
       # the repo's own config.toml, one version source for local and CI.
@@ -41,14 +43,17 @@ jobs:
         with:
           install_args: python pipx shellcheck shfmt yamllint
 
-      - name: syntax (dash / bash / zsh -n)
+      # zsh ONLY, and that is the whole point: shellcheck refuses zsh
+      # ("Unknown shell: zsh"), so these files have no other guard. The sh and
+      # bash files need no `-n` pass -- shellcheck rejects everything dash -n
+      # rejects and five constructs more ([[ ]], echo -e, local, source, +=),
+      # measured. shfmt is not a substitute either: it reads real zsh such as
+      # ${(f)...} as an error.
+      - name: syntax (zsh -n)
         run: |
-          find run setup scripts .config/shell \( -name '*.sh' -o -name run \) \
-            -exec dash -n {} +
           for f in .zshenv $(find .config/zsh -name '.z*' -o -name '*.zsh' 2>/dev/null); do
             zsh -n "$f"
           done
-          bash -n .bashrc && bash -n .bash_profile
 
       # .bashrc and .bash_profile sit at the root and carry no shebang worth
       # following, hence -s bash and an explicit mention: the find below would
@@ -88,7 +93,14 @@ jobs:
             echo "::error file=run::cannot read STEPS"
             exit 1
           fi
-          for s in $steps; do
+          # zsh does NOT word-split an unquoted PARAMETER expansion; it DOES
+          # split a command substitution. Both measured in dash/bash/zsh. So
+          # `for s in $steps` ran ONCE under zsh, with the whole list as a
+          # single step name, and reported every step as missing -- a false
+          # alarm on a sane tree. GitHub runs bash, so the CI never saw it;
+          # docs/maintenance.md invites you to replay these, and this repo's
+          # login shell is zsh.
+          for s in $(printf '%s\n' "$steps" | tr ' ' '\n'); do
             [ -f "setup/steps/$s.sh" ] || {
               echo "::error file=run::STEPS lists '$s', setup/steps/$s.sh is missing"
               rc=1
@@ -106,6 +118,80 @@ jobs:
             esac
           done
           exit "$rc"
+
+      # The doc carries claims no shell check can contradict: paths. Three
+      # mechanical checks, each one a defect that actually shipped -- a page
+      # pointing at a file that had moved, a merge that left five dead
+      # references in code comments.
+      # Narrow on purpose: only tokens whose first segment is a tracked
+      # top-level entry. Bare basenames (`env.sh`, read relative to their own
+      # page) and keybindings (`Ctrl-h/j/k/l`, `ls/ll/la/lt`) are not paths,
+      # and a check that flags them is a check that gets switched off.
+      - name: every repo path in backticks exists
+        run: |
+          rc=0
+          # Space-joined, and membership tested with the `case` idiom the STEPS
+          # check above already uses: `for r in $roots` skipped EVERY path
+          # under zsh (unquoted parameter expansion, no word splitting), so the
+          # check returned 0 whatever the doc said. Silent, which is worse than
+          # the false alarm it caused two steps up. Measured.
+          roots=$(git ls-files | awk -F/ 'NF>1 {print $1}' | sort -u | tr '\n' ' ')
+          for f in README.md docs/*.md .config/git/README.md .config/tmux/README.md; do
+            for tok in $(grep -o '`[^` ]*`' "$f" | tr -d '`'); do
+              case "$tok" in
+                # placeholders, globs, and the generated gitignored file
+                *'<'* | *'>'* | *'*'* | *'…'* | *config.local*) continue ;;
+                # An ABSOLUTE path is not a repo path (/etc/zshenv,
+                # /Applications/Claude.app). It matters here and not only as a
+                # scope note: ${tok%%/*} is EMPTY for those, and an empty
+                # $first matched the space-joined membership test below.
+                /*) continue ;;
+              esac
+              first=${tok%%/*}
+              [ "$first" = "$tok" ] && continue
+              case " $roots " in *" $first "*) ;; *) continue ;; esac
+              [ -e "$tok" ] || {
+                echo "::error file=$f::\`$tok\` does not exist"
+                rc=1
+              }
+            done
+          done
+          exit "$rc"
+
+      # The path check above only sees paths in BACKTICKS. The defect it was
+      # written for -- a page pointing at a file that had moved -- takes the
+      # other form: deleting a page orphans the markdown links to it, and none
+      # of them is in backticks. No count is written here: it would go stale on
+      # every page added.
+      - name: every internal markdown link resolves
+        run: |
+          rc=0
+          for f in README.md docs/*.md .config/git/README.md .config/tmux/README.md; do
+            d=${f%/*}
+            [ "$d" = "$f" ] && d=.
+            for l in $(grep -oE '\]\([^)]+\.md(#[^)]*)?\)' "$f" |
+              sed 's/^](//; s/)$//; s/#.*//'); do
+              case "$l" in http*) continue ;; esac
+              [ -e "$d/$l" ] || {
+                echo "::error file=$f::the markdown link to $l does not resolve"
+                rc=1
+              }
+            done
+          done
+          exit "$rc"
+
+      # The backtick check above only looks inside markdown. A doc page named
+      # from a CODE comment (`Brewfile`, `config.toml`, a step) is reached by
+      # nothing -- and merging two pages left five dead references exactly
+      # there. Narrow on purpose: only `docs/<name>.md`, which is decidable.
+      - name: every docs page named anywhere exists
+        run: |
+          missing=$(git ls-files -z | xargs -0 grep -ho 'docs/[a-z0-9_-]*\.md' 2>/dev/null |
+            sort -u | while read -r p; do [ -e "$p" ] || printf '%s ' "$p"; done)
+          [ -z "$missing" ] || {
+            echo "::error::doc pages referenced but missing: $missing"
+            exit 1
+          }
 
       - name: shfmt (.editorconfig is the authority, -d must stay silent)
         # shfmt SKIPS hidden files when walking a directory and has no flag

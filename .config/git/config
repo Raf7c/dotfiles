@@ -76,7 +76,7 @@
 # expands no variable in pathname values, so allowedSignersFile has to be
 # expanded at generation time.
 
-# ------------------ Per-forge identity ------------------
+# --- Per-forge identity ---
 # The email above stays the DEFAULT, and it has to: a repository matching
 # neither condition below must still have an email, or git refuses to commit.
 # GitLab is an override, declared twice on purpose:

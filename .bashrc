@@ -7,18 +7,20 @@ _env="${XDG_CONFIG_HOME:-$HOME/.config}/shell/env.sh"
 unset _env
 
 # Non-interactive shells load the minimal env file, not this whole .bashrc:
-# env and PATH everywhere, no interactive behaviour leaking into scripts.
-# The :- defaults EVERYWHERE below: an empty XDG_STATE_HOME would turn the
-# history path into "/bash/history", unwritable, and lose the history silently.
+# env and PATH everywhere, no interactive behaviour leaking into scripts. The
+# :- defaults below: an empty XDG_STATE_HOME would make the history path
+# "/bash/history", unwritable, and lose it in silence.
 export BASH_ENV="${XDG_CONFIG_HOME:-$HOME/.config}/shell/env.sh"
 
-# ===================== Beyond: interactive only =====================
+# --- Beyond: interactive only ---
 case $- in *i*) ;; *) return ;; esac
 
-# Fedora system-wide settings for interactive non-login shells. No-op on macOS.
+# macOS ships this, and bash does not read it on its own for an interactive
+# non-login shell. zsh reads its own /etc counterparts by itself (GLOBAL_RCS is
+# left on), so sourcing it here is what keeps the two shells symmetric.
 [[ -r /etc/bashrc ]] && source /etc/bashrc
 
-# ------------------ History ------------------
+# --- History ---
 export HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/bash/history"
 [[ -d "${HISTFILE%/*}" ]] || mkdir -p -- "${HISTFILE%/*}"
 HISTSIZE=100000
@@ -34,19 +36,11 @@ case "${PROMPT_COMMAND:-}" in
   *) PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}" ;;
 esac
 
-# ------------------ Line editing ------------------
+# --- Line editing ---
 # Same reflexes as zsh: vi mode in the fallback shell too.
 set -o vi
 
-# ------------------ GPG ------------------
-# Only when stdin is a terminal: otherwise `tty` prints "not a tty" on STDOUT,
-# which poisons GPG_TTY and breaks every pinentry.
-if [ -t 0 ]; then
-  GPG_TTY=$(tty)
-  export GPG_TTY
-fi
-
-# ------------------ Completion ------------------
+# --- Completion ---
 if [[ -r /opt/homebrew/etc/profile.d/bash_completion.sh ]]; then
   source /opt/homebrew/etc/profile.d/bash_completion.sh
 elif [[ -r /usr/share/bash-completion/bash_completion ]]; then
@@ -69,19 +63,27 @@ if command -v mise >/dev/null 2>&1; then
   unset _mc
 fi
 
-# ------------------ Aliases ------------------
+# --- Aliases ---
 _al="${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliases.sh"
 # shellcheck source=/dev/null  # path known only at runtime; guarded by -r
 [[ -r "$_al" ]] && source "$_al"
 unset _al
 
-# ------------------ Tools init ------------------
+# --- Tools init ---
 # Guarded: a missing tool must never break the shell.
+# For the machine that HAS gpg: nothing here calls it, and the configs stay
+# portable. `[ -t 0 ]` is load-bearing: without it `tty` prints "not a tty",
+# and GPG_TTY holds THAT.
+if command -v gpg >/dev/null 2>&1 && [ -t 0 ]; then
+  GPG_TTY=$(tty)
+  export GPG_TTY
+fi
+
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)"
 command -v fzf >/dev/null 2>&1 && eval "$(fzf --bash)"
 command -v starship >/dev/null 2>&1 && eval "$(starship init bash)"
 
-# ------------------ PATH re-assertion ------------------
+# --- PATH re-assertion ---
 # bash has no `typeset -U`, and `mise activate --shims` re-prepends a directory
 # the parent shell already provided. Same re-assertion zsh does, first wins.
 if command -v awk >/dev/null 2>&1; then

@@ -16,8 +16,8 @@ run() {
   fi
 }
 
-# For the fragile commands (network, package managers): a dead mirror must be
-# reported, not abort the whole run through `set -e`. Returns 0 on purpose.
+# For the fragile commands (network, package managers). Returns 0 on purpose:
+# a dead mirror is reported, it does not abort the run.
 run_soft() {
   if [ "$DRY_RUN" = 1 ]; then
     run "$@"
@@ -35,6 +35,19 @@ log_done() {
   if [ "$DRY_RUN" = 1 ]; then log_info "[dry-run] $*"; else log_ok "$*"; fi
 }
 
+# Terminal line of a step whose failures are reported per ITEM (the manifest
+# consumers, brew bundle, mise): $1 on success, $2 when this step logged an
+# error. Warnings do NOT suppress the ✓ -- a warning is a deliberate skip, an
+# error is a failure. $_step_err0 is the baseline run_steps sets just before
+# sourcing the step; :-0 keeps the helper honest if a step is sourced by hand.
+log_done_clean() {
+  if [ "$(log_errors_count)" != "${_step_err0:-0}" ]; then
+    log_info "$2"
+    return 0
+  fi
+  log_done "$1"
+}
+
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || {
     log_error "missing command: $1"
@@ -42,13 +55,12 @@ require_cmd() {
   }
 }
 
-# No name = all the steps, in $STEPS order. With names = EXACT match (validated
-# by run). Each step is SOURCED, so it shares the libs and run's environment.
+# No name = all the steps, in $STEPS order. Each step is SOURCED, so it shares
+# the libs and run's environment.
 run_steps() {
   : "${STEPS:?STEPS must be set (step order, set by run)}"
-  # A filter name matching no step is silently dropped by the loop below. `run`
-  # validates the names YOU type; nothing validated the hand-written list of
-  # setup/commands/update.sh, so a typo there skipped a step without a word.
+  # `run` validates the names YOU type; nothing validated the hand-written
+  # list in setup/commands/update.sh, where a typo skipped a step in silence.
   for _flt in "$@"; do
     _known=0
     for _s in $STEPS; do [ "$_s" = "$_flt" ] && _known=1; done
@@ -61,9 +73,8 @@ run_steps() {
       for _flt in "$@"; do [ "$_short" = "$_flt" ] && _ok=1; done
       [ "$_ok" = 1 ] || continue
     fi
-    # Tested AFTER the filter: a step you did not ask for must not make noise.
-    # And an error, not a warning: $STEPS disagreeing with setup/steps/ is a repo
-    # bug, always a botched rename, and exit 0 is exactly how the last one went
+    # AFTER the filter: a step you did not ask for must not make noise. An
+    # error, not a warning: exit 0 is how the last botched rename went
     # unnoticed. The CI checks the same pairing both ways, before it ships.
     _f="$DOTFILES_DIR/setup/steps/$_short.sh"
     [ -e "$_f" ] || {
@@ -71,6 +82,9 @@ run_steps() {
       continue
     }
     log_step "step: $_short"
+    # The error count as it stands NOW: log_done_clean compares against this
+    # baseline, so a step's final ✓ speaks for THAT step and not for the run.
+    _step_err0=$(log_errors_count)
     # set -e would kill run on any uncaught failure inside a sourced step.
     # Capture the status instead; log_summary owns the final exit code.
     set +e
@@ -106,27 +120,28 @@ confirm() {
   case "$_ans" in y | Y) return 0 ;; *) return 1 ;; esac
 }
 
-# --- Centralized backups -----------------------------------------------------
+# --- Centralized backups ---
 # Everything moved during a run lands in ONE directory, keeping its path
-# relative to $HOME. Created on demand: no backup, no directory.
-# Assertion, not a default: an empty RUN_TS would drop every run's backups
-# straight into backups/, where successive runs would overwrite each other.
+# relative to $HOME. Created on demand. Assertion, not a default: an empty
+# RUN_TS would drop every run into backups/, overwriting the previous one.
 : "${RUN_TS:?RUN_TS must be set (exported by run)}"
 BACKUP_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/backups/$RUN_TS"
 
 backup_file() {
   _abs=$1
+  # An assertion, not a fallback: both callers build under $HOME, and a
+  # `basename` fallback would collapse /etc/foo and /var/foo onto one entry.
   case "$_abs" in
-    "$HOME"/*) _rel=${_abs#"$HOME"/} ;;
-    # Unreachable from the two callers here: both pass paths under $HOME.
-    # Kept, like pkg_install's `*)`, as the behaviour of a documented public
-    # helper for a future caller that does not.
-    *) _rel=$(basename -- "$_abs") ;;
+    "$HOME"/*) ;;
+    *)
+      log_error "backup: path outside \$HOME, refused: $_abs"
+      return 1
+      ;;
   esac
+  _rel=${_abs#"$HOME"/}
   _bdest="$BACKUP_DIR/$_rel"
   # Both TESTED, and the failure returned: the caller replaces the original
-  # right after. A ✓ printed over a backup that did not happen turned a full
-  # disk into silent data loss -- the file was gone and nothing had a copy.
+  # right after, so a ✓ over a backup that did not happen IS data loss.
   run mkdir -p -- "$(dirname -- "$_bdest")" || {
     log_error "backup: cannot create the directory for ${BACKUP_DIR#"$HOME"/}/$_rel"
     return 1
@@ -150,9 +165,8 @@ migrate_file() {
     backup_file "$_ms" || return 1
     return 0
   fi
-  # Tested like backup_file, and for a sharper reason: migrate runs ONCE per
-  # machine (docs/installer.md). A migration that failed in green is never
-  # replayed, and the legacy file stays outside XDG for good.
+  # Tested, and for a sharper reason than backup_file: migrate runs ONCE per
+  # machine, so a migration that failed in green is never replayed.
   run mkdir -p -- "$(dirname -- "$_md")" || {
     log_error "migration: cannot create ${_md%/*}"
     return 1
@@ -170,10 +184,9 @@ link_with_backup() {
   _src="$DOTFILES_DIR/$1"
   _dst="$HOME/$2"
   if [ ! -e "$_src" ]; then
-    # Warn, do not refuse: a missing source is usually a submodule not yet
-    # initialised, and the other links are still worth applying. The school
-    # repo takes the opposite view on purpose (its docs/architecture.md):
-    # its run has no per-step accounting, so it stops.
+    # Warn, do not refuse: usually a submodule not yet initialised, and the
+    # other links are still worth applying. An installer without per-step
+    # accounting would have to stop here instead; this one counts and goes on.
     log_warn "source missing, link skipped: $1"
     return 0
   fi
@@ -185,16 +198,13 @@ link_with_backup() {
     return 0
   fi
   # Where backup_file will have moved it ($_dst is always under $HOME here).
-  # A pre-existing SYMLINK is backed up too, not deleted: it records where the
-  # old config lived, and the restore-on-failure path below needs it. The school
-  # repo deliberately does the opposite (it drops dead links instead) — the two
-  # repos are independent and each states its choice.
+  # A pre-existing SYMLINK is backed up too: it records where the old config
+  # lived, and the restore path below needs it. Dropping them instead keeps
+  # dead links out of the backup directory, at the cost of that information.
   _lbak=''
   if [ -e "$_dst" ] || [ -L "$_dst" ]; then
-    # The link is NOT applied if the backup failed. This is the whole promise
-    # of "restorable backups": replacing a file whose copy does not exist
-    # destroys it, and the restore path below could never fire either -- it
-    # looks for a backup that was never written.
+    # NOT applied if the backup failed: replacing a file whose copy does not
+    # exist destroys it, and the restore path below looks for that copy.
     backup_file "$_dst" || {
       log_error "backup failed, link skipped to keep the original: $2"
       return 1

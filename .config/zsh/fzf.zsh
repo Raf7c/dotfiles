@@ -4,7 +4,7 @@
 # this file defines nothing and prints nothing.
 ((${+commands[fzf]})) || return 0
 
-# ------------------ Source command ------------------
+# --- Source command ---
 # fd when available, else find. -path … -prune is portable on GNU and BSD.
 if ((${+commands[fd]})); then
   export FZF_DEFAULT_COMMAND='fd --type f --hidden --strip-cwd-prefix'
@@ -32,7 +32,7 @@ else
 fi
 export FZF_CTRL_T_OPTS="--preview '$_FZF_PREVIEW_CMD'"
 
-# ------------------ Ctrl+F: files, hidden ones excluded ------------------
+# --- Ctrl+F: files, hidden ones excluded ---
 _fzf_file_no_hidden() {
   local result
   result=$(eval "$_FZF_NO_HIDDEN_COMMAND" | fzf --preview "$_FZF_PREVIEW_CMD") &&
@@ -43,7 +43,7 @@ zle -N _fzf_file_no_hidden
 # Declared next to the widget it uses, so it can never outlive it.
 bindkey '^F' _fzf_file_no_hidden
 
-# ------------------ fzf-git.sh: plain-command aliases ------------------
+# --- fzf-git.sh: plain-command aliases ---
 # The plugin binds CTRL-G CTRL-{F,B,T,R,H,S,L,W,E}; these call the same
 # functions as commands. The binding INSERTS the selection on the command line,
 # the alias PRINTS it, so `git switch $(gfb)` works. The gf* namespace cannot

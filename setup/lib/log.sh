@@ -18,11 +18,10 @@ else
   _c_bold=''
 fi
 
-# Failure accounting in FILES, not variables: log_warn/log_error are often
-# called inside `… | while` pipelines, i.e. subshells, where an increment would
-# be lost. They live in a private mktemp -d directory (0700, unpredictable
-# name): a $$-derived name in a world-writable /tmp can be pre-created as a
-# symlink by another user. Traps remove it on every exit path.
+# Accounting in FILES, not variables: log_warn/log_error are often called
+# inside `… | while` subshells, where an increment would be lost. Private
+# mktemp -d (0700): a $$-derived name in /tmp can be pre-created as a symlink
+# by another user. Traps remove it on every exit path.
 _log_dir=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-run.XXXXXX") || {
   printf 'log.sh: cannot create the temporary directory\n' >&2
   exit 1
@@ -31,14 +30,13 @@ _log_warns="$_log_dir/warns"
 _log_errors="$_log_dir/errors"
 
 log_cleanup() { rm -rf -- "$_log_dir"; }
-# INT/TERM exit with the conventional 128+signal code: on some shells the EXIT
-# trap would otherwise be the only one to fire.
+# 128+signal, the conventional code: on some shells the EXIT trap would
+# otherwise be the only one to fire.
 trap 'log_cleanup' EXIT
 trap 'log_cleanup; exit 130' INT
 trap 'log_cleanup; exit 143' TERM
-# HUP and QUIT too: without a trap of their own, dash dies from the signal
-# without running the EXIT trap and leaves $_log_dir behind. Measured with the
-# traps in place: INT 130, TERM 143, HUP 129 and QUIT 131 all clean up.
+# HUP and QUIT too: without their own trap, dash dies from the signal without
+# running EXIT and leaves $_log_dir behind. Measured, all four clean up.
 trap 'log_cleanup; exit 129' HUP
 trap 'log_cleanup; exit 131' QUIT
 
@@ -57,8 +55,19 @@ log_error() {
 # Forget what was logged so far (preamble noise).
 log_reset_counts() { rm -f -- "$_log_warns" "$_log_errors"; }
 
-# Returns 1 if any error was logged, so each command ends with an honest exit
-# code. Raw printf: the summary must not increment the counters it reports.
+# The error count so far: read before, read after, compare. Prints 0 rather
+# than nothing so the value is always a number `[` can take. Raw wc -- reading
+# a counter must not move it.
+log_errors_count() {
+  if [ -f "$_log_errors" ]; then
+    wc -l <"$_log_errors" | tr -d '[:space:]'
+  else
+    printf '0'
+  fi
+}
+
+# Returns 1 if any error was logged. Raw printf: the summary must not
+# increment the counters it reports.
 log_summary() {
   _lw=0
   _le=0

@@ -1,7 +1,7 @@
-# Sections mirror fedora.txt so the two files read side by side.
-# Who installs what, on which OS: docs/packages.md, one table, both OSes.
+# The single package list: macOS, Homebrew. Read by the `packages` step.
+# What is here, and what stays in your hands: docs/outils.md.
 
-# ------------------------------ formulas ------------------------------
+# --- formulas ---
 
 # core: shell, multiplexer, vcs
 brew "git"
@@ -35,14 +35,13 @@ brew "mise"
 brew "ansible"
 brew "ansible-lint"
 # The CLI only: on macOS podman needs a Linux VM, created once by hand with
-# `podman machine init` (docs/packages.md). The cask below starts it at login.
+# `podman machine init` (docs/outils.md). The cask below starts it at login.
 brew "podman"
 
 # network
 brew "cloudflared"
 
-# secrets / security
-brew "gnupg"
+# secrets / security -- no client here, see docs/outils.md
 brew "age"
 brew "sops"
 brew "age-plugin-yubikey"
@@ -50,7 +49,7 @@ brew "ykman"
 brew "openssh"
 brew "libfido2"
 
-# ------------------------------- casks --------------------------------
+# --- casks ---
 
 # terminal & font
 cask "ghostty"

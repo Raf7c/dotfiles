@@ -1,55 +1,49 @@
 #!/usr/bin/env sh
-# Step prereqs: package manager + base tools. macOS installs Homebrew, which
-# also brings the Command Line Tools and therefore git; Fedora installs
-# git + curl. Asks before the Homebrew bootstrap: it is a system change.
+# Step prereqs: package manager + base tools. Homebrew also brings the Command
+# Line Tools, and therefore git and curl. Asks before the bootstrap: it is a
+# system change.
 
-if is_macos; then
-  # ------------------ Homebrew ------------------
-  if command -v brew >/dev/null 2>&1; then
-    log_ok "Homebrew already present"
-  elif confirm "Install Homebrew (macOS package manager)?"; then
-    if [ "$DRY_RUN" = 1 ]; then
-      log_info "[dry-run] install Homebrew (curl … install.sh | bash)"
-    else
-      log_info "installing Homebrew…"
-      # Exported for the WHOLE run, not just this installer: steps are sourced
-      # in the same shell and nothing unsets it, so the `brew bundle` of the
-      # packages step sees it too. That is intended — `-y` means "ask me
-      # nothing" for the entire command, not for one download.
-      [ "$ASSUME_YES" = 1 ] && export NONINTERACTIVE=1
-      # Download THEN execute: a failed curl must not expand to an empty
-      # string silently executed by `bash -c`.
-      _hb=$(curl -fsSL -- https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh) ||
-        {
-          log_error "Homebrew: download failed (network?)"
-          unset _hb
-          return 1
-        }
-      /bin/bash -c "$_hb" ||
-        {
-          log_error "Homebrew: installer failed"
-          unset _hb
-          return 1
-        }
-      unset _hb
-    fi
+# --- Homebrew ---
+if command -v brew >/dev/null 2>&1; then
+  log_ok "Homebrew already present"
+elif confirm "Install Homebrew (macOS package manager)?"; then
+  if [ "$DRY_RUN" = 1 ]; then
+    # NOT "curl … | bash": the code below downloads to a variable first, and
+    # a preview showing the pattern the code avoids would be a lie.
+    log_info "[dry-run] Homebrew: download install.sh, then run it"
   else
-    log_warn "Homebrew not installed -> packages will fail on macOS"
+    log_info "installing Homebrew…"
+    # Exported for the WHOLE run: steps are sourced in the same shell, so
+    # `brew bundle` sees it too. Intended -- `-y` means "ask me nothing".
+    [ "$ASSUME_YES" = 1 ] && export NONINTERACTIVE=1
+    # Download THEN execute: a failed curl must not expand to an empty
+    # string silently executed by `bash -c`.
+    _hb=$(curl -fsSL -- https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh) ||
+      {
+        log_error "Homebrew: download failed (network?)"
+        unset _hb
+        return 1
+      }
+    /bin/bash -c "$_hb" ||
+      {
+        log_error "Homebrew: installer failed"
+        unset _hb
+        return 1
+      }
+    unset _hb
   fi
-
-  # Load brew in THIS run, so the packages step finds it. Apple Silicon path
-  # only: gitsign.sh is the one that has to cover intel too.
-  if [ "$DRY_RUN" != 1 ]; then
-    [ -x /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
-  fi
-  # Outside the guard, like every other hash -r here: it clears the shell's
-  # command cache, never $HOME nor the system, so dry-run has nothing to hide.
-  hash -r
 else
-  # ------------------ Linux: git + curl ------------------
-  pkg_install git curl
-  hash -r
+  log_warn "Homebrew not installed -> packages will fail on macOS"
 fi
+
+# Load brew in THIS run, so the packages step finds it. Apple Silicon only:
+# gitsign.sh is the one that has to cover intel too.
+if [ "$DRY_RUN" != 1 ]; then
+  [ -x /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+# Outside the guard: `hash -r` clears the shell's command cache, never $HOME
+# nor the system, so dry-run has nothing to hide.
+hash -r
 
 # Non-blocking: the install may have been declined.
 _pr_ready=1
@@ -64,10 +58,12 @@ if [ "$DRY_RUN" != 1 ]; then
   }
 fi
 
-# The ✓ used to print right under those two warnings, contradicting them.
-# log_info rather than a third log_warn: the warnings above are already counted.
+# log_info rather than a third log_warn: the warnings above are already
+# counted. This branch covers the WARNING case, which log_done_clean leaves
+# alone on purpose; the helper covers the error case underneath it.
 if [ "$_pr_ready" = 1 ]; then
-  log_done "prerequisites ready"
+  log_done_clean "prerequisites ready" \
+    "prerequisites: something failed (see the ✗ above)"
 else
   log_info "prerequisites incomplete (see the warnings above)"
 fi

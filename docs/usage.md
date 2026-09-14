@@ -1,96 +1,95 @@
 # Usage
 
-Everything you type: the bindings this configuration adds or changes, and
-the aliases it defines. Stock defaults are not listed.
+Tout ce qu'on tape : les raccourcis que cette configuration ajoute ou change,
+et les alias qu'elle définit. Les valeurs par défaut d'origine ne sont pas
+listées.
 
-## zsh: line editing (vi mode)
+## zsh : édition de ligne (mode vi)
 
-`bindkey -v`, `KEYTIMEOUT=10` (100 ms to leave insert mode). bash mirrors
-it (`set -o vi` in `.bashrc`), so the reflexes carry over to the fallback
-shell.
+`bindkey -v`, `KEYTIMEOUT=10` (100 ms pour sortir du mode insertion). bash le
+reproduit (`set -o vi` dans `.bashrc`), si bien que les réflexes se reportent
+sur le shell de fallback.
 
-| Key | Action | Source |
+| Touche | Action | Source |
 |---|---|---|
-| `Esc` | normal mode (vi) | `.zshrc` |
-| `Ctrl-R` | fuzzy history search (fzf) | `fzf --zsh` |
-| `Ctrl-T` | fuzzy file picker, bat preview | `fzf --zsh` |
-| `Alt-C` | fuzzy cd into a subdirectory | `fzf --zsh` |
-| `Ctrl-F` | file picker **without** hidden files | `fzf.zsh` widget |
-| `Tab` | fzf-tab completion menu (`<`/`>` switch groups, `Tab` moves down) | fzf-tab |
+| `Esc` | mode normal (vi) | `.zshrc` |
+| `Ctrl-R` | recherche floue dans l'historique (fzf) | `fzf --zsh` |
+| `Ctrl-T` | sélecteur de fichiers flou, aperçu bat | `fzf --zsh` |
+| `Alt-C` | cd flou dans un sous-répertoire | `fzf --zsh` |
+| `Ctrl-F` | sélecteur de fichiers **sans** les fichiers cachés | widget `fzf.zsh` |
+| `Tab` | menu de complétion fzf-tab (`<`/`>` changent de groupe, `Tab` descend) | fzf-tab |
 
-fzf uses `fd` when present, `find` otherwise; previews use `bat`, then
-`head` as fallback, so every binding works on a machine that has none of
-the three.
+fzf utilise `fd` quand il est présent, `find` sinon ; les aperçus utilisent
+`bat`, puis `head` en fallback, si bien que chaque raccourci fonctionne sur une
+machine qui n'a aucun des trois.
 
 ## tmux
 
-Documented with its config:
-[.config/tmux/README.md](../.config/tmux/README.md): bindings, theme,
-clipboard, plugins.
+[.config/tmux/README.md](../.config/tmux/README.md).
 
-## Shell aliases and functions
+## Alias et fonctions de shell
 
-| Alias | Becomes | Needs |
+| Alias | Devient | A besoin de |
 |---|---|---|
-| `ll` / `la` | `eza -lh` / `eza -lah`, icons and git status | eza (fallback: `ls -lh` / `ls -lah`) |
-| `lt` | `eza --tree --icons` | eza (fallback: `tree`) |
-| `ls` | `eza --icons` | eza only: without it, `ls` stays the system `ls` |
+| `ll` / `la` | `eza -lh` / `eza -lah`, icônes et statut git | eza (fallback : `ls -lh` / `ls -lah`) |
+| `lt` | `eza --tree --icons=auto` | eza (fallback : `tree`) |
+| `ls` | `eza --icons=auto` | eza seulement : sans lui, `ls` reste le `ls` du système |
 | `cat` | `bat` | bat |
-| `diff` | `diff --color=auto` | GNU diff (probed) |
-| `df` | `df -h` | nothing |
-| `v` | `nvim` | nothing |
-| `path` | `$PATH`, one directory per line | nothing |
+| `diff` | `diff --color=auto` | GNU diff (sondé) |
+| `df` | `df -h` | rien |
+| `v` | `nvim` | rien |
+| `path` | `$PATH`, un répertoire par ligne | rien |
 | `g` / `gst` / `gd` / `gck` / `gcm` / `gcma` / `gbr` / `gbra` | git / status / diff / checkout / commit / commit -a / branch / branch -a | git |
-| `ghc <repo>` | clones `github.com:$GITUSER/<repo>` into `$GHREPOS`, then cd | nothing |
-| `glc <repo>` | clones `gitlab.com:$GLUSER/<repo>` into `$GLREPOS`, then cd | nothing |
+| `ghc <repo>` | clone `github.com:$GITUSER/<repo>` dans `$GHREPOS`, puis cd | git |
+| `glc <repo>` | clone `gitlab.com:$GLUSER/<repo>` dans `$GLREPOS`, puis cd | git |
 
 `GITUSER` (GitHub), `GLUSER` (GitLab), `REPOS` (`~/lab`), `GHREPOS`
-(`$REPOS/github`) and `GLREPOS` (`$REPOS/gitlab`) are set in
-`shell/env.sh`, which is where you change them. Two username variables
-because the two accounts are not named the same. The directories are created
-by `./run install` (directories step).
+(`$REPOS/github`) et `GLREPOS` (`$REPOS/gitlab`) sont posés dans
+`shell/env.sh`, et c'est là qu'elles se changent. Deux variables de nom
+d'utilisateur parce que les deux comptes ne portent pas le même nom. Les
+répertoires sont créés par `./run install` (étape directories).
 
-These two are **shortcuts for tidiness, not a layout you owe git anything
-for**: the identity a repo uses is decided by its remote URL, so a plain
-`git clone` into any directory picks the right one on its own
-([.config/git/README.md](../.config/git/README.md)).
+`ghc` et `glc` sont des **raccourcis de rangement, pas une organisation que git
+exigerait** : l'identité qu'un dépôt utilise est décidée par l'URL de son
+remote, donc un simple `git clone` dans n'importe quel répertoire choisit la
+bonne tout seul.
 
-These are **shell** aliases, not git aliases: `gst`, not `git st`. What
-that costs is written where they live (`shell/aliases.sh`): outside an
-interactive shell, git answers to plain git only. The git config itself
-is documented at [.config/git/README.md](../.config/git/README.md).
+Et ce sont des alias de **shell**, pas des alias git : `gst`, pas `git st`.
+Hors d'un shell interactif, git ne répond qu'à git tel quel — le coût est écrit
+là où ils vivent, dans `shell/aliases.sh`. La config git elle-même :
+[.config/git/README.md](../.config/git/README.md).
 
-## git objects: fzf-git.sh
+## Objets git : fzf-git.sh
 
-[fzf-git.sh](https://github.com/junegunn/fzf-git.sh), loaded by zinit
-when fzf is present. Every binding starts with `Ctrl-G`; the same
-functions are also reachable as plain `gf*` commands.
+[fzf-git.sh](https://github.com/junegunn/fzf-git.sh), chargé par zinit quand
+fzf est présent. Chaque raccourci commence par `Ctrl-G` ; les mêmes fonctions
+sont aussi joignables comme de simples commandes `gf*`.
 
-| Binding | Alias | Object |
+| Raccourci | Alias | Objet |
 |---|---|---|
-| `Ctrl-G Ctrl-F` | `gff` | files (tracked + untracked, with status) |
+| `Ctrl-G Ctrl-F` | `gff` | fichiers (suivis + non suivis, avec le statut) |
 | `Ctrl-G Ctrl-B` | `gfb` | branches |
 | `Ctrl-G Ctrl-T` | `gft` | tags |
 | `Ctrl-G Ctrl-R` | `gfr` | remotes |
-| `Ctrl-G Ctrl-H` | `gfh` | commit hashes |
+| `Ctrl-G Ctrl-H` | `gfh` | hachages de commits |
 | `Ctrl-G Ctrl-S` | `gfs` | stashes |
 | `Ctrl-G Ctrl-L` | `gfl` | reflogs |
 | `Ctrl-G Ctrl-W` | `gfw` | worktrees |
-| `Ctrl-G Ctrl-E` | `gfe` | each ref (`git for-each-ref`) |
-| `Ctrl-G ?` | `gfk` | the list of these bindings |
+| `Ctrl-G Ctrl-E` | `gfe` | chaque ref (`git for-each-ref`) |
+| `Ctrl-G ?` | `gfk` | la liste de ces raccourcis |
 
-The binding **inserts** the selection into the command line; the alias
-**prints** it, hence `git switch $(gfb)`. Inside the picker: `Ctrl-O` opens
-in the browser, `Alt-E` in `$EDITOR`, `Ctrl-/` cycles the preview.
+Le raccourci **insère** la sélection dans la ligne de commande ; l'alias
+l'**affiche**, d'où `git switch $(gfb)`. Dans le sélecteur : `Ctrl-O` ouvre
+dans le navigateur, `Alt-E` dans `$EDITOR`, `Ctrl-/` fait défiler l'aperçu.
 
-## Terminals
+## Terminaux
 
-Neither ghostty nor kitty carries a custom binding. Stock defaults on
-both is what keeps muscle memory portable between them. Notable
-behaviours: `copy-on-select`, `macos-option-as-alt`. Configuration:
-[terminals.md](terminals.md).
+Ni ghostty ni kitty ne porte de raccourci personnalisé. Les valeurs d'origine
+sur les deux, c'est ce qui garde la mémoire musculaire portable entre eux.
+Comportements notables : `copy-on-select`, `macos-option-as-alt`.
+Configuration : [outils.md](outils.md), section « Terminaux ».
 
 ---
 
-See also: [tools.md](tools.md) for the tools behind these bindings, and
-[terminals.md](terminals.md) for ghostty, kitty and their configuration.
+Voir aussi : [outils.md](outils.md) pour les outils derrière ces raccourcis
+et l'origine de chacun.

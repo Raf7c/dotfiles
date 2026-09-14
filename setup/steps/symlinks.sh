@@ -16,8 +16,7 @@ dotfiles_links | while read -r _src _dst _rest; do
   link_with_backup "$_src" "$_dst"
 done
 
-# Like directories and migrate, the two other manifest consumers: a step's
-# status is that of its last command, and without this it would be the status
-# of whichever link happened to come last. Every failure already went through
-# log_error, and log_summary owns the exit code.
-log_done "symlinks applied"
+# Also fixes the step's exit status: it is that of its LAST command, which
+# without this line would be whichever link happened to come last.
+log_done_clean "symlinks applied" \
+  "symlinks: some could not be applied (see the ✗ above)"
