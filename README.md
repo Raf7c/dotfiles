@@ -20,7 +20,7 @@ l'emploi.
 
 | | |
 |---|---|
-| OS | **macOS** pour l'installeur ; les configs, elles, sont portables |
+| OS | **macOS** pour l'installeur ; les configs, elles sont portables |
 | Outils | `git`, `curl` |
 | Accès | une clé SSH sur GitHub, le clone utilise `git@` |
 | `sudo` | deux étapes, et pas systématiquement |
@@ -117,6 +117,21 @@ exec zsh
 ```
 
 `./run install` est idempotent. Prévisualiser d'abord : `./run install -n`.
+
+<details>
+<summary>Machine neuve : pourquoi les clés viennent après</summary>
+
+`ssh-keygen -K` est le seul moyen de redériver les clés depuis la YubiKey, et
+celui de macOS ne sait pas parler aux clés FIDO2 : il répond `No FIDO
+SecurityKeyProvider specified`. Celui qui sait vient de Homebrew, que
+`./run install` pose. D'où l'ordre :
+
+1. Le clone et l'installation ci-dessus. Le submodule passe du premier coup,
+   son URL est en `git@`.
+2. Les clés de la YubiKey, puis `./run install gitsign` :
+   [docs/security.md](docs/security.md).
+
+</details>
 
 Ensuite, dans l'ordre :
 
