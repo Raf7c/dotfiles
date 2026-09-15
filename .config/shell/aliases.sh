@@ -34,6 +34,14 @@ alias path='printf "%s\n" "$PATH" | tr ":" "\n"'
 
 alias v='nvim'
 
+# GNU gcc, whose formula ships `gcc-16` and never a plain `gcc`: Homebrew will
+# not shadow Apple's. PERISHABLE: bump the number when brew moves to gcc-17.
+# This is a KEYBOARD convenience and nothing more. `make` runs `cc` as a
+# program, not through the alias table, and its recipes use a non-interactive
+# shell that never reads this file -- measured. A project that wants GNU gcc
+# says so with `CC = gcc-16` in its Makefile.
+command -v gcc-16 >/dev/null 2>&1 && alias gcc='gcc-16'
+
 # Shell aliases, NOT git aliases: `gst` beats `git st`. The trade-off is that
 # they live only in interactive shells; a script or an IDE sees plain git.
 if command -v git >/dev/null 2>&1; then
