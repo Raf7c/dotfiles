@@ -16,6 +16,7 @@ dotfiles_links() {
 .config/nvim           .config/nvim
 .config/starship.toml  .config/starship.toml
 .config/mise           .config/mise
+.config/yazi           .config/yazi
 scripts                .config/scripts
 
 # --- startup files at the root of $HOME ---

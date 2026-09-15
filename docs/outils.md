@@ -18,7 +18,7 @@ Légende : **brew** / **cask** = Brewfile · **mise** = `config.toml` ·
 
 | Outil | Vient de |
 |---|---|
-| git · tmux · zsh · bash · tree · eza · zoxide · fzf · bat · fd · ripgrep · btop · jq · make · cmake · just · lazygit · ansible · ansible-lint | brew |
+| git · tmux · zsh · bash · tree · eza · zoxide · fzf · bat · fd · ripgrep · btop · jq · make · cmake · just · lazygit · yazi · ansible · ansible-lint | brew |
 | bash-completion | brew `bash-completion@2` |
 | age · sops · age-plugin-yubikey · ykman | brew, voir « Ce qui sert un autre dépôt » |
 | openssh · libfido2 | brew, ils comblent un manque de macOS ([security.md](security.md)) |
@@ -63,6 +63,7 @@ ne se voient jamais.
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | cd | sauts par fréquence-récence : `z proj` |
 | [starship](https://starship.rs) | PS1 | une seule config de prompt pour zsh et bash |
 | [btop](https://github.com/aristocratos/btop) | top | vue lisible des ressources |
+| [yazi](https://yazi-rs.github.io) | `ls` et `cd` à la main | explorateur de fichiers en terminal ; thème auto clair/sombre, réglages d'origine pour le reste |
 | [lazygit](https://github.com/jesseduffield/lazygit) | rien | mettre des hunks en index bat `git add -p` |
 | [jq](https://github.com/jqlang/jq) | rien | du JSON en ligne de commande |
 | [just](https://github.com/casey/just) | rien | lanceur de commandes nommées, **pas** un remplaçant de make |
@@ -71,6 +72,27 @@ ne se voient jamais.
 `plain,numbers`. `just` contre `make` : make construit (C, cibles
 incrémentales), just lance les tâches d'un dépôt sans la cérémonie des
 `.PHONY`.
+
+## Les aperçus de yazi
+
+Cinq paquets n'ont pas d'autre client : ils alimentent les aperçus de yazi, et
+chacun couvre un type de fichier.
+
+| Paquet | Ce qu'il permet d'afficher |
+|---|---|
+| `sevenzip` | le contenu d'une archive |
+| `poppler` | un PDF |
+| `resvg` | un SVG |
+| `ffmpeg` | la vignette d'une vidéo |
+| `imagemagick` | polices, HEIC, JPEG XL |
+
+Sans eux yazi fonctionne : il n'affiche simplement rien pour ces types. `jq`,
+`fd`, `ripgrep`, `fzf` et `zoxide`, qu'il utilise aussi, sont déjà là pour leurs
+propres raisons.
+
+Les *flavors* ne sont pas fournis avec le binaire. `package.toml` enregistre
+lesquels, l'étape `plugins` lance `ya pkg install`, et `flavors/` est gitignoré
+— même mécanique que les plugins tmux.
 
 ## Ce qui sert un autre dépôt
 

@@ -21,6 +21,15 @@ brew "ripgrep"
 brew "btop"
 brew "jq"
 brew "lazygit"
+# yazi and what its previews need: sevenzip (archives), poppler (PDF), resvg
+# (SVG), ffmpeg (video), imagemagick (fonts, HEIC). Without them yazi runs,
+# it just shows nothing for those types.
+brew "yazi"
+brew "ffmpeg"
+brew "sevenzip"
+brew "poppler"
+brew "resvg"
+brew "imagemagick"
 
 # build & tasks
 brew "make"

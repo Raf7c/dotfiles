@@ -40,5 +40,23 @@ if command -v tmux >/dev/null 2>&1 && [ -x "$_tpm_dir/bin/install_plugins" ]; th
     log_warn "TPM: plugin install failed (network, or tmux.conf unreadable), retry with: prefix + I"
 fi
 
+# --- yazi flavors ---
+# Same shape as TPM: `ya pkg` writes into ~/.config/yazi/flavors/, which is the
+# repo through the symlink, and that directory is gitignored. `install` and not
+# `add`: it replays package.toml, the versioned record of what to fetch. Adding
+# a flavor is `ya pkg add <owner>/<repo>:<name>` once, then commit package.toml.
+_yazi_dir="${XDG_CONFIG_HOME:-$HOME/.config}/yazi"
+if [ ! -L "$_yazi_dir" ]; then
+  log_info "yazi: ~/.config/yazi is not the repo link yet -> run 'symlinks' first"
+elif [ ! -f "$_yazi_dir/package.toml" ]; then
+  log_info "yazi: no package.toml -> flavors not declared yet, theme.toml falls back"
+elif command -v ya >/dev/null 2>&1; then
+  # No network is not a reason to abort: yazi runs with its built-in theme.
+  run ya pkg install ||
+    log_warn "yazi: flavor install failed (network?), retry with: ya pkg install"
+else
+  log_info "yazi: 'ya' absent -> the full run installs it, then: ./run install plugins"
+fi
+
 log_info "zinit: no action (self-installs on first zsh)"
-unset _tpm_dir
+unset _tpm_dir _yazi_dir

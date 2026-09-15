@@ -12,6 +12,10 @@
 # tmux plugins (managed by TPM, not versioned)
 .config/tmux/plugins/
 
+# yazi flavors (managed by `ya pkg`, not versioned). package.toml, which
+# records what to fetch, IS versioned next to it.
+.config/yazi/flavors/
+
 # Claude Code local state (settings.local.json, session data)
 .claude/
 
