@@ -29,8 +29,8 @@ Ce dépôt est public. Rien de secret n'y est versionné.
 
 ## Les clés
 
-Deux YubiKeys. La première porte les trois identifiants FIDO2, un par usage,
-et sert à tout au quotidien.
+Deux YubiKeys, mais une seule compte ici. Celle du quotidien porte les
+identifiants ci-dessous, un par usage.
 
 | Fichier | Droit | Présence |
 |---|---|---|
@@ -38,14 +38,15 @@ et sert à tout au quotidien.
 | `~/.ssh/github_sk` | push GitHub | PIN |
 | `~/.ssh/gitlab_sk` | push GitLab | PIN |
 
-La seconde est un **secours pour sops** : elle porte une identité age, et elle
-est rangée ailleurs que la première. Elle ne porte aucun des trois identifiants
-ci-dessus, donc elle ne remplace pas la première pour signer ni pour pousser.
+La seconde est rangée ailleurs et sert de **secours**. Elle ne porte aucun de
+ces identifiants : perdre celle du quotidien coupe la signature et les deux
+forges, que la seconde soit sous la main ou non.
 
 > [!CAUTION]
-> PIV et FIDO2 sont deux applications séparées sur la clé. `ykman piv reset` ne
-> répare **aucun** problème de signature ni de push, et il efface l'identité age
-> de la clé, définitivement.
+> PIV et FIDO2 sont deux applications séparées sur la clé, chacune avec sa
+> remise à zéro. `ykman piv reset` ne répare **aucun** problème de signature ni
+> de push, et efface l'identité age. `ykman fido reset` efface les identifiants
+> ci-dessus. Les deux sont définitives.
 
 <details>
 <summary>Pourquoi une clé pour signer et deux pour pousser</summary>
@@ -97,8 +98,8 @@ chmod 644 github_sk.pub gitlab_sk.pub id_signing_sk.pub
 cd ~/.dotfiles && ./run install gitsign
 ```
 
-`ssh-keygen -K` récupère les trois identifiants d'un coup. Le `./run install
-gitsign` final active la signature.
+`ssh-keygen -K` récupère les identifiants résidents de la clé branchée. Le
+`./run install gitsign` final active la signature.
 
 > [!IMPORTANT]
 > Ça vient **après** `./run install`. L'`ssh-keygen` capable de parler à une
@@ -108,7 +109,7 @@ gitsign` final active la signature.
 <summary>Pourquoi ces renommages</summary>
 
 Le suffixe `_rk_<nom>` vient de l'espace de noms `-O application=ssh:<nom>`
-donné à la création. C'est pour ça que les trois reviennent distinguables.
+donné à la création. C'est pour ça qu'ils reviennent distinguables.
 
 Seul `id_signing_sk` est un nom que quelque chose cherche tout seul.
 `github_sk` et `gitlab_sk` doivent être pointés par `~/.ssh/config`. Sinon ssh
@@ -240,17 +241,18 @@ et ses commits cessent de se vérifier.
 
 ### Perdre la YubiKey
 
-Celle du quotidien. Les trois identifiants sont dessus et nulle part
-ailleurs — la clé de secours ne les porte pas. Rien à effacer sur les machines.
-Dans cet ordre :
+Celle du quotidien. Ses identifiants sont dessus et nulle part ailleurs — la
+clé de secours ne les porte pas. Rien à effacer sur les machines. Dans cet
+ordre :
 
 1. **Révoquer les deux clés d'authentification.** Retirer `github_sk.pub` de
    GitHub et `gitlab_sk.pub` de GitLab. Tant qu'elles y sont, celui qui tient
    la clé peut pousser ; le PIN est la seule chose sur son chemin.
 2. **Laisser la clé de signature enregistrée.** La retirer ferait retomber en
    Unverified tout ce qu'elle a signé.
-3. Créer trois identifiants sur la clé de remplacement, les envoyer, et ajouter
-   la nouvelle clé de signature à `allowed_signers` avec un `valid-after`.
+3. Recréer ces identifiants sur la clé de remplacement, les envoyer, et
+   ajouter la nouvelle clé de signature à `allowed_signers` avec un
+   `valid-after`.
 
 `allowed_signers` ne demande aucune suppression : une ligne dont la fenêtre est
 fermée vérifie encore les vieux commits et ne peut plus rien signer de neuf.
