@@ -20,6 +20,7 @@ Légende : **brew** / **cask** = Brewfile · **mise** = `config.toml` ·
 |---|---|
 | git · tmux · zsh · bash · tree · eza · zoxide · fzf · bat · fd · ripgrep · btop · jq · make · cmake · just · lazygit · yazi · xh · posting · uv · gcc · ansible · ansible-lint | brew |
 | bash-completion | brew `bash-completion@2` |
+| delta | brew `git-delta` |
 | age · sops · age-plugin-yubikey · ykman | brew, voir « Ce qui sert un autre dépôt » |
 | openssh · libfido2 | brew, ils comblent un manque de macOS ([security.md](security.md)) |
 | cloudflared | brew, voir « Ce qui sert un autre dépôt » |
@@ -71,6 +72,7 @@ ne se voient jamais.
 | [btop](https://github.com/aristocratos/btop) | top | vue lisible des ressources |
 | [yazi](https://yazi-rs.github.io) | `ls` et `cd` à la main | explorateur de fichiers en terminal ; thème auto clair/sombre, réglages d'origine pour le reste |
 | [lazygit](https://github.com/jesseduffield/lazygit) | rien | mettre des hunks en index bat `git add -p` |
+| [delta](https://github.com/dandavison/delta) | le pager de git | `git diff`, `git log`, `git show` en deux colonnes, avec numéros de ligne et coloration syntaxique ; suit le fond clair ou sombre du terminal |
 | [jq](https://github.com/jqlang/jq) | rien | du JSON en ligne de commande |
 | [xh](https://github.com/ducaale/xh) | `curl`, à la main | requêtes HTTP écrites à la main : syntaxe lisible, JSON coloré. `curl` reste pour les scripts et les téléchargements |
 | [just](https://github.com/casey/just) | rien | lanceur de commandes nommées, **pas** un remplaçant de make |

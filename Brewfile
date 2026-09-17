@@ -5,6 +5,9 @@
 
 # core: shell, multiplexer, vcs
 brew "git"
+# The formula is git-delta, the binary is `delta`: git's pager, wired in
+# .config/git/config. On a machine that does not have it yet, git prints one
+brew "git-delta"
 brew "tmux"
 brew "zsh"
 brew "bash"

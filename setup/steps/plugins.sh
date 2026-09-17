@@ -1,7 +1,6 @@
 #!/usr/bin/env sh
-# Step plugins: clone TPM (tmux). zinit has nothing to do here, it self-installs
-# on the first zsh launch (.config/zsh/zinit.zsh). Since ~/.config/tmux is a
-# link to the repo, TPM lands in .config/tmux/plugins/, already gitignored.
+# Step plugins: clone TPM (tmux), replay the yazi flavors. zinit has nothing to
+# do here, it self-installs on the first zsh launch (.config/zsh/zinit.zsh).
 
 # TPM lands INSIDE ~/.config/tmux, which symlinks points at the repo. Run alone
 # before symlinks, this would clone into a real directory that symlinks later

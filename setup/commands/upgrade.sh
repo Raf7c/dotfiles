@@ -52,7 +52,6 @@ if [ -r "$_zinit" ] && command -v zsh >/dev/null 2>&1; then
   # cclear last, and it belongs HERE: the plugins follow HEAD, so an update
   # that drops a completion upstream leaves a dangling symlink behind, and
   # compinit then prints "no such file or directory" on EVERY shell start.
-  # The command that creates the orphan is the one that must clear it.
   run zsh -fc "typeset -gA ZINIT; ZINIT[ZCOMPDUMP_PATH]=\"${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-\${HOST}-\${ZSH_VERSION}\"; source '$_zinit'; zinit self-update; zinit update --all; zinit cclear" ||
     log_warn "zinit: update failed"
 else

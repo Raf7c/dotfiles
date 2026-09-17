@@ -39,7 +39,13 @@ machine qui n'a aucun des trois.
 | `df` | `df -h` | rien |
 | `v` | `nvim` | rien |
 | `path` | `$PATH`, un répertoire par ligne | rien |
-| `g` / `gst` / `gd` / `gck` / `gcm` / `gcma` / `gbr` / `gbra` | git / status / diff / checkout / commit / commit -a / branch / branch -a | git |
+| `g` | `git` | git |
+| `ga` / `ga.` / `gaa` | `git add` / `add .` / `add --all` | git |
+| `gs` / `gd` / `gds` | `git status` / `diff` / `diff --staged` | git |
+| `gc` / `gck` | `git commit` / `checkout` | git |
+| `gb` / `gbd` / `gbD` | `git branch` / `branch --delete` / `branch -D` | git |
+| `gpl` / `gp` | `git pull` / `git push` | git |
+| `gl` | `git log --graph --oneline` | git |
 | `ghc <repo>` | clone `github.com:$GITUSER/<repo>` dans `$GHREPOS`, puis cd | git |
 | `glc <repo>` | clone `gitlab.com:$GLUSER/<repo>` dans `$GLREPOS`, puis cd | git |
 
@@ -54,7 +60,7 @@ exigerait** : l'identité qu'un dépôt utilise est décidée par l'URL de son
 remote, donc un simple `git clone` dans n'importe quel répertoire choisit la
 bonne tout seul.
 
-Et ce sont des alias de **shell**, pas des alias git : `gst`, pas `git st`.
+Ce sont des alias de **shell**, pas des alias git : `gs`, pas `git st`.
 Hors d'un shell interactif, git ne répond qu'à git tel quel — le coût est écrit
 là où ils vivent, dans `shell/aliases.sh`. La config git elle-même :
 [.config/git/README.md](../.config/git/README.md).
@@ -63,15 +69,20 @@ là où ils vivent, dans `shell/aliases.sh`. La config git elle-même :
 
 [fzf-git.sh](https://github.com/junegunn/fzf-git.sh), chargé par zinit quand
 fzf est présent. Chaque raccourci commence par `Ctrl-G` ; les mêmes fonctions
-sont aussi joignables comme de simples commandes `gf*`.
+sont aussi joignables comme de simples commandes. Une **lettre doublée** pour
+les trois du quotidien, le préfixe `gf*` pour le reste.
+
+Chaque raccourci est lié **deux fois** : `Ctrl-G Ctrl-B` et `Ctrl-G b` appellent
+le même widget. La seconde forme évite de garder `Ctrl` enfoncé, la table
+ci-dessous ne cite que la première.
 
 | Raccourci | Alias | Objet |
 |---|---|---|
 | `Ctrl-G Ctrl-F` | `gff` | fichiers (suivis + non suivis, avec le statut) |
-| `Ctrl-G Ctrl-B` | `gfb` | branches |
+| `Ctrl-G Ctrl-B` | `gbb` | branches |
 | `Ctrl-G Ctrl-T` | `gft` | tags |
 | `Ctrl-G Ctrl-R` | `gfr` | remotes |
-| `Ctrl-G Ctrl-H` | `gfh` | hachages de commits |
+| `Ctrl-G Ctrl-H` | `ghh` | hachages de commits |
 | `Ctrl-G Ctrl-S` | `gfs` | stashes |
 | `Ctrl-G Ctrl-L` | `gfl` | reflogs |
 | `Ctrl-G Ctrl-W` | `gfw` | worktrees |
@@ -79,8 +90,14 @@ sont aussi joignables comme de simples commandes `gf*`.
 | `Ctrl-G ?` | `gfk` | la liste de ces raccourcis |
 
 Le raccourci **insère** la sélection dans la ligne de commande ; l'alias
-l'**affiche**, d'où `git switch $(gfb)`. Dans le sélecteur : `Ctrl-O` ouvre
+l'**affiche**, d'où `git switch $(gbb)`. Dans le sélecteur : `Ctrl-O` ouvre
 dans le navigateur, `Alt-E` dans `$EDITOR`, `Ctrl-/` fait défiler l'aperçu.
+
+`gfk` fait exception, et c'est la seule ligne de la table où les deux colonnes
+ne sont pas équivalentes : le raccourci affiche la liste **sous** le prompt, en
+message transitoire, effacé à la frappe suivante ; l'alias l'écrit dans le
+défilement, où elle reste lisible pendant qu'on tape. C'est aussi le seul des
+dix qui n'exige pas d'être dans un dépôt git.
 
 ## Terminaux
 

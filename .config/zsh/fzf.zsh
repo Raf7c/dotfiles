@@ -46,13 +46,15 @@ bindkey '^F' _fzf_file_no_hidden
 # --- fzf-git.sh: plain-command aliases ---
 # The plugin binds CTRL-G CTRL-{F,B,T,R,H,S,L,W,E}; these call the same
 # functions as commands. The binding INSERTS the selection on the command line,
-# the alias PRINTS it, so `git switch $(gfb)` works. The gf* namespace cannot
-# collide with the g* aliases of shell/aliases.sh.
+# the alias PRINTS it, so `git switch $(gbb)` works.
+# A DOUBLED letter for the three used daily, the gf* prefix for the rest. The
+# first three leave that prefix, so they are the ones to check against
+# shell/aliases.sh before adding a git alias in gb*, gf* or gh*.
 alias gff='_fzf_git_files'
-alias gfb='_fzf_git_branches'
+alias gbb='_fzf_git_branches'
+alias ghh='_fzf_git_hashes'
 alias gft='_fzf_git_tags'
 alias gfr='_fzf_git_remotes'
-alias gfh='_fzf_git_hashes'
 alias gfs='_fzf_git_stashes'
 alias gfl='_fzf_git_lreflogs'
 alias gfw='_fzf_git_worktrees'

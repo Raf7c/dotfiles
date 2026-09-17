@@ -34,25 +34,33 @@ alias path='printf "%s\n" "$PATH" | tr ":" "\n"'
 
 alias v='nvim'
 
-# GNU gcc, whose formula ships `gcc-16` and never a plain `gcc`: Homebrew will
-# not shadow Apple's. PERISHABLE: bump the number when brew moves to gcc-17.
-# This is a KEYBOARD convenience and nothing more. `make` runs `cc` as a
-# program, not through the alias table, and its recipes use a non-interactive
-# shell that never reads this file -- measured. A project that wants GNU gcc
-# says so with `CC = gcc-16` in its Makefile.
+# The formula ships `gcc-16` and never a plain `gcc`: Homebrew will not shadow
+# Apple's. PERISHABLE: bump the number when brew moves to gcc-17. A keyboard
+# convenience only -- `make` runs `cc` as a program and never sees an alias.
 command -v gcc-16 >/dev/null 2>&1 && alias gcc='gcc-16'
 
-# Shell aliases, NOT git aliases: `gst` beats `git st`. The trade-off is that
+# Shell aliases, NOT git aliases: `gs` beats `git st`. The trade-off is that
 # they live only in interactive shells; a script or an IDE sees plain git.
+# `gb*` and `gh*` are shared with zsh/fzf.zsh: check there before adding one.
 if command -v git >/dev/null 2>&1; then
   alias g='git'
-  alias gst='git status'
+  alias ga='git add'
+  alias ga.='git add .'
+  alias gaa='git add --all'
+  alias gs='git status'
   alias gd='git diff'
+  alias gds='git diff --staged'
+  alias gc='git commit'
   alias gck='git checkout'
-  alias gcm='git commit'
-  alias gcma='git commit -a'
-  alias gbr='git branch'
-  alias gbra='git branch -a'
+  alias gb='git branch'
+  alias gbd='git branch --delete'
+  alias gbD='git branch -D'
+  alias gpl='git pull'
+  alias gp='git push'
+  # `--oneline` IS `--pretty=oneline --abbrev-commit`, and `--decorate` is the
+  # default on a terminal: both measured, both dropped.
+  alias gl='git log --graph --oneline'
+  alias gconf='git config --list --show-origin --show-scope'
 fi
 
 # ghc / glc <repo>: clone into $GHREPOS / $GLREPOS, then cd. TIDINESS only --
