@@ -120,10 +120,8 @@ command -v fzf >/dev/null 2>&1 && eval "$(fzf --zsh)"
 
 # --- PATH, last word ---
 # zinit prepends its OWN polaris/bin from this file, i.e. after .zprofile, and
-# `mise activate --shims` re-prepends the shims. So the order asserted by
-# docs/architecture.md is only true if it is re-asserted here, last. The point
-# is not the empty polaris/bin of today: it is that the last word on PATH must
-# not belong to a third-party clone tracking HEAD.
+# `mise activate --shims` re-prepends the shims. Re-asserted here, last: the
+# last word on PATH must not belong to a third-party clone tracking HEAD.
 _zsh_build_path
 # Defined in $ZDOTDIR/.zshenv, which .zprofile also needs, so it cannot be
 # unset there. Here it can: nothing calls it afterwards. It still reaches

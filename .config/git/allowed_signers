@@ -1,7 +1,6 @@
 # Which keys may sign, and under which names. Maintained by
-# `./run install gitsign`, APPEND ONLY: a valid-before added by hand during a
-# rotation survives every replay. What a principal does and does not decide:
-# ./README.md. How to rotate a key: ../../docs/security.md.
+# `./run install gitsign`, APPEND ONLY. What a principal does and does not
+# decide: ./README.md. How to rotate a key: ../../docs/security.md.
 #
 # The second principal is inert today, and kept deliberately: it records that
 # both identities are mine, and it is the line that would carry a per-forge

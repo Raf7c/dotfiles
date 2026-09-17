@@ -2,6 +2,15 @@
     name = Raphaël Congiusti
     email = 122828688+Raf7c@users.noreply.github.com
 
+[core]
+    pager = delta
+
+[delta]
+    side-by-side = true
+    line-numbers = true
+    # `n` and `N` jump from file to file inside the pager.
+    navigate = true
+
 [column]
     ui = auto
 
@@ -79,15 +88,9 @@
 # --- Per-forge identity ---
 # The email above stays the DEFAULT, and it has to: a repository matching
 # neither condition below must still have an email, or git refuses to commit.
-# GitLab is an override, declared twice on purpose:
-#   gitdir    matches on the PATH, so a `git init` in ~/lab/gitlab is right
-#             from its very first commit, before any remote exists;
-#   hasconfig matches on the REMOTE URL, so a GitLab repo cloned ANYWHERE else
-#             is right too. That one is what makes the ~/lab layout a
-#             convenience rather than a requirement.
-# Together they cover each other. One blind spot remains: a repo outside
-# ~/lab/gitlab with no remote yet. Add the remote before the first commit, or
-# repair with `git commit --amend --reset-author`. See README.md here.
+# GitLab is an override, declared twice on purpose: one condition on the PATH,
+# one on the REMOTE URL. What each one covers, and the blind spot they leave:
+# README.md here.
 # `hasconfig` needs git >= 2.36. The ~/lab path is written out because git
 # expands no variable in a condition: move $REPOS and move this line too.
 [includeIf "gitdir:~/lab/gitlab/"]

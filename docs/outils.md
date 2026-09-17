@@ -18,19 +18,26 @@ Légende : **brew** / **cask** = Brewfile · **mise** = `config.toml` ·
 
 | Outil | Vient de |
 |---|---|
-| git · tmux · zsh · bash · tree · eza · zoxide · fzf · bat · fd · ripgrep · btop · jq · make · cmake · just · lazygit · ansible · ansible-lint | brew |
+| git · tmux · zsh · bash · tree · eza · zoxide · fzf · bat · fd · ripgrep · btop · jq · make · cmake · just · lazygit · yazi · xh · posting · uv · gcc · ansible · ansible-lint | brew |
 | bash-completion | brew `bash-completion@2` |
+| delta | brew `git-delta` |
 | age · sops · age-plugin-yubikey · ykman | brew, voir « Ce qui sert un autre dépôt » |
 | openssh · libfido2 | brew, ils comblent un manque de macOS ([security.md](security.md)) |
 | cloudflared | brew, voir « Ce qui sert un autre dépôt » |
 | ghostty · kitty · Nerd Font JetBrains Mono | cask |
-| jetbrains-toolbox · gitkraken · raycast · keymapp · obsidian · claude (bureau) · firefox · google-chrome | cask |
+| jetbrains-toolbox · gitkraken · bruno · postman · raycast · keymapp · obsidian · claude (bureau) · firefox · google-chrome | cask |
 | podman · docker | brew `podman` + cask `podman-desktop` · cask `docker-desktop` |
 | starship · mise | brew |
 | claude code (le CLI) | **`./run`**, installeur officiel |
 | runtimes et linters épinglés | mise |
 
 `chsh` et `pbcopy` sont intégrés à macOS.
+
+La formule `gcc` ne pose qu'un binaire numéroté, `gcc-16` : elle ne recouvre
+jamais le `gcc` d'Apple. Un alias de shell interactif, dans
+`.config/shell/aliases.sh`, fait pointer `gcc` dessus au clavier. `make` et
+`cc` restent sur clang d'Apple ; un projet qui veut GNU le dit avec
+`CC = gcc-16` dans son Makefile.
 
 <details>
 <summary>Trois précisions qui évitent une erreur</summary>
@@ -63,14 +70,56 @@ ne se voient jamais.
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | cd | sauts par fréquence-récence : `z proj` |
 | [starship](https://starship.rs) | PS1 | une seule config de prompt pour zsh et bash |
 | [btop](https://github.com/aristocratos/btop) | top | vue lisible des ressources |
+| [yazi](https://yazi-rs.github.io) | `ls` et `cd` à la main | explorateur de fichiers en terminal ; thème auto clair/sombre, réglages d'origine pour le reste |
 | [lazygit](https://github.com/jesseduffield/lazygit) | rien | mettre des hunks en index bat `git add -p` |
+| [delta](https://github.com/dandavison/delta) | le pager de git | `git diff`, `git log`, `git show` en deux colonnes, avec numéros de ligne et coloration syntaxique ; suit le fond clair ou sombre du terminal |
 | [jq](https://github.com/jqlang/jq) | rien | du JSON en ligne de commande |
+| [xh](https://github.com/ducaale/xh) | `curl`, à la main | requêtes HTTP écrites à la main : syntaxe lisible, JSON coloré. `curl` reste pour les scripts et les téléchargements |
 | [just](https://github.com/casey/just) | rien | lanceur de commandes nommées, **pas** un remplaçant de make |
+| [uv](https://docs.astral.sh/uv/) | `pip`, `venv` | dépendances, verrous et environnements d'un projet python. **Pas** l'interpréteur : mise le garde |
+| [posting](https://posting.sh) | Postman, Insomnia | client HTTP en TUI, requêtes en YAML versionnables. Complète `xh` : l'un pour une ligne, l'autre pour une collection |
 
 `bat` : config `numbers,changes,header` ; l'aperçu fzf la remplace par
 `plain,numbers`. `just` contre `make` : make construit (C, cibles
 incrémentales), just lance les tâches d'un dépôt sans la cérémonie des
 `.PHONY`.
+
+## Quatre clients HTTP, quatre usages
+
+| Outil | Interface | Les requêtes vivent | Hors ligne |
+|---|---|---|---|
+| `xh` | ligne de commande | nulle part, c'est une ligne | oui |
+| `posting` | TUI | YAML, dans le dépôt du projet | oui |
+| `bruno` | GUI | fichiers `.bru`, dans le dépôt du projet | oui |
+| `postman` | GUI | dans un compte Postman | non |
+
+`xh` ne recouvre rien : il n'a pas de collection. Les trois autres en ont une,
+et ce qui les sépare est **où elle est rangée** — versionnée à côté du code,
+ou dans un compte.
+
+`postman` est là pour les collections qui arrivent dans ce format, pas par
+préférence.
+
+## Les aperçus de yazi
+
+Cinq paquets n'ont pas d'autre client : ils alimentent les aperçus de yazi, et
+chacun couvre un type de fichier.
+
+| Paquet | Ce qu'il permet d'afficher |
+|---|---|
+| `sevenzip` | le contenu d'une archive |
+| `poppler` | un PDF |
+| `resvg` | un SVG |
+| `ffmpeg` | la vignette d'une vidéo |
+| `imagemagick` | polices, HEIC, JPEG XL |
+
+Sans eux yazi fonctionne : il n'affiche simplement rien pour ces types. `jq`,
+`fd`, `ripgrep`, `fzf` et `zoxide`, qu'il utilise aussi, sont déjà là pour leurs
+propres raisons.
+
+Les *flavors* ne sont pas fournis avec le binaire. `package.toml` enregistre
+lesquels, l'étape `plugins` lance `ya pkg install`, et `flavors/` est gitignoré
+— même mécanique que les plugins tmux.
 
 ## Ce qui sert un autre dépôt
 

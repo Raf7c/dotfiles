@@ -1,5 +1,3 @@
-# dotfiles
-
 ![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)
 ![Shell](https://img.shields.io/badge/shell-zsh%20%C2%B7%20bash-1a1a1a?logo=gnubash&logoColor=white)
 ![Install](https://img.shields.io/badge/install-POSIX%20sh%20%C2%B7%20idempotent-2ea44f)
@@ -18,12 +16,12 @@ l'emploi.
 
 ## Prérequis
 
-| | |
-|---|---|
-| OS | **macOS** pour l'installeur ; les configs, elles, sont portables |
-| Outils | `git`, `curl` |
-| Accès | une clé SSH sur GitHub, le clone utilise `git@` |
-| `sudo` | deux étapes, et pas systématiquement |
+|        |                                                                 |
+| ------ | --------------------------------------------------------------- |
+| OS     | **macOS** pour l'installeur ; les configs, elles sont portables |
+| Outils | `git`, `curl`                                                   |
+| Accès  | une clé SSH sur GitHub, le clone utilise `git@`                 |
+| `sudo` | deux étapes, et pas systématiquement                            |
 
 <details>
 <summary>Le détail de ces quatre lignes</summary>
@@ -51,13 +49,13 @@ reste demeure dans `$HOME`.
 
 ## Garanties
 
-| Garantie | Ce que ça veut dire |
-|---|---|
-| Installeur en POSIX sh | idempotent, `--dry-run` fidèle, backups restaurables, codes de sortie honnêtes |
-| `$HOME` propre | tout suit [XDG](https://specifications.freedesktop.org/basedir-spec/latest/), migration des anciens historiques comprise |
-| Aucun root pour le shell | `~/.zshenv` fait tout depuis `$HOME` |
-| Dégradation propre | pas de réseau, pas de git, un outil manquant : le shell démarre quand même |
-| L'outillage fait autorité | shellcheck et shfmt épinglés par le dépôt, imposés par lui |
+| Garantie                  | Ce que ça veut dire                                                                                                      |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Installeur en POSIX sh    | idempotent, `--dry-run` fidèle, backups restaurables, codes de sortie honnêtes                                           |
+| `$HOME` propre            | tout suit [XDG](https://specifications.freedesktop.org/basedir-spec/latest/), migration des anciens historiques comprise |
+| Aucun root pour le shell  | `~/.zshenv` fait tout depuis `$HOME`                                                                                     |
+| Dégradation propre        | pas de réseau, pas de git, un outil manquant : le shell démarre quand même                                               |
+| L'outillage fait autorité | shellcheck et shfmt épinglés par le dépôt, imposés par lui                                                               |
 
 **Non-objectifs** : aucun framework pour l'installeur, aucune installation
 système ou multi-utilisateur, aucun support Linux ou Windows. `./run` refuse
@@ -118,22 +116,37 @@ exec zsh
 
 `./run install` est idempotent. Prévisualiser d'abord : `./run install -n`.
 
+<details>
+<summary>Machine neuve : pourquoi les clés viennent après</summary>
+
+`ssh-keygen -K` est le seul moyen de redériver les clés depuis la YubiKey, et
+celui de macOS ne sait pas parler aux clés FIDO2 : il répond `No FIDO
+SecurityKeyProvider specified`. Celui qui sait vient de Homebrew, que
+`./run install` pose. D'où l'ordre :
+
+1. Le clone et l'installation ci-dessus. Le submodule passe du premier coup,
+   son URL est en `git@`.
+2. Les clés de la YubiKey, puis `./run install gitsign` :
+   [docs/security.md](docs/security.md).
+
+</details>
+
 Ensuite, dans l'ordre :
 
-| Quoi | Où |
-|---|---|
+| Quoi                   | Où                                                                  |
+| ---------------------- | ------------------------------------------------------------------- |
 | changer l'identité git | `.config/git/config`, versionné — [pourquoi](.config/git/README.md) |
-| activer la signature | [docs/security.md](docs/security.md), après l'installation |
+| activer la signature   | [docs/security.md](docs/security.md), après l'installation          |
 
 Sans YubiKey sur cette machine, il n'y a rien à faire : `gitsign` laisse la
 signature désactivée et rien d'autre ne change.
 
 ## Commandes
 
-| Commande | Effet |
-|---|---|
-| `./run install` | tout, jusqu'à prêt. Idempotent |
-| `./run update` | `git pull`, puis resynchronise liens, paquets, runtimes, plugins |
+| Commande        | Effet                                                                |
+| --------------- | -------------------------------------------------------------------- |
+| `./run install` | tout, jusqu'à prêt. Idempotent                                       |
+| `./run update`  | `git pull`, puis resynchronise liens, paquets, runtimes, plugins     |
 | `./run upgrade` | monte les versions : brew, mise, claude code, zinit, TPM, submodules |
 
 Options : `-n`/`--dry-run`, `-y`/`--yes`, `-h`/`--help`.
@@ -152,16 +165,16 @@ Sauter les deux étapes qui demandent sudo :
 
 ## Documentation
 
-| Page | Contenu |
-|---|---|
-| [architecture.md](docs/architecture.md) | chaînes de démarrage, organisation XDG, bootstrap sans root, politique des plugins |
-| [installer.md](docs/installer.md) | comment `run` fonctionne, contrat des étapes, backups |
-| [usage.md](docs/usage.md) | tout ce qu'on tape : mode vi de zsh, fzf, fzf-git, alias |
-| [outils.md](docs/outils.md) | d'où vient chaque outil, pourquoi il est là, ce que mise épingle |
-| [maintenance.md](docs/maintenance.md) | ce que la CI vérifie, et quoi faire quand quelque chose casse |
-| [security.md](docs/security.md) | clés, signature, secrets, privilèges, planchers de version — toute la sécurité, une page |
-| [tmux](.config/tmux/README.md) | tout tmux : raccourcis, thème, plugins (vit avec sa config) |
-| [git](.config/git/README.md) | mécanique de config.local, les deux identités, alias, valeurs par défaut notables |
+| Page                                    | Contenu                                                                                  |
+| --------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [architecture.md](docs/architecture.md) | chaînes de démarrage, organisation XDG, bootstrap sans root, politique des plugins       |
+| [installer.md](docs/installer.md)       | comment `run` fonctionne, contrat des étapes, backups                                    |
+| [usage.md](docs/usage.md)               | tout ce qu'on tape : mode vi de zsh, fzf, fzf-git, alias                                 |
+| [outils.md](docs/outils.md)             | d'où vient chaque outil, pourquoi il est là, ce que mise épingle                         |
+| [maintenance.md](docs/maintenance.md)   | ce que la CI vérifie, et quoi faire quand quelque chose casse                            |
+| [security.md](docs/security.md)         | clés, signature, secrets, privilèges, planchers de version — toute la sécurité, une page |
+| [tmux](.config/tmux/README.md)          | tout tmux : raccourcis, thème, plugins (vit avec sa config)                              |
+| [git](.config/git/README.md)            | mécanique de config.local, les deux identités, alias, valeurs par défaut notables        |
 
 tmux et git sont documentés **à côté de leur config**, parce qu'ils portent une
 mécanique qui ne saute pas aux yeux à la lecture des fichiers. Tout ce qui
