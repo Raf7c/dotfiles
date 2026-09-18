@@ -7,3 +7,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Without this, Dependabot targets the DEFAULT branch, so its bumps would
+    # land on main behind dev's back and main would stop being a fast-forward
+    # of dev. The config itself is only read from the default branch: this line
+    # does nothing until it reaches main.
+    target-branch: dev
