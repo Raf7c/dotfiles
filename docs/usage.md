@@ -52,7 +52,8 @@ machine qui n'a aucun des trois.
 `GITUSER` (GitHub), `GLUSER` (GitLab), `REPOS` (`~/lab`), `GHREPOS`
 (`$REPOS/github`) et `GLREPOS` (`$REPOS/gitlab`) sont posés dans
 `shell/env.sh`, et c'est là qu'elles se changent. Deux variables de nom
-d'utilisateur parce que les deux comptes ne portent pas le même nom. Les
+d'utilisateur, qui portent le même nom aujourd'hui : les garder séparées est ce
+qui permet de renommer un compte sans toucher aux URL de l'autre. Les
 répertoires sont créés par `./run install` (étape directories).
 
 `ghc` et `glc` sont des **raccourcis de rangement, pas une organisation que git
